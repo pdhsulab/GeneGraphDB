@@ -40,3 +40,10 @@ def addclusters():
 @click.argument('cluster2')
 def association(db, cluster1, cluster2):
     pass
+
+# This is Sam's job
+@cli.command(short_help='Find close relatives of query protein seuqences')
+@click.argument('db')
+@click.argument('protein')
+def search(db, protein):
+    pass
