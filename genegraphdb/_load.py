@@ -22,6 +22,7 @@ def load_proteins(protein):
         name_truncate = rec.id[:20]
         if name_truncate in done:
                 continue
+        done.add(name_truncate)
         length = len(str(rec.seq.strip('*')))
         print(name_truncate+","+str(length)+",Protein", file=outfile)
     outfile.close()
