@@ -1,0 +1,13 @@
+Metadata-Version: 2.1
+Name: genegraphdb
+Version: 0.0.0.dev0
+Summary: A command line tool to create and query a gene graph databases.
+Home-page: https://github.com/pdhsulab/GeneGraphDB
+Author: Matt Durrant
+Author-email: mdurrant@berkeley.edu
+License: MIT
+Platform: UNKNOWN
+License-File: LICENSE.txt
+
+UNKNOWN
+
