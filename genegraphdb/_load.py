@@ -11,13 +11,13 @@ from genegraphdb import proteinnode
 from os.path import abspath
 import time
 
-def _single(sample_id, fasta, protein, gff, contigs, google_bucket):
+def _single(sample_id, fasta, protein, gff, contigs, google_bucket, gene_neighbors, distance):
 
     load_proteins(protein)
     recid2contig = load_fasta(fasta, contigs)
     load_contig2sample(sample_id, contigs)
     load_gene_coords(gff, recid2contig)
-    proteinnode.connect_proteins("gene_coords.tmp.csv", 5000, False)
+    proteinnode.connect_proteins("gene_coords.tmp.csv", distance, gene_neighbors)
 
 
 def load_proteins(protein):
@@ -106,7 +106,7 @@ def load_contig2sample(sample_id, contigs):
     outfile.close()
     conn = graphdb.Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
     cmd_make_node = """
-                   CREATE (s:Sample {{sampleID: {id}}})
+                   MERGE (s:Sample {{sampleID: {id}}})
                     """.format(id=str(sample_id))
     cmd_load_edges = """
           LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row 
