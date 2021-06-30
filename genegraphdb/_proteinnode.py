@@ -9,7 +9,7 @@ import os
 from os import remove
 from os.path import abspath
 import time
-from collections import deque
+from collections import deque, ChainMap
 from csv import reader
 
 
@@ -18,10 +18,7 @@ def connect_proteins(coords_csv, max_distance, gene_neighbs = True):
     tic = time.time()
     outfile = open("protein2protein.tmp.csv", "w")
     print("phash,qhash", file=outfile)
-    if gene_neighbs:
-        gene_distance_csv(coords_csv, max_distance, outfile)
-    else:
-        base_distance_csv(coords_csv, max_distance, outfile)
+    create_protein_pair_csv(coords_csv, max_distance, outfile, gene_neighbs)
     outfile.close()
     load_csv()
     toc = time.time()
@@ -29,42 +26,61 @@ def connect_proteins(coords_csv, max_distance, gene_neighbs = True):
     print("Loading protein2protein edges took %f seconds" % (toc - tic))
 
 # saves a temp .csv with all the protein pairs
-def gene_distance_csv(coords_csv, max_distance, outfile):
+def create_protein_pair_csv(coords_csv, max_distance, outfile, gene_neighbs):
     with open(coords_csv, 'r') as f:
         infile = reader(f)
         header = next(infile)
-
-        neigh_queue = deque()
+        gene_neigh_queue, base_neigh_queue = deque(), deque()
         row1 = next(infile)
-        old_phash = row1[0]
-        old_chash = row1[1]
-        old_start_coord = row1[2]  # only initialize this once, even with many contigs per sample
-        print("old_chash is " + str(old_chash))
-        print("old_phash is " + str(old_phash))
-        neigh_queue.appendleft(old_phash)
+        old_phash, old_chash, old_start_coord = row1[0], row1[1], row1[2]
+        if gene_neighbs:
+            gene_neigh_queue.appendleft(old_phash)
+            if header != None:
+                for line in infile:
+                    cur_phash, cur_chash, cur_start_coord = line[0], line[1], line[2]
+                    for old_phash in gene_neigh_queue:
+                        print(cur_phash + "," + old_phash, file=outfile)
+                    gene_neigh_queue = update_gene_neigh_queue(gene_neigh_queue, cur_phash, old_chash,
+                                                      cur_chash, max_distance, cur_start_coord,
+                                                      old_start_coord)
+                    old_start_coord = cur_start_coord
+                    old_chash = cur_chash
+        else:
+            print("yay! bases!")
+            base_neigh_queue.appendleft({"phash": old_phash, "start_coord": old_start_coord})
+            if header != None:
+                for line in infile:
+                    cur_phash, cur_chash, cur_start_coord = line[0], line[1], line[2]
+                    for _dict in base_neigh_queue:
+                        old_phash = _dict["phash"]
+                        print(cur_phash + "," + old_phash, file=outfile)
+                    base_neigh_queue = update_base_neigh_queue(base_neigh_queue, cur_phash, old_chash,
+                                                           cur_chash, max_distance, cur_start_coord,
+                                                           old_start_coord)
+                    old_start_coord = cur_start_coord
+                    old_chash = cur_chash
 
-        if header != None:
-            for line in infile:
-                # FIGURE THIS OUT
-                cur_phash, cur_chash, cur_start_coord = line[0], line[1], line[2]
-                for old_phash in neigh_queue:
-                    print(cur_phash + "," + old_phash, file=outfile)
-                neigh_queue = update_neighb_queue(neigh_queue, cur_phash, old_chash, cur_chash,
-                                                  max_distance, cur_start_coord, old_start_coord)
 
-                old_start_coord = cur_start_coord
-                # old_phash = cur_phash
-                old_chash = cur_chash
-
-def base_distance_csv(coords_csv, max_distance):
-    #TO DO
-    pass
-
-def update_neighb_queue(queue, cur_phash, old_chash, cur_chash, max_distance, new_coord, old_coord):
+def update_gene_neigh_queue(queue, cur_phash, old_chash, cur_chash, max_distance, new_coord,
+                        old_coord):
     if newGene_is_sorted(old_chash, cur_chash, new_coord, old_coord):
         if len(queue) >= max_distance:
             queue.pop()
         queue.appendleft(cur_phash)
+    else:
+        sort_coords_csv()
+    return queue
+
+def update_base_neigh_queue(queue, cur_phash, old_chash, cur_chash, max_distance, new_coord,
+                        old_coord):
+    if newGene_is_sorted(old_chash, cur_chash, new_coord, old_coord):
+        print(queue)
+        try:
+            while int(new_coord) - int(queue[-1]["start_coord"]) > max_distance:
+                queue.pop()
+        except:
+            pass
+        queue.appendleft({"phash": cur_phash, "start_coord": new_coord})
     else:
         sort_coords_csv()
     return queue

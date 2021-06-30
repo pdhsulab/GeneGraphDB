@@ -17,7 +17,7 @@ def _single(sample_id, fasta, protein, gff, contigs, google_bucket):
     recid2contig = load_fasta(fasta, contigs)
     load_contig2sample(sample_id, contigs)
     load_gene_coords(gff, recid2contig)
-    _proteinnode.connect_proteins("gene_coords.tmp.csv", 5)
+    _proteinnode.connect_proteins("gene_coords.tmp.csv", 5000, False)
 
 
 def load_proteins(protein):
