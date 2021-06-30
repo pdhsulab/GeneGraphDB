@@ -200,6 +200,7 @@ def kmerdb():
       USING PERIODIC COMMIT
       LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row
       MATCH (k:Kmer), (p:Protein)
+      WHERE k.kmerId = row.kmer AND p.hashId = row.phash
       MERGE (k)-[r:KMER_OF]->(p
       """.format(csv=abspath(csv_path))
     conn.query(cmd_loadRelations, db = "neo4j")
