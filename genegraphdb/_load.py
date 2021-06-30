@@ -4,8 +4,10 @@ import gzip
 import re
 import sys
 import os
+from genegraphdb import _proteinnode
 from os import remove
 from genegraphdb import graphdb
+from genegraphdb import _proteinnode
 from os.path import abspath
 import time
 
@@ -13,7 +15,9 @@ def _single(sample_id, fasta, protein, gff, contigs, google_bucket):
 
     load_proteins(protein)
     recid2contig = load_fasta(fasta, contigs)
+    load_contig2sample(sample_id, contigs)
     load_gene_coords(gff, recid2contig)
+    _proteinnode.connect_proteins("gene_coords.tmp.csv", 5000, False)
 
 
 def load_proteins(protein):
@@ -50,7 +54,6 @@ def load_proteins(protein):
 def load_fasta(fasta, contigs):
     print("Loading contigs...")
     tic = time.time()
-
     recid2contig = dict()
     with gzip.open(contigs, 'rt') as infile:
         infile.readline()
@@ -67,7 +70,7 @@ def load_fasta(fasta, contigs):
         contig, clength = recid2contig[rec.id]
         name_truncate = contig[:20]
         if name_truncate in done:
-                continue
+            continue
         done.add(name_truncate)
         length = len(str(rec.seq.strip('*')))
         print(name_truncate+","+str(clength), file=outfile)
@@ -75,7 +78,9 @@ def load_fasta(fasta, contigs):
     del done
 
     conn = graphdb.Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
-    cmd = "LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row MERGE (n:Contig {{hashid: row.hashid, length:row.length}})".format(
+    cmd = """LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row
+          MERGE (n:Contig {{hashid: row.hashid, length:row.length}})
+          """.format(
         csv=abspath('contigs.tmp.csv')
     )
     print(cmd)
@@ -87,6 +92,40 @@ def load_fasta(fasta, contigs):
     remove('contigs.tmp.csv')
 
     return recid2contig
+
+def load_contig2sample(sample_id, contigs):
+    print("Loading contig2sample edges...")
+    tic = time.time()
+    outfile = open("contig2sample.tmp.csv", "w")
+    print("chash,sampleid", file=outfile)
+    with gzip.open(contigs, 'rt') as infile:
+        infile.readline()
+        for line in infile:
+            line = line.strip().split('\t')
+            print(line[1][:20]+','+str(sample_id), file=outfile)
+    outfile.close()
+    conn = graphdb.Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
+    cmd_make_node = """
+                   CREATE (s:Sample {{sampleID: {id}}})
+                    """.format(id=str(sample_id))
+    cmd_load_edges = """
+          LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row 
+          MATCH (c:Contig), (s:Sample)
+          WHERE c.hashid = row.chash AND toString(s.sampleID) = toString(row.sampleid)
+          MERGE (c)-[e:contig2sample]->(s)
+          """.format(
+        csv=abspath('contig2sample.tmp.csv')
+    )
+    print(cmd_make_node)
+    conn.query(cmd_make_node, db=DBNAME)
+    print(cmd_load_edges)
+    conn.query(cmd_load_edges, db=DBNAME)
+    conn.close()
+    toc = time.time()
+
+    print("Loading contig2sample edges took %f seconds" % (toc-tic))
+
+    #remove("contig2sample.tmp.csv")
 
 def load_gene_coords(gff, recid2contig):
     print("Loading gene coords...")
