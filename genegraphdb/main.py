@@ -35,7 +35,7 @@ def load():
 @click.option('--fasta', '-f', required=True, help='The nucleotide FASTA file of the genome.', type=click.Path(exists=True))
 @click.option('--protein', '-p', required=True, help='The protein FASTA file.', type=click.Path(exists=True))
 @click.option('--gff', '-g', required=True, help='The GFF file.', type=click.Path(exists=True))
-@click.option('--contigs', '-g', required=True, help='The contigs file.', type=click.Path(exists=True))
+@click.option('--contigs', '-c', required=True, help='The contigs file.', type=click.Path(exists=True))
 @click.option('--google-bucket', '-gb', default=None, help='The Google bucket to store sequences.')
 def single(sample_id, fasta, protein, gff, contigs, google_bucket):
     _load._single(sample_id, fasta, protein, gff, contigs, google_bucket)
