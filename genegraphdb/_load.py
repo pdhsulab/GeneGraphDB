@@ -4,10 +4,10 @@ import gzip
 import re
 import sys
 import os
-from genegraphdb import _proteinnode
+from genegraphdb import proteinnode
 from os import remove
 from genegraphdb import graphdb
-from genegraphdb import _proteinnode
+from genegraphdb import proteinnode
 from os.path import abspath
 import time
 
@@ -17,7 +17,7 @@ def _single(sample_id, fasta, protein, gff, contigs, google_bucket):
     recid2contig = load_fasta(fasta, contigs)
     load_contig2sample(sample_id, contigs)
     load_gene_coords(gff, recid2contig)
-    _proteinnode.connect_proteins("gene_coords.tmp.csv", 5000, False)
+    proteinnode.connect_proteins("gene_coords.tmp.csv", 5000, False)
 
 
 def load_proteins(protein):

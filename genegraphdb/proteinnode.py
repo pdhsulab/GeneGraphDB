@@ -74,7 +74,7 @@ def update_gene_neigh_queue(queue, cur_phash, old_chash, cur_chash, max_distance
 def update_base_neigh_queue(queue, cur_phash, old_chash, cur_chash, max_distance, new_coord,
                         old_coord):
     if newGene_is_sorted(old_chash, cur_chash, new_coord, old_coord):
-        print(queue)
+        #print(queue)
         try:
             while int(new_coord) - int(queue[-1]["start_coord"]) > max_distance:
                 queue.pop()

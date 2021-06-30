@@ -2,6 +2,9 @@ from genegraphdb import *
 from neo4j import GraphDatabase
 import re
 import hashlib
+from os.path import abspath
+from collections import defaultdict
+
 
 class Neo4jConnection:
 
@@ -33,10 +36,12 @@ class Neo4jConnection:
                 session.close()
         return response
 
+
 def showdatabases():
     conn = Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
     return conn.query("SHOW DATABASES")
     conn.close()
+
 
 def hasdb():
     for rec in showdatabases():
@@ -44,18 +49,20 @@ def hasdb():
             return True
     return False
 
+
 def createdb():
     print("Creating database: %s" % DBNAME)
 
     conn = Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
     conn.query("CREATE DATABASE %s" % DBNAME)
     conn.query("CREATE CONSTRAINT uniq_protein_hashid ON (n:Protein) ASSERT n.hashid IS UNIQUE", db=DBNAME)
-    #ENTERPRISE ONLY: conn.query("CREATE CONSTRAINT exist_protein_hashid ON (n:Protein) ASSERT exists(n.hashid)", db=DBNAME)
+    # ENTERPRISE ONLY: conn.query("CREATE CONSTRAINT exist_protein_hashid ON (n:Protein) ASSERT exists(n.hashid)", db=DBNAME)
     conn.query("CREATE CONSTRAINT uniq_contig_hashid ON (n:Contig) ASSERT n.hashid IS UNIQUE", db=DBNAME)
-    #ENTERPRISE ONLY: conn.query("CREATE CONSTRAINT exist_contig_hashid ON (n:Contig) ASSERT exists(n.hashid)", db=DBNAME)
+    # ENTERPRISE ONLY: conn.query("CREATE CONSTRAINT exist_contig_hashid ON (n:Contig) ASSERT exists(n.hashid)", db=DBNAME)
     conn.close()
 
     print("Database created")
+
 
 def num_nodes():
     conn = Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
@@ -63,6 +70,7 @@ def num_nodes():
     conn.close()
 
     return num_nodes
+
 
 def num_rels():
     conn = Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
@@ -73,7 +81,6 @@ def num_rels():
 
 
 def add_node(nodetype, properties=None, conn=None):
-
     close = False
     if conn is None:
         conn = Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
@@ -90,6 +97,7 @@ def add_node(nodetype, properties=None, conn=None):
     if close:
         conn.close()
 
+
 def add_nodes(nodes, conn=None):
     close = False
     if conn is None:
@@ -103,8 +111,8 @@ def add_nodes(nodes, conn=None):
         conn.close()
     pass
 
-def protein_exists(hashid, conn=None):
 
+def protein_exists(hashid, conn=None):
     close = False
     if conn is None:
         conn = Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
@@ -118,13 +126,14 @@ def protein_exists(hashid, conn=None):
 
     return exists
 
-#Takes in string of protein amino acid sequence
+
+# Takes in string of protein amino acid sequence
 def search(protein):
-    start_index = 0                                                                  
+    start_index = 0
     conn = Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
     kmer_size = 7
-    proteinToNum = {}
-    while(start_index + kmer_size <= len(protein)):
+    proteinToNum = defaultdict(int)
+    while (start_index + kmer_size <= len(protein) + 1):
         kmerSeq = protein[start_index:start_index + kmer_size]
         print(kmerSeq)
         cmd = """
@@ -132,19 +141,17 @@ def search(protein):
            WHERE a.kmerId ='{kmerName}'
            RETURN p.hashId
            """.format(kmerName=kmerSeq)
-        matchingProteins = conn.query(cmd, db = "neo4j")
+        matchingProteins = conn.query(cmd, db="neo4j")
         if matchingProteins is not None:
             for p in matchingProteins:
-                if p in proteinToNum:
-                    proteinToNum[p] += 1
-                else:
-                    proteinToNum[p] = 1
+                proteinToNum[p] += 1
         start_index += 1
     print(proteinToNum)
     conn.close()
 
+
 def kmerdb():
-    #Variable
+    # Variable
     csv_path = "kmer_protein_tmp.csv"
     outfile = open(csv_path, "w")
     fileName = "uniref100"
@@ -152,23 +159,25 @@ def kmerdb():
     num_sequences = 0
     MAX_SEQUENCES = 1000
     hash_to_sequence = {}
-    
-    #Add one sequence's kmers to CSV
+
+    # Add one sequence's kmers to CSV
     def addSeqCSV(sequence, hashcode):
         global num_insertions
         start_index = 0
-        while (start_index + kmer_size < len(sequence)):
+        while (start_index + kmer_size < len(sequence) + 1):
             kmer = sequence[start_index:start_index + kmer_size]
             ### Write to CSV
-            print(kmer, hashcode, sep = ",", file = outfile)
+            print(kmer, hashcode, sep=",", file=outfile)
             start_index += 1
             num_insertions += 1
+
+    # Delete this
     with open(fileName) as myFile:
-        print('kmer,phash', file = outfile)
+        print('kmer,phash', file=outfile)
         for seq in myFile:
-            #Calculate hashcode
-            str = seq
-            hashcode = hashlib.sha256(str.encode()).hexdigest()
+            # Calculate hashcode
+            s = seq
+            hashcode = hashlib.sha256(s.strip('*').encode()).hexdigest()
             addSeqCSV(seq, hashcode)
             hash_to_sequence[hashcode] = seq
             if num_sequences >= MAX_SEQUENCES:
@@ -176,36 +185,38 @@ def kmerdb():
             num_sequences += 1
     outfile.close()
 
-    #Neo4j code
+    # Neo4j code
     conn = Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
-    #Clear previous data (used while testing)
+    # Clear previous data (used while testing)
     conn.query("MATCH (a) -[r] -> () DELETE a, r")
     conn.query("MATCH (a) delete a")
-    #Load kmer nodes
+    # Load kmer nodes
     cmd_loadKmers = """
       USING PERIODIC COMMIT
       LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row
       MERGE (k:Kmer {{kmerId: row.kmer}})
       """.format(csv=abspath(csv_path))
-    conn.query(cmd_loadKmers, db = "neo4j")
-    #Load protein nodes
+    conn.query(cmd_loadKmers, db="neo4j")
+    # Load protein nodes
     cmd_loadProteins = """
       USING PERIODIC COMMIT
       LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row
-      MERGE (p:Protein {{hashId: row.phash}})
+      MERGE (p:Protein {{hashId: row.phash, length: row.plen, seq: row.pseq}})
       """.format(csv=abspath(csv_path))
-    conn.query(cmd_loadProteins, db = "neo4j")
-    #Load Relationships
+    conn.query(cmd_loadProteins, db="neo4j")
+    # Load Relationships
     cmd_loadRelations = """
       USING PERIODIC COMMIT
       LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row
+<<<<<<< HEAD
+      MATCH (k:Kmer {{kmerId: row.kmer}}), (p:Protein {{hashId: row.phash}})
+      MERGE (k)-[r:KMER_OF]->(p)
+=======
       MATCH (k:Kmer), (p:Protein)
       WHERE k.kmerId = row.kmer AND p.hashId = row.phash
       MERGE (k)-[r:KMER_OF]->(p
+>>>>>>> 370fbc6215a6998b67cd81421ed2ff95d369b212
       """.format(csv=abspath(csv_path))
-    conn.query(cmd_loadRelations, db = "neo4j")
+    conn.query(cmd_loadRelations, db="neo4j")
 
     conn.close()
-
-
-              
