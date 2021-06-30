@@ -1,6 +1,7 @@
 from genegraphdb import *
 from neo4j import GraphDatabase
 import re
+import hashlib
 
 class Neo4jConnection:
 
@@ -116,3 +117,94 @@ def protein_exists(hashid, conn=None):
         conn.close()
 
     return exists
+
+#Takes in string of protein amino acid sequence
+def search(protein):
+    start_index = 0                                                                  
+    conn = Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
+    kmer_size = 7
+    proteinToNum = {}
+    while(start_index + kmer_size <= len(protein)):
+        kmerSeq = protein[start_index:start_index + kmer_size]
+        print(kmerSeq)
+        cmd = """
+           MATCH (a:Kmer) - [:KMER_OF] ->(p:Protein)
+           WHERE a.kmerId ='{kmerName}'
+           RETURN p.hashId
+           """.format(kmerName=kmerSeq)
+        matchingProteins = conn.query(cmd, db = "neo4j")
+        if matchingProteins is not None:
+            for p in matchingProteins:
+                if p in proteinToNum:
+                    proteinToNum[p] += 1
+                else:
+                    proteinToNum[p] = 1
+        start_index += 1
+    print(proteinToNum)
+    conn.close()
+
+def kmerdb():
+    #Variable
+    csv_path = "kmer_protein_tmp.csv"
+    outfile = open(csv_path, "w")
+    fileName = "uniref100"
+    kmer_size = 7
+    num_sequences = 0
+    MAX_SEQUENCES = 1000
+    hash_to_sequence = {}
+    
+    #Add one sequence's kmers to CSV
+    def addSeqCSV(sequence, hashcode):
+        global num_insertions
+        start_index = 0
+        while (start_index + kmer_size < len(sequence)):
+            kmer = sequence[start_index:start_index + kmer_size]
+            ### Write to CSV
+            print(kmer, hashcode, sep = ",", file = outfile)
+            start_index += 1
+            num_insertions += 1
+    with open(fileName) as myFile:
+        print('kmer,phash', file = outfile)
+        for seq in myFile:
+            #Calculate hashcode
+            str = seq
+            hashcode = hashlib.sha256(str.encode()).hexdigest()
+            addSeqCSV(seq, hashcode)
+            hash_to_sequence[hashcode] = seq
+            if num_sequences >= MAX_SEQUENCES:
+                break
+            num_sequences += 1
+    outfile.close()
+
+    #Neo4j code
+    conn = Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
+    #Clear previous data (used while testing)
+    conn.query("MATCH (a) -[r] -> () DELETE a, r")
+    conn.query("MATCH (a) delete a")
+    #Load kmer nodes
+    cmd_loadKmers = """
+      USING PERIODIC COMMIT
+      LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row
+      MERGE (k:Kmer {{kmerId: row.kmer}})
+      """.format(csv=abspath(csv_path))
+    conn.query(cmd_loadKmers, db = "neo4j")
+    #Load protein nodes
+    cmd_loadProteins = """
+      USING PERIODIC COMMIT
+      LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row
+      MERGE (p:Protein {{hashId: row.phash}})
+      """.format(csv=abspath(csv_path))
+    conn.query(cmd_loadProteins, db = "neo4j")
+    #Load Relationships
+    cmd_loadRelations = """
+      USING PERIODIC COMMIT
+      LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row
+      MATCH (k:Kmer), (p:Protein)
+      MERGE (k)-[r:KMER_OF]->(p
+      """.format(csv=abspath(csv_path))
+    conn.query(cmd_loadRelations, db = "neo4j")
+
+    conn.close()
+
+
+              
