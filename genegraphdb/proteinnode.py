@@ -12,7 +12,6 @@ import time
 from collections import deque, ChainMap
 from csv import reader
 
-
 def connect_proteins(coords_csv, max_distance, gene_neighbs = True):
     print("Loading protein2protein edges...")
     tic = time.time()
@@ -74,12 +73,11 @@ def update_gene_neigh_queue(queue, cur_phash, old_chash, cur_chash, max_distance
 def update_base_neigh_queue(queue, cur_phash, old_chash, cur_chash, max_distance, new_coord,
                         old_coord):
     if newGene_is_sorted(old_chash, cur_chash, new_coord, old_coord):
-        #print(queue)
         try:
             while int(new_coord) - int(queue[-1]["start_coord"]) > max_distance:
                 queue.pop()
-        except:
-            pass
+        except TypeError:
+            print("Type error with gene coordinates")
         queue.appendleft({"phash": cur_phash, "start_coord": new_coord})
     else:
         sort_coords_csv()
@@ -89,8 +87,8 @@ def newGene_is_sorted(old_chash, cur_chash, new_coord, old_coord):
     try:
         #to do- test if this works
         return int(new_coord) > int(old_coord) or old_chash != cur_chash
-    except:
-        print(str(new_coord) + "," + str(old_coord))
+    except TypeError:
+        print("Type error with gene coordinates")
 
 def sort_coords_csv():
     # TO DO: sort gene_coords.tmp.csv

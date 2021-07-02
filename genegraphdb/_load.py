@@ -7,7 +7,6 @@ import os
 from genegraphdb import proteinnode
 from os import remove
 from genegraphdb import graphdb
-from genegraphdb import proteinnode
 from os.path import abspath
 import time
 
