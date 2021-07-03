@@ -9,7 +9,7 @@ import os
 from os import remove
 from os.path import abspath
 import time
-from collections import deque, ChainMap
+from collections import deque
 from csv import reader
 
 def connect_proteins(coords_csv, max_distance, gene_neighbs = True):

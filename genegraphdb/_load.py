@@ -10,9 +10,10 @@ from genegraphdb import graphdb
 from os.path import abspath
 import time
 
-def _single(sample_id, fasta, protein, gff, contigs, google_bucket, gene_neighbors, distance):
+def _single(sample_id, fasta, protein, crispr, gff, contigs, google_bucket, gene_neighbors, distance):
 
     load_proteins(protein)
+    load_CRISPRs(sample_id, crispr)
     recid2contig = load_fasta(fasta, contigs)
     load_contig2sample(sample_id, contigs)
     load_gene_coords(gff, recid2contig)
