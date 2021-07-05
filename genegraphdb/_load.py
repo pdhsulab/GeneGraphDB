@@ -1,22 +1,25 @@
 from genegraphdb import *
+from genegraphdb import graphdb
+from genegraphdb import proteinnode
+from genegraphdb import crisprnode
 from Bio import SeqIO
 import gzip
 import re
 import sys
 import os
-from genegraphdb import proteinnode
 from os import remove
-from genegraphdb import graphdb
 from os.path import abspath
 import time
 
-def _single(sample_id, fasta, protein, crispr, gff, contigs, google_bucket, gene_neighbors, distance):
-
+def _single(sample_id, fasta, protein, protein_gff, crispr_gff, contigs, google_bucket, gene_neighbors, distance):
+    # merge .gffs
+    sorted_gff_name = crisprnode.merge_gff(sample_id)
     load_proteins(protein)
-    load_CRISPRs(sample_id, crispr)
+    crisprnode.load_CRISPRs()
     recid2contig = load_fasta(fasta, contigs)
     load_contig2sample(sample_id, contigs)
-    load_gene_coords(gff, recid2contig)
+    #load_gene_coords(protein_gff, recid2contig)
+    load_gene_coords(sorted_gff_name, recid2contig)
     proteinnode.connect_proteins("gene_coords.tmp.csv", distance, gene_neighbors)
 
 
@@ -130,8 +133,9 @@ def load_contig2sample(sample_id, contigs):
 def load_gene_coords(gff, recid2contig):
     print("Loading gene coords...")
     tic = time.time()
-    outfile = open("gene_coords.tmp.csv", "w")
-    print("phash,chash,start,end,orient", file=outfile)
+    outfile_proteins = open("gene_coords.tmp.csv", "w")
+    outfile_CRISPRs = open("crispr_coords.tmp.csv", "w")
+    print("phash,chash,start,end,orient", file=outfile_proteins)
     with gzip.open(gff, "rt") as infile:
         for line in infile:
             if line.startswith("#"):
@@ -144,7 +148,7 @@ def load_gene_coords(gff, recid2contig):
             phash = line[-1].split("ID=")[-1].split(';')[0][:20]
             chash = recid2contig[line[0]][0][:20]
 
-            print(phash, chash, line[3], line[4], line[6], sep=',', file=outfile)
+            print(phash, chash, line[3], line[4], line[6], sep=',', file=outfile_proteins)
     outfile.close()
 
     conn = graphdb.Neo4jConnection(DBURI, DBUSER, DBPASSWORD)

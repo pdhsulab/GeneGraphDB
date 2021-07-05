@@ -15,7 +15,8 @@ setup(
         'neo4j==4.3.1',
         'pytz==2021.1',
         'biopython==1.79',
-        'numpy==1.21.0'
+        'numpy==1.21.0',
+        'bedtools==2.30.0'
     ],
     zip_safe=False,
     entry_points = {
