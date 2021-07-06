@@ -110,3 +110,17 @@ def load_csv():
     print(cmd_load_edges)
     conn.query(cmd_load_edges, db=DBNAME)
     conn.close()
+
+def load_protein_coords():
+    conn = graphdb.Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
+    cmd = """
+          LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row 
+          MATCH (p:Protein), (c:Contig) 
+          WHERE p.hashid = row.phash AND c.hashid = row.chash 
+          MERGE (p)-[r:GeneCoord {{start: row.start, end: row.end, orient: row.orient}}]->(c)
+          """.format(
+        csv=abspath('gene_coords.tmp.csv')
+    )
+    print(cmd)
+    conn.query(cmd, db=DBNAME)
+    conn.close()

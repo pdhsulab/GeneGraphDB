@@ -22,7 +22,8 @@ def load_CRISPRs():
     #outfile_minced = open("minced_hashed.tmp.gff", "w")
     print("hashid,repeat,repeat_len,array_len,num_spacers", file=outfile_crispr)
     done = set()
-    with open("temp.minced.gff", "rt") as infile:
+    crisprid_to_crhash = dict()
+    with open("temp.minced.gff") as infile:
         for line in infile:
             if line.startswith("#"):
                 continue
@@ -38,6 +39,8 @@ def load_CRISPRs():
                          "," + str(num_spacers)
             crhash = hashlib.sha256(unique_str.encode()).hexdigest()
             name_truncate = crhash[:20]
+            crisprid = re.findall(r"=(.*)", line[8].split(";")[0])[0]
+            crisprid_to_crhash[crisprid] = name_truncate
             unique_str = name_truncate + "," + unique_str
             if unique_str in done:
                 continue
@@ -56,6 +59,7 @@ def load_CRISPRs():
     toc = time.time()
     #remove('CRISPRs.tmp.csv')
     print("Loading CRISPRs took %f seconds" % (toc-tic))
+    return crisprid_to_crhash
 
 def merge_gff(sample_id):
     # parse through minced.gff
@@ -74,3 +78,17 @@ def merge_gff(sample_id):
     # os.system("rm temp.merged.sorted.gff")
     print("finished merging gffs")
     return("temp.merged.sorted.gff")
+
+def load_crispr_coords():
+    conn = graphdb.Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
+    cmd = """
+          LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row 
+          MATCH (cr:CRISPR), (c:Contig) 
+          WHERE cr.hashid = row.crhash AND c.hashid = row.chash 
+          MERGE (cr)-[r:CrisprCoord {{start: row.start, end: row.end}}]->(c)
+          """.format(
+        csv=abspath('crispr_coords.tmp.csv')
+    )
+    print(cmd)
+    conn.query(cmd, db=DBNAME)
+    conn.close()
