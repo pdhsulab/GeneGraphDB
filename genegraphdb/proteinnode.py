@@ -20,9 +20,10 @@ def connect_proteins(coords_csv, max_distance, gene_neighbs = True):
     print("recid,phash,qhash", file=outfile)
     os.system("cat gene_coords.tmp.csv | sed -e '1s/phash/hash/' | cut -d',' -f 1-5 > gene_coords_m.tmp.csv")
     os.system("cat crispr_coords.tmp.csv | awk 'FNR > 1' > tmp.crispr_coords.csv")
-    os.system("cat gene_coords_m.tmp.csv tmp.crispr_coords.csv | sort --field-separator=',' -k1,1 -k4,4n "
-              "> merged_sorted_coords.tmp.csv")
-    os.system("rm gene_coords_m.tmp.csv tmp.crispr_coords.csv")
+    os.system("cat gene_coords_m.tmp.csv tmp.crispr_coords.csv > merged_coords.tmp.csv")
+    os.system("head -n1 merged_coords.tmp.csv > merged_sorted_coords.tmp.csv && tail -n+2 merged_coords.tmp.csv | sort "
+              "--field-separator=',' -k1,1 -k4,4n >> merged_sorted_coords.tmp.csv")
+    os.system("rm gene_coords_m.tmp.csv tmp.crispr_coords.csv merged_coords.tmp.csv")
     merge_sorted_coords_csv = "merged_sorted_coords.tmp.csv"
     create_protein_pair_csv(merge_sorted_coords_csv, max_distance, outfile, gene_neighbs)
     outfile.close()
@@ -48,7 +49,7 @@ def create_protein_pair_csv(coords_csv, max_distance, outfile, gene_neighbs):
                     for old_phash in gene_neigh_queue:
                         print(recid + "," + cur_phash + "," + old_phash, file=outfile)
                     gene_neigh_queue = update_gene_neigh_queue(gene_neigh_queue, cur_phash, old_chash,
-                                                      cur_chash, max_distance, cur_start_coord,
+                                                      cur_chash, 1, cur_start_coord,
                                                       old_start_coord)
                     old_start_coord = cur_start_coord
                     old_chash = cur_chash
@@ -57,7 +58,6 @@ def create_protein_pair_csv(coords_csv, max_distance, outfile, gene_neighbs):
             base_neigh_queue.appendleft({"phash": old_phash, "start_coord": old_start_coord})
             if header != None:
                 for line in infile:
-                    print(line)
                     recid, cur_phash, cur_chash, cur_start_coord = line[0], line[1], line[2], line[3]
                     for _dict in base_neigh_queue:
                         old_phash = _dict["phash"]
@@ -82,7 +82,7 @@ def update_gene_neigh_queue(queue, cur_phash, old_chash, cur_chash, max_distance
 def update_base_neigh_queue(queue, cur_phash, old_chash, cur_chash, max_distance, new_coord,
                         old_coord):
     if newGene_is_sorted(old_chash, cur_chash, new_coord, old_coord):
-        print([old_chash, cur_chash, new_coord, old_coord])
+        # print([old_chash, cur_chash, new_coord, old_coord])
         while len(queue) > 0 and int(new_coord) - int(queue[-1]["start_coord"]) > max_distance:
             queue.pop()
         queue.appendleft({"phash": cur_phash, "start_coord": new_coord})
