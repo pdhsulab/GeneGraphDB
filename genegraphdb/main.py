@@ -34,19 +34,20 @@ def load():
 @click.option('--sample_id', '-s', required=True, help='The nucleotide FASTA file of the genome.')
 @click.option('--fasta', '-f', required=True, help='The nucleotide FASTA file of the genome.', type=click.Path(exists=True))
 @click.option('--protein', '-p', required=True, help='The protein FASTA file.', type=click.Path(exists=True))
-@click.option('--gff', '-g', required=True, help='The GFF file.', type=click.Path(exists=True))
+@click.option('--protein-gff', '-pg', required=True, help='The protein GFF file.', type=click.Path(exists=True))
+@click.option('--crispr-gff', '-crg', required=True, help='The CRISPR array GFF file.', type=click.Path(exists=True))
 @click.option('--contigs', '-c', required=True, help='The contigs file.', type=click.Path(exists=True))
 @click.option('--google-bucket', '-gb', default=None, help='The Google bucket to store sequences.')
 @click.option('--gene-neighbors/--gene-window', default=True, help='Calculate neighbors using number of genes away vs. base pair window.')
 @click.option('--distance', '-d', default=None, type=int, help='The distance in number of neighbors or base pairs')
-def single(sample_id, fasta, protein, gff, contigs, google_bucket, gene_neighbors, distance):
+def single(sample_id, fasta, protein, protein_gff, crispr_gff, contigs, google_bucket, gene_neighbors, distance):
 
     if gene_neighbors and distance is None:
         distance = 3
     elif not gene_neighbors and distance is None:
         distance = 5000
 
-    _load._single(sample_id, fasta, protein, gff, contigs, google_bucket, gene_neighbors, distance)
+    _load._single(sample_id, fasta, protein, protein_gff, crispr_gff, contigs, google_bucket, gene_neighbors, distance)
 
 @load.command(short_help='Load multiple samples into the database.')
 def multi():
