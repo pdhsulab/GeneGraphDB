@@ -51,9 +51,7 @@ def createdb():
     conn = Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
     conn.query("CREATE DATABASE %s" % DBNAME)
     conn.query("CREATE CONSTRAINT uniq_protein_hashid ON (n:Protein) ASSERT n.hashid IS UNIQUE", db=DBNAME)
-    #ENTERPRISE ONLY: conn.query("CREATE CONSTRAINT exist_protein_hashid ON (n:Protein) ASSERT exists(n.hashid)", db=DBNAME)
     conn.query("CREATE CONSTRAINT uniq_contig_hashid ON (n:Contig) ASSERT n.hashid IS UNIQUE", db=DBNAME)
-    #ENTERPRISE ONLY: conn.query("CREATE CONSTRAINT exist_contig_hashid ON (n:Contig) ASSERT exists(n.hashid)", db=DBNAME)
     conn.close()
 
     print("Database created")
