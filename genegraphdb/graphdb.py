@@ -118,14 +118,23 @@ def protein_exists(hashid, conn=None):
 
     return exists
 
+#Generates a set of kmers for the desired protein at the desired kmer size
+def kmerSet(protein, kmer_size):
+    kmer_set = set()
+    start_index = 0
+    while(start_index + kmer_size <= len(protein) + 1):
+        kmerSeq = protein[start_index:start_index + kmer_size]
+        kmer_set.add(kmerSeq)
+
 #Takes in string of protein amino acid sequence
-def search(protein):
-    start_index = 0                                                                  
+def search(protein):                                                                 
     conn = Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
     kmer_size = 7
     proteinToNum = {}
-    while(start_index + kmer_size <= len(protein)):
-        kmerSeq = protein[start_index:start_index + kmer_size]
+    kmer_set = kmerSet(protein, kmer_size)
+
+    #Add all kmers for this protein to the Neo4j database
+    for kmerSeq in kmer_set:
         print(kmerSeq)
         cmd = """
            MATCH (a:Kmer) - [:KMER_OF] ->(p:Protein)
@@ -139,9 +148,15 @@ def search(protein):
                     proteinToNum[p] += 1
                 else:
                     proteinToNum[p] = 1
-        start_index += 1
     print(proteinToNum)
     conn.close()
+
+#Add one sequence's kmers to CSV
+def addSeqCSV(sequence, hashcode, kmer_size, outfile):
+    kmer_set = kmerSet(sequence, kmer_size)
+    for kmer in kmer_set:
+        ### Write to CSV
+        print(kmer, hashcode, sep = ",", file = outfile)
 
 def kmerdb():
     #Variable
@@ -151,26 +166,14 @@ def kmerdb():
     kmer_size = 7
     num_sequences = 0
     MAX_SEQUENCES = 1000
-    hash_to_sequence = {}
     
-    #Add one sequence's kmers to CSV
-    def addSeqCSV(sequence, hashcode):
-        global num_insertions
-        start_index = 0
-        while (start_index + kmer_size < len(sequence)):
-            kmer = sequence[start_index:start_index + kmer_size]
-            ### Write to CSV
-            print(kmer, hashcode, sep = ",", file = outfile)
-            start_index += 1
-            num_insertions += 1
     with open(fileName) as myFile:
         print('kmer,phash', file = outfile)
         for seq in myFile:
             #Calculate hashcode
             str = seq
             hashcode = hashlib.sha256(str.encode()).hexdigest()
-            addSeqCSV(seq, hashcode)
-            hash_to_sequence[hashcode] = seq
+            addSeqCSV(seq, hashcode, kmer_size, outfile)
             if num_sequences >= MAX_SEQUENCES:
                 break
             num_sequences += 1
