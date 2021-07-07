@@ -14,12 +14,11 @@ from collections import deque, ChainMap
 from csv import reader
 from BCBio import GFF
 
-def load_CRISPRs():
+def load_CRISPRs(sample_id):
     # create fasta from minced.gff
     print("Loading CRISPRs...")
     tic = time.time()
     outfile_crispr = open("CRISPRs.tmp.csv", "w")
-    #outfile_minced = open("minced_hashed.tmp.gff", "w")
     print("hashid,repeat,repeat_len,array_len,num_spacers", file=outfile_crispr)
     done = set()
     crisprid_to_crhash = dict()
@@ -57,7 +56,7 @@ def load_CRISPRs():
     conn.query(cmd, db=DBNAME)
     conn.close()
     toc = time.time()
-    #remove('CRISPRs.tmp.csv')
+    os.system('rm CRISPRs.tmp.csv temp.minced.gff')
     print("Loading CRISPRs took %f seconds" % (toc-tic))
     return crisprid_to_crhash
 
@@ -68,20 +67,23 @@ def merge_gff(sample_id):
     # sortBed -i temp.merged.gff > temp.merged.sorted.gff
     print("start merging gffs")
     protein_path = str(sample_id) + ".prodigal.gff"
+    os.system("gunzip -d -c " + protein_path + ".gz > " + protein_path)
     minced_gff_path = str(sample_id) + ".minced.gff"
     os.system("gunzip -d -c " + protein_path + ".gz > " + protein_path)
     os.system("gunzip -d -c " + minced_gff_path + ".gz > " + minced_gff_path)
     os.system("cat " + minced_gff_path + " | grep ID=CRISPR > temp.minced.gff")
     os.system("cat " + protein_path + " temp.minced.gff > temp.merged.gff")
-    os.system("sortBed -i temp.merged.gff > temp.merged.sorted.gff")
-    os.system("rm temp.merged.gff " + protein_path + " " + minced_gff_path)
-    # os.system("rm temp.merged.sorted.gff")
+    return_filename = "merged.sorted.tmp.gff"
+    os.system("sortBed -i temp.merged.gff > " + return_filename)
+    os.system("rm temp.merged.gff " + protein_path)
+    # os.system("rm " + return_filename)
     print("finished merging gffs")
-    return("temp.merged.sorted.gff")
+    return(return_filename)
 
 def load_crispr_coords():
     conn = graphdb.Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
     cmd = """
+          USING PERIODIC COMMIT
           LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row 
           MATCH (cr:CRISPR), (c:Contig) 
           WHERE cr.hashid = row.crhash AND c.hashid = row.chash 

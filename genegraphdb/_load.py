@@ -15,12 +15,13 @@ def _single(sample_id, fasta, protein, protein_gff, crispr_gff, contigs, google_
     # merge .gffs
     sorted_gff_name = crisprnode.merge_gff(sample_id)
     load_proteins(protein)
-    crisprid2crhash = crisprnode.load_CRISPRs()
+    crisprid2crhash = crisprnode.load_CRISPRs(sample_id)
     recid2contig = load_fasta(fasta, contigs)
     load_contig2sample(sample_id, contigs)
     #load_gene_coords(protein_gff, recid2contig)
     load_coords(sorted_gff_name, recid2contig, crisprid2crhash)
     proteinnode.connect_proteins("gene_coords.tmp.csv", distance, gene_neighbors)
+    #connect_crisprs("crispr_coords.tmp.csv", distance, gene_neighbors)
 
 
 def load_proteins(protein):
@@ -134,8 +135,8 @@ def load_coords(gff, recid2contig, crisprid2crhash):
     print("Loading gene and crispr coords...")
     tic = time.time()
     with open("gene_coords.tmp.csv", "w") as g_out, open("crispr_coords.tmp.csv", "w") as cr_out:
-        print("phash,chash,start,end,orient", file=g_out)
-        print("crhash,chash,start,end", file=cr_out)
+        print("recid,phash,chash,start,end,orient", file=g_out)
+        print("recid,crhash,chash,start,end", file=cr_out)
         with open(gff, "rt") as infile:
             for line in infile:
                 if line.startswith("#"):
@@ -147,31 +148,17 @@ def load_coords(gff, recid2contig, crisprid2crhash):
                 if "Prodigal" in line[1]:
                     phash = line[-1].split("ID=")[-1].split(';')[0][:20]
                     chash = recid2contig[line[0]][0][:20]
-                    print(phash, chash, line[3], line[4], line[6], sep=',', file=g_out)
+                    print(line[0], phash, chash, line[3], line[4], line[6], sep=',', file=g_out)
                 elif "minced" in line[1]:
                     old_id = line[-1].split("ID=")[-1].split(';')[0][:20]
                     crhash = crisprid2crhash[old_id]
                     chash = recid2contig[line[0]][0][:20]
-                    print(crhash, chash, line[3], line[4], sep=',', file=cr_out)
+                    print(line[0], crhash, chash, line[3], line[4], sep=',', file=cr_out)
     crisprnode.load_crispr_coords()
     proteinnode.load_protein_coords()
-    #outfile_proteins.close()
-    #outfile_CRISPRs.close()
-
-    # conn = graphdb.Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
-    # cmd = """
-    #       LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row
-    #       MATCH (p:Protein), (c:Contig)
-    #       WHERE p.hashid = row.phash AND c.hashid = row.chash
-    #       MERGE (p)-[r:GeneCoord {{start: row.start, end: row.end, orient: row.orient}}]->(c)
-    #       """.format(
-    #     csv=abspath('gene_coords.tmp.csv')
-    # )
-    # print(cmd)
-    # conn.query(cmd, db=DBNAME)
-    # conn.close()
     toc = time.time()
 
     print("Loading gene and crispr coords took %f seconds" % (toc-tic))
 
     #remove("gene_coords.tmp.csv")
+    #remove("crispr_coords.tmp.csv")
