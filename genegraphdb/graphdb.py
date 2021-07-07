@@ -227,9 +227,8 @@ def kmerdb():
     cmd_loadRelations = """
       USING PERIODIC COMMIT
       LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row
-      MATCH (k:Kmer), (p:Protein)
-      WHERE p.hashId = row.phash AND k.kmerId = row.kmer
-      MERGE (k)-[r:KMER_OF]->(p
+      MATCH (k:Kmer {{kmerId: row.kmer}}), (p:Protein {{hashId: row.phash}})
+      MERGE (k)-[r:KMER_OF]->(p)
       """.format(csv=abspath(csv_path))
     conn.query(cmd_loadRelations, db = "neo4j")
     print('FINISHED LOADING EDGES')
