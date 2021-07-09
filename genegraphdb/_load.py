@@ -11,17 +11,23 @@ from os import remove
 from os.path import abspath
 import time
 
-def _single(sample_id, fasta, protein, protein_gff, crispr_gff, contigs, google_bucket, gene_neighbors, distance):
+#def _single(sample_id, fasta, protein, protein_gff, crispr_gff, contigs, google_bucket, gene_neighbors, distance):
+def _single(sample_id, google_bucket, gene_neighbors, distance):
     # merge .gffs
+    sample_id = str(sample_id)
+    os.chdir(sample_id)
+    fasta, protein, contigs = sample_id + ".fna.gz", sample_id + ".prodigal.faa.gz", sample_id + ".contigs.tsv.gz"
+    tic = time.time()
     sorted_gff_name = crisprnode.merge_gff(sample_id)
     load_proteins(protein)
     crisprid2crhash = crisprnode.load_CRISPRs(sample_id)
     recid2contig = load_fasta(fasta, contigs)
     load_contig2sample(sample_id, contigs)
-    #load_gene_coords(protein_gff, recid2contig)
     load_coords(sorted_gff_name, recid2contig, crisprid2crhash)
-    proteinnode.connect_proteins("gene_coords.tmp.csv", distance, gene_neighbors)
-    #connect_crisprs("crispr_coords.tmp.csv", distance, gene_neighbors)
+    proteinnode.connect_proteins_crisprs("gene_coords.tmp.csv", distance, gene_neighbors)
+    toc = time.time()
+    os.chdir("..")
+    print("Loading the entire database took %f seconds" % (toc-tic))
 
 
 def load_proteins(protein):

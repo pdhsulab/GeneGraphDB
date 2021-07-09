@@ -13,7 +13,7 @@ from collections import deque
 import csv
 from csv import reader
 
-def connect_proteins(coords_csv, max_distance, gene_neighbs = True):
+def connect_proteins_crisprs(coords_csv, max_distance, gene_neighbs = True):
     print("Loading protein2protein edges...")
     tic = time.time()
     outfile = open("protein2protein.tmp.csv", "w")

@@ -19,7 +19,7 @@ def load_CRISPRs(sample_id):
     print("Loading CRISPRs...")
     tic = time.time()
     outfile_crispr = open("CRISPRs.tmp.csv", "w")
-    print("hashid,repeat,repeat_len,array_len,num_spacers", file=outfile_crispr)
+    print("hashid,repeat_len,array_len,num_spacers", file=outfile_crispr)
     done = set()
     crisprid_to_crhash = dict()
     with open("temp.minced.gff") as infile:
@@ -31,16 +31,15 @@ def load_CRISPRs(sample_id):
                 print(len(line))
                 continue
             array_repeat = re.findall(r"=(.*)", line[8].split(";")[3])[0]
+            crhash = hashlib.sha256(array_repeat.encode()).hexdigest()
+            name_truncate = crhash[:20]
             repeat_len = len(array_repeat)
             array_len = abs(int(line[4]) - int(line[3])) + 1
             num_spacers = line[5]
-            unique_str = array_repeat + "," + str(repeat_len) + "," + str(array_len) + \
+            unique_str = name_truncate + "," + str(repeat_len) + "," + str(array_len) + \
                          "," + str(num_spacers)
-            crhash = hashlib.sha256(unique_str.encode()).hexdigest()
-            name_truncate = crhash[:20]
             crisprid = re.findall(r"=(.*)", line[8].split(";")[0])[0]
             crisprid_to_crhash[crisprid] = name_truncate
-            unique_str = name_truncate + "," + unique_str
             if unique_str in done:
                 continue
             done.add(unique_str)  # is this necessary?
@@ -48,7 +47,7 @@ def load_CRISPRs(sample_id):
     outfile_crispr.close()
     del done
     conn = graphdb.Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
-    cmd = "LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row MERGE (n:CRISPR {{hashid: row.hashid, repeat: row.repeat, " \
+    cmd = "LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row MERGE (n:CRISPR {{hashid: row.hashid, " \
           "repeat_len: row.repeat_len, array_len: row.array_len, " \
           "num_spacers: row.num_spacers}})".format(csv=abspath('CRISPRs.tmp.csv')
     )
