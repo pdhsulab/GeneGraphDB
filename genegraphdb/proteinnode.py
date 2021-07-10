@@ -71,34 +71,31 @@ def create_protein_pair_csv(coords_csv, max_distance, outfile, gene_neighbs):
 
 def update_gene_neigh_queue(queue, cur_phash, old_chash, cur_chash, max_distance, new_coord,
                         old_coord):
-    if newGene_is_sorted(old_chash, cur_chash, new_coord, old_coord):
+    if newGene_is_same_contig(old_chash, cur_chash, new_coord, old_coord):
         if len(queue) >= max_distance:
             queue.pop()
         queue.appendleft(cur_phash)
     else:
-        sort_coords_csv()
+        queue = deque()
+        queue.appendleft({"phash": cur_phash, "start_coord": new_coord})
     return queue
 
 def update_base_neigh_queue(queue, cur_phash, old_chash, cur_chash, max_distance, new_coord,
                         old_coord):
-    if newGene_is_sorted(old_chash, cur_chash, new_coord, old_coord):
-        # print([old_chash, cur_chash, new_coord, old_coord])
-        while len(queue) > 0 and int(new_coord) - int(queue[-1]["start_coord"]) > max_distance:
+    if newGene_is_same_contig(old_chash, cur_chash, new_coord, old_coord):
+        while (int(new_coord) - int(queue[-1]["start_coord"])) > max_distance:
             queue.pop()
+            if len(queue) == 0:
+                break
         queue.appendleft({"phash": cur_phash, "start_coord": new_coord})
     else:
-        # to do - this is not an exception - handle cases where moving b/w contigs
-        print([old_chash, cur_chash, new_coord, old_coord])
-        raise Exception("Input gff is not sorted - system bug")
+        queue = deque()
+        queue.appendleft({"phash": cur_phash, "start_coord": new_coord})
     return queue
 
 # still necessary - checks whether pointer is moving to a new contig
-def newGene_is_sorted(old_chash, cur_chash, new_coord, old_coord):
-    try:
-        #to do- test if this works
-        return int(new_coord) > int(old_coord) or old_chash != cur_chash
-    except TypeError:
-        print("Type error with gene coordinates")
+def newGene_is_same_contig(old_chash, cur_chash, new_coord, old_coord):
+        return old_chash == cur_chash
 
 #csv will have two columns - one for donor protein's phash, other for recipient
 def load_csv():

@@ -2,6 +2,7 @@ import click
 from genegraphdb import *
 from genegraphdb import graphdb
 from genegraphdb import _load
+import os
 
 @click.group()
 def cli():
@@ -31,15 +32,16 @@ def load():
     pass
 
 @load.command(short_help='Load a single sample into the database.')
-@click.option('--sample_id', '-s', required=True, help='The id of this genome or metagenomic sample.')
-#@click.option('--fasta', '-f', required=True, help='The nucleotide FASTA file of the genome.', type=click.Path(exists=True))
-#@click.option('--protein', '-p', required=True, help='The protein FASTA file.', type=click.Path(exists=True))
-#@click.option('--protein-gff', '-pg', required=True, help='The protein GFF file.', type=click.Path(exists=True))
-#@click.option('--crispr-gff', '-crg', required=True, help='The CRISPR array GFF file.', type=click.Path(exists=True))
-#@click.option('--contigs', '-c', required=True, help='The contigs file.', type=click.Path(exists=True))
+@click.option('--sample_id', '-s', required=True, type=str, help='The id of this genome or metagenomic sample.')
+# @click.option('--fasta', '-f', required=True, help='The nucleotide FASTA file of the genome.', type=click.Path(exists=True))
+# @click.option('--protein', '-p', required=True, help='The protein FASTA file.', type=click.Path(exists=True))
+# @click.option('--protein-gff', '-pg', required=True, help='The protein GFF file.', type=click.Path(exists=True))
+# @click.option('--crispr-gff', '-crg', required=True, help='The CRISPR array GFF file.', type=click.Path(exists=True))
+# @click.option('--contigs', '-c', required=True, help='The contigs file.', type=click.Path(exists=True))
 @click.option('--google-bucket', '-gb', default=None, help='The Google bucket to store sequences.')
 @click.option('--gene-neighbors/--gene-window', default=True, help='Calculate neighbors using number of genes away vs. base pair window.')
 @click.option('--distance', '-d', default=None, type=int, help='The distance in number of neighbors or base pairs')
+# def single(sample_id, fasta, protein, protein_gff, crispr_gff, contigs, google_bucket, gene_neighbors, distance):
 def single(sample_id, google_bucket, gene_neighbors, distance):
     # to do - comment out first condition?
     if gene_neighbors and distance is None:
@@ -55,8 +57,12 @@ def single(sample_id, google_bucket, gene_neighbors, distance):
 @click.option('--google-bucket', '-gb', default=None, help='The Google bucket to store sequences.')
 @click.option('--gene-neighbors/--gene-window', default=True, help='Calculate neighbors using number of genes away vs. base pair window.')
 @click.option('--distance', '-d', default=None, type=int, help='The distance in number of neighbors or base pairs')
-def multi(samples_path, google_bucket, gene_neighbors, distance):
-    pass
+def multi(samples_id_path, google_bucket, gene_neighbors, distance):
+    os.chdir(samples_id_path)
+    for sample_id in os.listdir(samples_id_path):
+        # to do - debug this, pass in single() function to get same default params
+        _load._single(sample_id, google_bucket, gene_neighbors, distance)
+    os.chdir("../GeneGraphDB")
 
 @cli.command(short_help='Ådd clusters to protein nodes in the database.')
 def addclusters():

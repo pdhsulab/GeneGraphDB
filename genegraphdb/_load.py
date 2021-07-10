@@ -11,10 +11,9 @@ from os import remove
 from os.path import abspath
 import time
 
-#def _single(sample_id, fasta, protein, protein_gff, crispr_gff, contigs, google_bucket, gene_neighbors, distance):
+# def _single(sample_id, fasta, protein, protein_gff, crispr_gff, contigs, google_bucket, gene_neighbors, distance):
 def _single(sample_id, google_bucket, gene_neighbors, distance):
     # merge .gffs
-    sample_id = str(sample_id)
     os.chdir(sample_id)
     fasta, protein, contigs = sample_id + ".fna.gz", sample_id + ".prodigal.faa.gz", sample_id + ".contigs.tsv.gz"
     tic = time.time()
