@@ -11,9 +11,9 @@ from os import remove
 from os.path import abspath
 import time
 
-# def _single(sample_id, fasta, protein, protein_gff, crispr_gff, contigs, google_bucket, gene_neighbors, distance):
-def _single(sample_id, google_bucket, gene_neighbors, distance):
-    # merge .gffs
+def _single(sample_id, google_bucket, gene_neighbors, distance, comment):
+    outfile = open("ggdb_load_stats.csv", "a")
+    print("sample_id,load_time,comment")
     os.chdir(sample_id)
     fasta, protein, contigs = sample_id + ".fna.gz", sample_id + ".prodigal.faa.gz", sample_id + ".contigs.tsv.gz"
     tic = time.time()
@@ -23,10 +23,11 @@ def _single(sample_id, google_bucket, gene_neighbors, distance):
     recid2contig = load_fasta(fasta, contigs)
     load_contig2sample(sample_id, contigs)
     load_coords(sorted_gff_name, recid2contig, crisprid2crhash)
-    proteinnode.connect_proteins_crisprs("gene_coords.tmp.csv", distance, gene_neighbors)
+    proteinnode.connect_proteins_crisprs(distance, gene_neighbors)
     toc = time.time()
     os.chdir("..")
-    print("Loading the entire database took %f seconds" % (toc-tic))
+    print("Loading the entire database took %f seconds" % (toc - tic) + "\n")
+    print(sample_id + "," + str(toc - tic) + "," + comment, file=outfile)
 
 
 def load_proteins(protein):
@@ -115,12 +116,12 @@ def load_contig2sample(sample_id, contigs):
     outfile.close()
     conn = graphdb.Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
     cmd_make_node = """
-                   MERGE (s:Sample {{sampleID: {id}}})
+                   MERGE (s:Sample {{sampleID: "{id}"}})
                     """.format(id=str(sample_id))
     cmd_load_edges = """
           LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row 
           MATCH (c:Contig), (s:Sample)
-          WHERE c.hashid = row.chash AND toString(s.sampleID) = toString(row.sampleid)
+          WHERE c.hashid = row.chash AND s.sampleID = row.sampleid
           MERGE (c)-[e:contig2sample]->(s)
           """.format(
         csv=abspath('contig2sample.tmp.csv')

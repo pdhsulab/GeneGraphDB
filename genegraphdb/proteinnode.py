@@ -13,7 +13,7 @@ from collections import deque
 import csv
 from csv import reader
 
-def connect_proteins_crisprs(coords_csv, max_distance, gene_neighbs = True):
+def connect_proteins_crisprs(max_distance, gene_neighbs = True):
     print("Loading protein2protein edges...")
     tic = time.time()
     outfile = open("protein2protein.tmp.csv", "w")
@@ -77,7 +77,7 @@ def update_gene_neigh_queue(queue, cur_phash, old_chash, cur_chash, max_distance
         queue.appendleft(cur_phash)
     else:
         queue = deque()
-        queue.appendleft({"phash": cur_phash, "start_coord": new_coord})
+        queue.appendleft(cur_phash)
     return queue
 
 def update_base_neigh_queue(queue, cur_phash, old_chash, cur_chash, max_distance, new_coord,
