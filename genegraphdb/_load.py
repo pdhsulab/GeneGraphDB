@@ -27,6 +27,8 @@ def _single(sample_id, google_bucket, gene_neighbors, distance, comment):
     toc = time.time()
     os.chdir("..")
     print("Loading the entire database took %f seconds" % (toc - tic) + "\n")
+    if comment is None:
+        comment = ""
     print(sample_id + "," + str(toc - tic) + "," + comment, file=outfile)
 
 

@@ -98,7 +98,7 @@ def newGene_is_same_contig(old_chash, cur_chash, new_coord, old_coord):
         return old_chash == cur_chash
 
 #csv will have two columns - one for donor protein's phash, other for recipient
-def load_csv():
+def load_csv(csv = 'protein2protein.tmp.csv'):
     conn = graphdb.Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
     cmd_protein2protein_edges = """
               USING PERIODIC COMMIT
@@ -107,7 +107,7 @@ def load_csv():
               WHERE p.hashid = row.phash AND q.hashid = row.qhash
               MERGE (p)-[f:protein2protein]->(q)
               """.format(
-        csv=abspath('protein2protein.tmp.csv')
+        csv=abspath(csv)
     )
     cmd_crispr2protein_edges = """
               USING PERIODIC COMMIT
@@ -117,7 +117,7 @@ def load_csv():
               OR (p.hashid = row.qhash AND c.hashid = row.phash)
               MERGE (p)-[f:protein2crispr]->(c)
               """.format(
-        csv=abspath('protein2protein.tmp.csv')
+        csv=abspath(csv)
     )
     print(cmd_protein2protein_edges)
     conn.query(cmd_protein2protein_edges, db=DBNAME)

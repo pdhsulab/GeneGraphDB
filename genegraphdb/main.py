@@ -38,17 +38,13 @@ def load():
 @click.option('--gene-neighbors/--gene-window', default=True, help='Calculate neighbors using number of genes away vs. base pair window.')
 @click.option('--distance', '-d', default=None, type=int, help='The distance in number of neighbors or base pairs')
 @click.option('--comment', '-c', default=None, type=str, help='Any notes on a particular load script runtime')
-@click.option('--load_indiv/--load_bulk', default=True, help='Load one or multiple samples with a single csv import')
-def single(sample_id, google_bucket, gene_neighbors, distance, comment, load_indiv):
+def single(sample_id, google_bucket, gene_neighbors, distance, comment):
     # to do - comment out first condition?
     if gene_neighbors and distance is None:
         distance = 3
     elif not gene_neighbors and distance is None:
         distance = 5000
-    if load_indiv:
-        _load._single(sample_id, google_bucket, gene_neighbors, distance, comment)
-    else:
-        _loadmulti._single(sample_id, google_bucket, gene_neighbors, distance, comment)
+    _load._single(sample_id, google_bucket, gene_neighbors, distance, comment)
 
 @load.command(short_help='Load multiple samples into the database.')
 @click.option('--samples_id_path', '-s', required=True, help='The path to directory with genome and metagenomic samples.')
@@ -60,6 +56,10 @@ def single(sample_id, google_bucket, gene_neighbors, distance, comment, load_ind
 @click.option('--append_stats/--reset_stats', default=True, help='Reset notes and runtimes of load-script runs')
 def multi(samples_id_path, google_bucket, gene_neighbors, distance, comment, load_indiv, append_stats):
     os.chdir(samples_id_path)
+    if gene_neighbors and distance is None:
+        distance = 3
+    elif not gene_neighbors and distance is None:
+        distance = 5000
     if load_indiv:
         for sample_id in os.listdir(samples_id_path):
             # to do - debug this, pass in single() function to get same default params
@@ -80,8 +80,7 @@ def multi(samples_id_path, google_bucket, gene_neighbors, distance, comment, loa
             except NotADirectoryError:
                 print(sample_id + " is not a directory")
         outfile.close()
-        _loadmulti.bulk_load_protein_crispr_edges()
-
+        _loadmulti.bulk_load_protein_crispr_edges(distance, gene_neighbors)
     os.chdir("../GeneGraphDB")
 
 @cli.command(short_help='Ådd clusters to protein nodes in the database.')
