@@ -154,12 +154,12 @@ def findMinHash(salt_num, kmers):
              min_hash = test_min_hash
     return min_hash
 
+kmer_size = 5
 def kmerdb():
     #Variable
     csv_path = "minhash_gene_tmp.csv"
     outfile = open(csv_path, "w")
     fileName = "uniref100.fasta"
-    kmer_size = 5
     num_sequences = 0
     MAX_SEQUENCES = 1000
 
@@ -169,13 +169,13 @@ def kmerdb():
         for salt_num in range(0, num_min_hash):
             minhash = findMinHash(salt_num, kmers)
             #Writes to CSV
-            print(name, minhash, sep = ",", file = outfile)
+            print(name, minhash, len(sequence), sep = ",", file = outfile)
     
     #Opens and reads UniRef100 database
     tic_csv = time.time()
     print("STARTING CSV WRITING")
     fasta_sequences_uniref = SeqIO.parse(open(fileName), 'fasta')
-    print('name,minhash', file = outfile)
+    print('name,minhash,plen', file = outfile)
     for fasta in fasta_sequences_uniref:
         seq = str(fasta.seq)
         hashcode = hashlib.sha256(seq.strip('*').encode()).hexdigest()
@@ -217,8 +217,8 @@ def kmerdb():
     cmd_loadProteins = """
     USING PERIODIC COMMIT
     LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row
-    WITH DISTINCT row.name as pname
-    MERGE (p:Protein {{name: pname}})
+    WITH DISTINCT row.name as pname, row.plen as plength
+    MERGE (p:Protein {{name: pname, length: plength}})
     """.format(csv=abspath(csv_path))
     conn.query(cmd_loadProteins, db = "neo4j")
     print("FINISHED LOADING PROTEINS")
@@ -248,7 +248,6 @@ def kmerdb():
 #Takes in string of protein amino acid sequence
 def search(protein):                                                                 
     conn = Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
-    kmer_size = 7
     proteinToNum = defaultdict(lambda: 0)
     kmer_set = kmerSet(protein, kmer_size)
 
@@ -256,7 +255,7 @@ def search(protein):
     for salt_num in range(0, num_min_hash):
         min_hash = findMinHash(salt_num, kmer_set)
         cmd = """
-           MATCH (m:Kmer) - [:MINHASH_OF] ->(p:Protein)
+           MATCH (m:Kmer) - [:MINHASH_OF] -> (p:Protein)
            WHERE m.hashID ='{minhash}'
            RETURN p.hashId
            """.format(minhash = min_hash)
