@@ -5,6 +5,7 @@ import re
 import hashlib
 from os.path import abspath
 from collections import defaultdict
+import uuid
 
 class Neo4jConnection:
 
@@ -121,122 +122,151 @@ def protein_exists(hashid, conn=None):
 
     return exists
 
-#Generates a set of kmers for the desired protein at the desired kmer size
-def kmerSet(protein, kmer_size):
+
+
+#Generates a set of kmers for a protein at the designated kmer size
+def kmerSet(sequence, kmer_size):
     kmer_set = set()
     start_index = 0
-    while(start_index + kmer_size <= len(protein) + 1):
-        kmerSeq = protein[start_index:start_index + kmer_size]
+    while(start_index + kmer_size <= len(sequence) + 1):
+        kmerSeq = sequence[start_index : start_index + kmer_size]
         kmer_set.add(kmerSeq)
         start_index += 1
     return kmer_set
 
-#Takes in string of protein amino acid sequence
-def search(protein):                                                                 
-    conn = Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
-    kmer_size = 7
-    proteinToNum = {}
-    kmer_set = kmerSet(protein, kmer_size)
+#Set up minhasing parameters/functions
+hash_size = 25
+num_min_hash = 25
+num_to_salt = {}
+for i in range(0,num_min_hash):
+    num_to_salt[i] = uuid.uuid4().hex
 
-    #Add all kmers for this protein to the Neo4j database
-    for kmerSeq in kmer_set:
-        print(kmerSeq)
-        cmd = """
-           MATCH (a:Kmer) - [:KMER_OF] ->(p:Protein)
-           WHERE a.kmerId ='{kmerName}'
-           RETURN p.hashId
-           """.format(kmerName=kmerSeq)
-        matchingProteins = conn.query(cmd, db = "neo4j")
-        if matchingProteins is not None:
-            for p in matchingProteins:
-                if p in proteinToNum:
-                    proteinToNum[p] += 1
-                else:
-                    proteinToNum[p] = 1
-    print(proteinToNum)
-    conn.close()
+#Calculates hashcode given salt
+def hashWithSalt(salt, kmer):
+    return hashlib.sha256(salt.encode() + kmer.strip('*').encode()).hexdigest()[0:hash_size]
 
-#Add one sequence's kmers to CSV
-def addSeqCSV(sequence, hashcode, kmer_size, outfile):
-    kmer_set = kmerSet(sequence, kmer_size)
-    for kmer in kmer_set:
-        ### Write to CSV
-        print(kmer, hashcode, sep = ",", file = outfile)
+#Minhash of particular hash function for a set of kmers
+def findMinHash(salt_num, kmers):
+    min_hash = ""
+    for kmer in kmers:
+        test_min_hash = hashWithSalt(num_to_salt[salt_num], kmer)
+        if min_hash == "" or test_min_hash < min_hash:
+             min_hash = test_min_hash
+    return min_hash
 
 def kmerdb():
     #Variable
-    csv_path = "kmer_protein_tmp.csv"
+    csv_path = "minhash_gene_tmp.csv"
     outfile = open(csv_path, "w")
-    fileName = "uniref100"
-    kmer_size = 7
+    fileName = "uniref100.fasta"
+    kmer_size = 5
     num_sequences = 0
     MAX_SEQUENCES = 1000
+
+    #Writes protein to minhash pairs (num_min_hash possible pairs per protein)
+    def addSeqCSV(sequence, name):
+        kmers = kmerSet(sequence, kmer_size)
+        for salt_num in range(0, num_min_hash):
+            minhash = findMinHash(salt_num, kmers)
+            #Writes to CSV
+            print(name, minhash, sep = ",", file = outfile)
     
+    #Opens and reads UniRef100 database
     tic_csv = time.time()
-    print('STARTING CSV WRITING')
+    print("STARTING CSV WRITING")
     fasta_sequences_uniref = SeqIO.parse(open(fileName), 'fasta')
-    print('kmer,phash', file = outfile)
+    print('name,minhash', file = outfile)
     for fasta in fasta_sequences_uniref:
         seq = str(fasta.seq)
         hashcode = hashlib.sha256(seq.strip('*').encode()).hexdigest()
-        addSeqCSV(seq, hashcode, kmer_size, outfile)
+        addSeqCSV(seq, hashcode)
         if num_sequences >= MAX_SEQUENCES:
             break
-        if num_sequences%100 == 0:
-            print('FINISHED WITH {0} SEQUENCES'.format(num_sequences))
+        if num_sequences%10000 == 0:
+            print(num_sequences)
         num_sequences += 1
     outfile.close()
-    print('FINISHED WITH CSV')
+    print("FINISHED WITH CSV")
     toc_csv = time.time()
     print("Writing CSV file took %f seconds" % (toc_csv - tic_csv))
 
     #Neo4j code
     conn = Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
-    #Clear previous data (used while testing)
+
+    #Clear previous data 
     conn.query("MATCH (a) -[r] -> () DELETE a, r")
     conn.query("MATCH (a) delete a")
-    #Load kmer nodes
-    tic_kmers = time.time()
-    print("LOADING KMERS")
+
+    #Load minhash nodes with timers
+    tic_minhash = time.time()
+    print("LOADING MINHASHES")
     cmd_loadKmers = """
-      USING PERIODIC COMMIT
-      LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row
-      WITH DISTINCT row.kmer as kmer
-      MERGE (k:Kmer {{kmerId: kmer}})
-      """.format(csv=abspath(csv_path))
+    USING PERIODIC COMMIT
+    LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row
+    WITH DISTINCT row.minhash as minhash
+    MERGE (m:Minhash {{hashID: minhash}})
+    """.format(csv=abspath(csv_path))
     conn.query(cmd_loadKmers, db = "neo4j")
-    print('FINISHED LOADING KMERS')
-    toc_kmers = time.time()
-    print("Loading kmers took %f seconds" % (toc_kmers-tic_kmers))
-    #Load protein nodes
+    print("FINISHED LOADING MINHASHES")
+    toc_minhash = time.time()
+    print("Loading minhashes took %f seconds" % (toc_minhash-tic_minhash))
+
+    #Load protein nodes with timers
     tic_proteins = time.time()
     print('LOADING PROTEINS')
     cmd_loadProteins = """
-      USING PERIODIC COMMIT
-      LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row
-      WITH DISTINCT row.phash as phash
-      MERGE (p:Protein {{hashId: phash}})
-      """.format(csv=abspath(csv_path))
+    USING PERIODIC COMMIT
+    LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row
+    WITH DISTINCT row.name as pname
+    MERGE (p:Protein {{name: pname}})
+    """.format(csv=abspath(csv_path))
     conn.query(cmd_loadProteins, db = "neo4j")
     print("FINISHED LOADING PROTEINS")
     toc_proteins = time.time()
     print("Loading proteins took %f seconds" % (toc_proteins - tic_proteins))
-    #Load Relationships
+
+   #Load relationships with timers
     tic_edges = time.time()
-    print('LOADING EDGES')
+    print("LOADING EDGES")
     cmd_loadRelations = """
-      USING PERIODIC COMMIT
-      LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row
-      MATCH (k:Kmer {{kmerId: row.kmer}}), (p:Protein {{hashId: row.phash}})
-      MERGE (k)-[r:KMER_OF]->(p)
-      """.format(csv=abspath(csv_path))
+    USING PERIODIC COMMIT
+    LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row
+    MATCH (m:Minhash {{hashID: row.minhash}}), (p:Protein {{name: row.name}})
+    MERGE (m)-[r:MINHASH_OF]->(p)
+    """.format(csv=abspath(csv_path))
     conn.query(cmd_loadRelations, db = "neo4j")
     print('FINISHED LOADING EDGES')
     toc_edges = time.time()
     print("Loading edges took %f secondds" % (toc_edges - tic_edges))
-
+    
+    #Total number of nodes in Neo4j database (for testing)
     print(conn.query("MATCH (n) RETURN count(n)"))
+    
+    #Close connection
     conn.close()
+
+#Takes in string of protein amino acid sequence
+def search(protein):                                                                 
+    conn = Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
+    kmer_size = 7
+    proteinToNum = defaultdict(lambda: 0)
+    kmer_set = kmerSet(protein, kmer_size)
+
+    #Add all kmers for this protein to the Neo4j database
+    for salt_num in range(0, num_min_hash):
+        min_hash = findMinHash(salt_num, kmer_set)
+        cmd = """
+           MATCH (m:Kmer) - [:MINHASH_OF] ->(p:Protein)
+           WHERE m.hashID ='{minhash}'
+           RETURN p.hashId
+           """.format(minhash = min_hash)
+        matchingProteins = conn.query(cmd, db = "neo4j")
+        if matchingProteins is not None:
+            for p in matchingProteins:
+                proteinToNum[p] += 1
+    print(proteinToNum)
+    conn.close()
+
 
 
               
