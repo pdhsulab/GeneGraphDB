@@ -1,0 +1,52 @@
+sample_id,load_time,p2p_edge_time,comment
+uvig_35168,0.672600031,0.129808187,load csvs one by one
+5000461,1.503774881,0.485193968,load csvs one by one
+3127621,1.420697927,0.574177027,load csvs one by one
+3458451,1.34299612,0.574337721,load csvs one by one
+4717041,1.580731153,0.753369093,load csvs one by one
+2077561,1.672401905,0.734369755,load csvs one by one
+561291,1.592911005,0.656859875,load csvs one by one
+871321,1.157736063,0.507916927,load csvs one by one
+3640881,1.664447308,0.749967813,load csvs one by one
+2690171,0.958159208,0.371752977,load csvs one by one
+GUT_GENOME138446,0.801457882,0.318866968,load csvs one by one
+,14.36791348,5.856620312,14.36791348
+sample_id,load_time,p2p_edge_time,comment
+uvig_35168,0.513566971,null,load csvs en bulk
+5000461,1.011219978,null,load csvs en bulk
+3127621,0.907654762,null,load csvs en bulk
+3458451,0.759763002,null,load csvs en bulk
+4717041,0.827604771,null,load csvs en bulk
+2077561,0.915421009,null,load csvs en bulk
+561291,0.791301012,null,load csvs en bulk
+871321,0.602701902,null,load csvs en bulk
+3640881,0.850030184,null,load csvs en bulk
+2690171,0.53232193,null,load csvs en bulk
+GUT_GENOME138446,0.558012009,null,load csvs en bulk
+,8.26959753,5.21,13.47959753
+sample_id,load_time,p2p_edge_time,comment
+uvig_35168,0.249542236,0.076597929,load csvs one by one after all data already loaded
+5000461,0.917911053,0.466726303,load csvs one by one after all data already loaded
+3127621,0.971822977,0.451357126,load csvs one by one after all data already loaded
+3458451,0.74041605,0.369152069,load csvs one by one after all data already loaded
+4717041,0.910932064,0.449644089,load csvs one by one after all data already loaded
+2077561,0.932358027,0.480453253,load csvs one by one after all data already loaded
+561291,0.773277283,0.388360023,load csvs one by one after all data already loaded
+871321,0.531244755,0.248380899,load csvs one by one after all data already loaded
+3640881,0.927997112,0.491356134,load csvs one by one after all data already loaded
+2690171,0.458817005,0.215383053,load csvs one by one after all data already loaded
+GUT_GENOME138446,0.399564981,0.187461138,load csvs one by one after all data already loaded
+,7.813883543,3.824872017,7.813883543
+sample_id,load_time,p2p_edge_time,comment
+uvig_35168,0.130001068,null,load csvs en bulk after all edges loaded
+5000461,0.366744041,null,load csvs en bulk after all edges loaded
+3127621,0.38375783,null,load csvs en bulk after all edges loaded
+3458451,0.42217803,null,load csvs en bulk after all edges loaded
+4717041,0.393853188,null,load csvs en bulk after all edges loaded
+2077561,0.420859098,null,load csvs en bulk after all edges loaded
+561291,0.378199577,null,load csvs en bulk after all edges loaded
+871321,0.264367104,null,load csvs en bulk after all edges loaded
+3640881,0.401255846,null,load csvs en bulk after all edges loaded
+2690171,0.234368086,null,load csvs en bulk after all edges loaded
+GUT_GENOME138446,0.191255808,null,load csvs en bulk after all edges loaded
+,3.586839676,2.7,6.286839676

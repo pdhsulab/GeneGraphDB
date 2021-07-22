@@ -13,25 +13,31 @@ from collections import deque
 import csv
 from csv import reader
 
-def connect_proteins_crisprs(max_distance, gene_neighbs = True):
+def connect_proteins_crisprs(sample_id, max_distance, gene_neighbs = True):
+    sample_id_path = sample_id + "/"
     print("Loading protein2protein edges...")
     tic = time.time()
-    outfile = open("protein2protein.tmp.csv", "w")
+    outfile = open(sample_id_path + "protein2protein.tmp.csv", "w")
     print("recid,phash,qhash", file=outfile)
-    os.system("cat gene_coords.tmp.csv | sed -e '1s/phash/hash/' | cut -d',' -f 1-5 > gene_coords_m.tmp.csv")
-    os.system("cat crispr_coords.tmp.csv | awk 'FNR > 1' > tmp.crispr_coords.csv")
-    os.system("cat gene_coords_m.tmp.csv tmp.crispr_coords.csv > merged_coords.tmp.csv")
-    os.system("head -n1 merged_coords.tmp.csv > merged_sorted_coords.tmp.csv && tail -n+2 merged_coords.tmp.csv | sort "
-              "--field-separator=',' -k1,1 -k4,4n >> merged_sorted_coords.tmp.csv")
-    os.system("rm gene_coords_m.tmp.csv tmp.crispr_coords.csv merged_coords.tmp.csv")
-    merge_sorted_coords_csv = "merged_sorted_coords.tmp.csv"
+    os.system("cat " + sample_id_path + "gene_coords.tmp.csv | sed -e '1s/phash/hash/' | cut -d',' -f 1-5 > "
+              + sample_id_path + "gene_coords_m.tmp.csv")
+    os.system("cat " + sample_id_path + "crispr_coords.tmp.csv | awk 'FNR > 1' > " + sample_id_path + "tmp.crispr_coords.csv")
+    os.system("cat " + sample_id_path + "gene_coords_m.tmp.csv " + sample_id_path + "tmp.crispr_coords.csv > "
+              + sample_id_path + "merged_coords.tmp.csv")
+    os.system("head -n1 " + sample_id_path + "merged_coords.tmp.csv > " + sample_id_path +
+              "merged_sorted_coords.tmp.csv && tail -n+2 " + sample_id_path + "merged_coords.tmp.csv | sort "
+              "--field-separator=',' -k1,1 -k4,4n >> " + sample_id_path + "merged_sorted_coords.tmp.csv")
+    os.system("rm " + sample_id_path + "gene_coords_m.tmp.csv " + sample_id_path + "tmp.crispr_coords.csv "
+              + sample_id_path + "merged_coords.tmp.csv")
+    merge_sorted_coords_csv = sample_id_path + "merged_sorted_coords.tmp.csv"
     create_protein_pair_csv(merge_sorted_coords_csv, max_distance, outfile, gene_neighbs)
     outfile.close()
-    load_csv()
+    load_csv(sample_id_path + "protein2protein.tmp.csv")
     toc = time.time()
     # remove("protein2protein.tmp.csv")
     # remove(merge_sorted_coords_csv)
     print("Loading protein2protein edges took %f seconds" % (toc - tic))
+    return toc-tic
 
 # saves a temp .csv with all the protein pairs
 def create_protein_pair_csv(coords_csv, max_distance, outfile, gene_neighbs):
@@ -98,7 +104,7 @@ def newGene_is_same_contig(old_chash, cur_chash, new_coord, old_coord):
         return old_chash == cur_chash
 
 #csv will have two columns - one for donor protein's phash, other for recipient
-def load_csv(csv = 'protein2protein.tmp.csv'):
+def load_csv(csv_path):
     conn = graphdb.Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
     cmd_protein2protein_edges = """
               USING PERIODIC COMMIT
@@ -107,7 +113,7 @@ def load_csv(csv = 'protein2protein.tmp.csv'):
               WHERE p.hashid = row.phash AND q.hashid = row.qhash
               MERGE (p)-[f:protein2protein]->(q)
               """.format(
-        csv=abspath(csv)
+        csv=abspath(csv_path)
     )
     cmd_crispr2protein_edges = """
               USING PERIODIC COMMIT
@@ -117,7 +123,7 @@ def load_csv(csv = 'protein2protein.tmp.csv'):
               OR (p.hashid = row.qhash AND c.hashid = row.phash)
               MERGE (p)-[f:protein2crispr]->(c)
               """.format(
-        csv=abspath(csv)
+        csv=abspath(csv_path)
     )
     print(cmd_protein2protein_edges)
     conn.query(cmd_protein2protein_edges, db=DBNAME)
@@ -125,7 +131,7 @@ def load_csv(csv = 'protein2protein.tmp.csv'):
     conn.query(cmd_crispr2protein_edges, db=DBNAME)
     conn.close()
 
-def load_protein_coords():
+def load_protein_coords(sample_id):
     conn = graphdb.Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
     cmd = """
           USING PERIODIC COMMIT
@@ -134,7 +140,7 @@ def load_protein_coords():
           WHERE p.hashid = row.phash AND c.hashid = row.chash 
           MERGE (p)-[r:GeneCoord {{start: row.start, end: row.end, orient: row.orient}}]->(c)
           """.format(
-        csv=abspath('gene_coords.tmp.csv')
+        csv=abspath(sample_id + '/gene_coords.tmp.csv')
     )
     print(cmd)
     conn.query(cmd, db=DBNAME)

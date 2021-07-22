@@ -60,28 +60,34 @@ def multi(samples_id_path, google_bucket, gene_neighbors, distance, comment, loa
         distance = 3
     elif not gene_neighbors and distance is None:
         distance = 5000
+
+    outfile = open("ggdb_load_stats.csv", "a")
+    print("sample_id,load_time,p2p_edge_time,comment", file=outfile)
+    if not append_stats:
+        outfile.truncate(0)
+        print("sample_id,load_time,p2p_edge_time,comment", file=outfile)
+
     if load_indiv:
-        for sample_id in os.listdir(samples_id_path):
-            # to do - debug this, pass in single() function to get same default params
+        for sample_id in os.listdir():
             try:
-                _load._single(sample_id, google_bucket, gene_neighbors, distance, comment)
+                # to do - implement better way to check if the sample_id is actually a directory
+                os.chdir(sample_id)
+                os.chdir("..")
+                _load._single(sample_id, google_bucket, gene_neighbors, distance, comment, outfile)
             except NotADirectoryError:
                 print(sample_id + " is not a directory")
     if not load_indiv:
-
-        outfile = open("ggdb_load_stats.csv", "a")
-        print("sample_id,load_time,comment", file=outfile)
-        if not append_stats:
-            outfile.truncate(0)
-            print("sample_id,load_time,comment", file=outfile)
-        for sample_id in os.listdir(samples_id_path):
+        for sample_id in os.listdir():
             try:
+                # to do - implement better way to check if the sample_id is actually a directory
+                os.chdir(sample_id)
+                os.chdir("..")
                 _loadmulti._single(sample_id, google_bucket, gene_neighbors, distance, comment, outfile)
             except NotADirectoryError:
                 print(sample_id + " is not a directory")
         outfile.close()
         _loadmulti.bulk_load_protein_crispr_edges(distance, gene_neighbors)
-    os.chdir("../GeneGraphDB")
+    os.chdir("..")
 
 @cli.command(short_help='Ådd clusters to protein nodes in the database.')
 def addclusters():
