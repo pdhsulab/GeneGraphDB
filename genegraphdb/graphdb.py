@@ -143,6 +143,7 @@ for i in range(0,num_min_hash):
 
 #Calculates hashcode given salt
 def hashWithSalt(salt, kmer):
+    #Do this hashlib.pbkdf2_hmac('sha256', b'ACYAGYACYYG', b'1', 1).hex()
     return hashlib.sha256(salt.encode() + kmer.strip('*').encode()).hexdigest()[0:hash_size]
 
 #Minhash of particular hash function for a set of kmers
@@ -182,7 +183,7 @@ def kmerdb():
         addSeqCSV(seq, hashcode)
         if num_sequences >= MAX_SEQUENCES:
             break
-        if num_sequences%10000 == 0:
+        if num_sequences % 10000 == 0:
             print(num_sequences)
         num_sequences += 1
     outfile.close()
