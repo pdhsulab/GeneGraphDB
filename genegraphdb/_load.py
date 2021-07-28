@@ -11,11 +11,8 @@ from os import remove
 from os.path import abspath
 import time
 
-def _single(sample_id, google_bucket, gene_neighbors, distance, comment, outfile):
-    # outfile = open("ggdb_load_stats.csv", "a")
-    # print("sample_id,load_time,p2p_edge_time,comment", file=outfile)
+def _single(sample_id, google_bucket, distance, comment, outfile):
     sample_id_path = sample_id + "/"
-    #os.chdir(sample_id)
     fasta, protein, contigs = sample_id_path + sample_id + ".fna.gz", \
                               sample_id_path + sample_id + ".prodigal.faa.gz", \
                               sample_id_path + sample_id + ".contigs.tsv.gz"
@@ -26,14 +23,12 @@ def _single(sample_id, google_bucket, gene_neighbors, distance, comment, outfile
     recid2contig = load_fasta(sample_id, fasta, contigs)
     load_contig2sample(sample_id, contigs)
     load_coords(sample_id, sorted_gff_name, recid2contig, crisprid2crhash)
-    p2p_edge_load_time = proteinnode.connect_proteins_crisprs(sample_id, distance, gene_neighbors)
+    p2p_edge_load_time = proteinnode.connect_proteins_crisprs(sample_id, distance)
     toc = time.time()
-    #os.chdir("..")
     print("Loading the entire database took %f seconds" % (toc - tic) + "\n")
     if comment is None:
         comment = ""
     print(sample_id + "," + str(toc - tic) + "," + str(p2p_edge_load_time) + "," + comment, file=outfile)
-
 
 def load_proteins(sample_id, protein):
     print("Loading proteins...")

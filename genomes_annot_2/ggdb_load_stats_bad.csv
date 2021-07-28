@@ -1,0 +1,336 @@
+sample_id,load_time,p2p_edge_time,comment
+8942821,0.948352575,null,big batch multi csv load from scratch
+4822461,0.91326189,null,big batch multi csv load from scratch
+8541061,0.805216074,null,big batch multi csv load from scratch
+uvig_392471,0.326163054,null,big batch multi csv load from scratch
+8152841,0.756572247,null,big batch multi csv load from scratch
+GUT_GENOME097007,1.02859807,null,big batch multi csv load from scratch
+679071,1.177092075,null,big batch multi csv load from scratch
+5016561,0.761715889,null,big batch multi csv load from scratch
+7355811,0.730717897,null,big batch multi csv load from scratch
+5906671,0.912050724,null,big batch multi csv load from scratch
+4893211,1.225707054,null,big batch multi csv load from scratch
+6658001,1.369793892,null,big batch multi csv load from scratch
+3379081,0.915349007,null,big batch multi csv load from scratch
+9062911,0.841069937,null,big batch multi csv load from scratch
+1821971,1.020756006,null,big batch multi csv load from scratch
+GUT_GENOME062488,0.841616869,null,big batch multi csv load from scratch
+5955431,0.980443001,null,big batch multi csv load from scratch
+6449081,0.933965921,null,big batch multi csv load from scratch
+GUT_GENOME262550,0.588910818,null,big batch multi csv load from scratch
+2151601,0.939397097,null,big batch multi csv load from scratch
+GUT_GENOME003003,0.598757982,null,big batch multi csv load from scratch
+GUT_GENOME076291,0.819242001,null,big batch multi csv load from scratch
+uvig_121793,0.420221329,null,big batch multi csv load from scratch
+8326308,0.330806732,null,big batch multi csv load from scratch
+GUT_GENOME074338,0.657114267,null,big batch multi csv load from scratch
+785041,0.79052496,null,big batch multi csv load from scratch
+5501991,1.047052145,null,big batch multi csv load from scratch
+GUT_GENOME152374,0.750752926,null,big batch multi csv load from scratch
+GUT_GENOME084945,0.649280071,null,big batch multi csv load from scratch
+8555501,0.738315105,null,big batch multi csv load from scratch
+19389738,0.401996136,null,big batch multi csv load from scratch
+1226081,0.749205112,null,big batch multi csv load from scratch
+4303631,0.876596928,null,big batch multi csv load from scratch
+GUT_GENOME244208,0.77377367,null,big batch multi csv load from scratch
+GUT_GENOME263752,0.728267908,null,big batch multi csv load from scratch
+6325811,0.918917894,null,big batch multi csv load from scratch
+GUT_GENOME112374,0.844632864,null,big batch multi csv load from scratch
+4380891,0.991651773,null,big batch multi csv load from scratch
+3490051,0.719728947,null,big batch multi csv load from scratch
+uvig_295756,0.365451097,null,big batch multi csv load from scratch
+3452321,1.015539885,null,big batch multi csv load from scratch
+GUT_GENOME112124,0.711885929,null,big batch multi csv load from scratch
+GUT_GENOME005275,0.962764025,null,big batch multi csv load from scratch
+9120521,0.652020216,null,big batch multi csv load from scratch
+GUT_GENOME224653,0.71777606,null,big batch multi csv load from scratch
+7218921,1.024993896,null,big batch multi csv load from scratch
+8005061,0.950818062,null,big batch multi csv load from scratch
+403701,0.874686956,null,big batch multi csv load from scratch
+7554201,0.531872034,null,big batch multi csv load from scratch
+7990211,1.700158119,null,big batch multi csv load from scratch
+5638591,0.600491047,null,big batch multi csv load from scratch
+682048,0.74213028,null,big batch multi csv load from scratch
+3645881,0.976511002,null,big batch multi csv load from scratch
+7498961,0.984071255,null,big batch multi csv load from scratch
+3029231,0.931659937,null,big batch multi csv load from scratch
+6499721,1.107834101,null,big batch multi csv load from scratch
+22827888,0.324511051,null,big batch multi csv load from scratch
+8735591,0.972476959,null,big batch multi csv load from scratch
+2158361,1.011765003,null,big batch multi csv load from scratch
+uvig_420711,0.356594801,null,big batch multi csv load from scratch
+7493461,0.609052181,null,big batch multi csv load from scratch
+4690411,0.613350868,null,big batch multi csv load from scratch
+4974421,0.922297001,null,big batch multi csv load from scratch
+3036751,0.935091019,null,big batch multi csv load from scratch
+GUT_GENOME131271,0.692528725,null,big batch multi csv load from scratch
+3081631,0.951054811,null,big batch multi csv load from scratch
+uvig_427545,0.325348854,null,big batch multi csv load from scratch
+7608801,0.987210751,null,big batch multi csv load from scratch
+1226211,0.727481127,null,big batch multi csv load from scratch
+7829281,1.049601793,null,big batch multi csv load from scratch
+9019091,0.985679865,null,big batch multi csv load from scratch
+4237521,0.941631079,null,big batch multi csv load from scratch
+4257091,0.970453978,null,big batch multi csv load from scratch
+8677931,0.896981001,null,big batch multi csv load from scratch
+4187511,0.965137959,null,big batch multi csv load from scratch
+7655378,0.402630091,null,big batch multi csv load from scratch
+11474038,0.403906107,null,big batch multi csv load from scratch
+1660181,0.783610106,null,big batch multi csv load from scratch
+7376611,0.682641029,null,big batch multi csv load from scratch
+4699491,0.92723918,null,big batch multi csv load from scratch
+5985521,0.784297943,null,big batch multi csv load from scratch
+7666951,1.009290695,null,big batch multi csv load from scratch
+,66.90611672,141.240655,
+sample_id,load_time,p2p_edge_time,comment
+8942821,0.741299868,null,big batch multi csv load NOT from scratch
+4822461,0.506265879,null,big batch multi csv load NOT from scratch
+8541061,0.384795189,null,big batch multi csv load NOT from scratch
+uvig_392471,0.148480892,null,big batch multi csv load NOT from scratch
+8152841,0.409703255,null,big batch multi csv load NOT from scratch
+GUT_GENOME097007,0.5269382,null,big batch multi csv load NOT from scratch
+679071,0.64373827,null,big batch multi csv load NOT from scratch
+5016561,0.420147896,null,big batch multi csv load NOT from scratch
+7355811,0.322078943,null,big batch multi csv load NOT from scratch
+5906671,0.611480236,null,big batch multi csv load NOT from scratch
+4893211,0.521317244,null,big batch multi csv load NOT from scratch
+6658001,0.579516888,null,big batch multi csv load NOT from scratch
+3379081,0.539317846,null,big batch multi csv load NOT from scratch
+9062911,0.503930092,null,big batch multi csv load NOT from scratch
+1821971,0.451291084,null,big batch multi csv load NOT from scratch
+GUT_GENOME062488,0.450247049,null,big batch multi csv load NOT from scratch
+5955431,0.516501188,null,big batch multi csv load NOT from scratch
+6449081,0.641537905,null,big batch multi csv load NOT from scratch
+GUT_GENOME262550,0.332188845,null,big batch multi csv load NOT from scratch
+2151601,0.529617071,null,big batch multi csv load NOT from scratch
+GUT_GENOME003003,0.412772179,null,big batch multi csv load NOT from scratch
+GUT_GENOME076291,0.47706008,null,big batch multi csv load NOT from scratch
+uvig_121793,0.161010027,null,big batch multi csv load NOT from scratch
+8326308,0.150658607,null,big batch multi csv load NOT from scratch
+GUT_GENOME074338,0.394556999,null,big batch multi csv load NOT from scratch
+785041,0.388139009,null,big batch multi csv load NOT from scratch
+5501991,0.614562988,null,big batch multi csv load NOT from scratch
+GUT_GENOME152374,0.402245998,null,big batch multi csv load NOT from scratch
+GUT_GENOME084945,0.384707689,null,big batch multi csv load NOT from scratch
+8555501,0.396952152,null,big batch multi csv load NOT from scratch
+19389738,0.161560059,null,big batch multi csv load NOT from scratch
+1226081,0.388484001,null,big batch multi csv load NOT from scratch
+4303631,0.569054127,null,big batch multi csv load NOT from scratch
+GUT_GENOME244208,0.414313078,null,big batch multi csv load NOT from scratch
+GUT_GENOME263752,0.423330069,null,big batch multi csv load NOT from scratch
+6325811,0.64647603,null,big batch multi csv load NOT from scratch
+GUT_GENOME112374,0.488024235,null,big batch multi csv load NOT from scratch
+4380891,0.569736004,null,big batch multi csv load NOT from scratch
+3490051,0.331293106,null,big batch multi csv load NOT from scratch
+uvig_295756,0.152431965,null,big batch multi csv load NOT from scratch
+3452321,0.610230207,null,big batch multi csv load NOT from scratch
+GUT_GENOME112124,0.343170166,null,big batch multi csv load NOT from scratch
+GUT_GENOME005275,0.51292491,null,big batch multi csv load NOT from scratch
+9120521,0.355588913,null,big batch multi csv load NOT from scratch
+GUT_GENOME224653,0.420590878,null,big batch multi csv load NOT from scratch
+7218921,0.48424983,null,big batch multi csv load NOT from scratch
+8005061,0.472596169,null,big batch multi csv load NOT from scratch
+403701,0.617192984,null,big batch multi csv load NOT from scratch
+7554201,0.229848623,null,big batch multi csv load NOT from scratch
+7990211,0.8290627,null,big batch multi csv load NOT from scratch
+5638591,0.30775404,null,big batch multi csv load NOT from scratch
+682048,0.398736715,null,big batch multi csv load NOT from scratch
+3645881,0.504127026,null,big batch multi csv load NOT from scratch
+7498961,0.474185228,null,big batch multi csv load NOT from scratch
+3029231,0.482052088,null,big batch multi csv load NOT from scratch
+6499721,0.595053911,null,big batch multi csv load NOT from scratch
+22827888,0.13653779,null,big batch multi csv load NOT from scratch
+8735591,0.558262825,null,big batch multi csv load NOT from scratch
+2158361,0.523024082,null,big batch multi csv load NOT from scratch
+uvig_420711,0.123137951,null,big batch multi csv load NOT from scratch
+7493461,0.324850082,null,big batch multi csv load NOT from scratch
+4690411,0.22580719,null,big batch multi csv load NOT from scratch
+4974421,0.450358868,null,big batch multi csv load NOT from scratch
+3036751,0.616999149,null,big batch multi csv load NOT from scratch
+GUT_GENOME131271,0.328547001,null,big batch multi csv load NOT from scratch
+3081631,0.514487028,null,big batch multi csv load NOT from scratch
+uvig_427545,0.117564917,null,big batch multi csv load NOT from scratch
+7608801,0.632001877,null,big batch multi csv load NOT from scratch
+1226211,0.317453861,null,big batch multi csv load NOT from scratch
+7829281,0.495212078,null,big batch multi csv load NOT from scratch
+9019091,0.567267179,null,big batch multi csv load NOT from scratch
+4237521,0.600468874,null,big batch multi csv load NOT from scratch
+4257091,0.477524281,null,big batch multi csv load NOT from scratch
+8677931,0.381077051,null,big batch multi csv load NOT from scratch
+4187511,0.516208172,null,big batch multi csv load NOT from scratch
+7655378,0.13021183,null,big batch multi csv load NOT from scratch
+11474038,0.137602091,null,big batch multi csv load NOT from scratch
+1660181,0.384974241,null,big batch multi csv load NOT from scratch
+7376611,0.308928967,null,big batch multi csv load NOT from scratch
+4699491,0.507237911,null,big batch multi csv load NOT from scratch
+5985521,0.337512016,null,big batch multi csv load NOT from scratch
+7666951,0.406747818,null,big batch multi csv load NOT from scratch
+,35.46513176,150.612379,
+sample_id,load_time,p2p_edge_time,comment
+8942821,2.363373995,1.712867737,big batch single csv load from scratch
+4822461,2.578599215,2.160537004,big batch single csv load from scratch
+8541061,1.833212137,1.514212847,big batch single csv load from scratch
+uvig_392471,0.24958086,0.134530067,big batch single csv load from scratch
+8152841,2.557281971,2.177494049,big batch single csv load from scratch
+GUT_GENOME097007,2.51091814,2.015393734,big batch single csv load from scratch
+679071,4.132385015,3.589176893,big batch single csv load from scratch
+5016561,3.1712358,2.664271116,big batch single csv load from scratch
+7355811,1.895081043,1.595071793,big batch single csv load from scratch
+5906671,2.900690079,2.440742731,big batch single csv load from scratch
+4893211,3.211942911,2.665781021,big batch single csv load from scratch
+6658001,4.923023939,4.158179045,big batch single csv load from scratch
+3379081,3.578852892,3.020192146,big batch single csv load from scratch
+9062911,2.402137041,1.984561205,big batch single csv load from scratch
+1821971,2.4331882,2.042991877,big batch single csv load from scratch
+GUT_GENOME062488,2.534892082,2.141355991,big batch single csv load from scratch
+5955431,2.834602118,2.434654951,big batch single csv load from scratch
+6449081,2.932547808,2.475342274,big batch single csv load from scratch
+GUT_GENOME262550,1.200408936,0.961464167,big batch single csv load from scratch
+2151601,2.802458763,2.416308165,big batch single csv load from scratch
+GUT_GENOME003003,1.124825001,0.840246916,big batch single csv load from scratch
+GUT_GENOME076291,1.399801016,1.009145975,big batch single csv load from scratch
+uvig_121793,0.227216005,0.115901947,big batch single csv load from scratch
+8326308,0.215891838,0.098875046,big batch single csv load from scratch
+GUT_GENOME074338,1.398202181,1.088380098,big batch single csv load from scratch
+785041,1.894652128,1.609190226,big batch single csv load from scratch
+5501991,2.97407794,2.533178806,big batch single csv load from scratch
+GUT_GENOME152374,1.438355923,1.116094828,big batch single csv load from scratch
+GUT_GENOME084945,1.36736989,1.084795237,big batch single csv load from scratch
+8555501,1.72456193,1.410582066,big batch single csv load from scratch
+19389738,0.216674805,0.118607044,big batch single csv load from scratch
+1226081,1.783339024,1.49309063,big batch single csv load from scratch
+4303631,2.830836058,2.347528934,big batch single csv load from scratch
+GUT_GENOME244208,1.323830128,1.024276018,big batch single csv load from scratch
+GUT_GENOME263752,1.346081018,0.953101158,big batch single csv load from scratch
+6325811,3.184795141,2.660409927,big batch single csv load from scratch
+GUT_GENOME112374,2.062547922,1.699065924,big batch single csv load from scratch
+4380891,3.503386974,3.072021008,big batch single csv load from scratch
+3490051,1.556810141,1.238656998,big batch single csv load from scratch
+uvig_295756,0.270215988,0.138231039,big batch single csv load from scratch
+3452321,3.329604149,2.806867361,big batch single csv load from scratch
+GUT_GENOME112124,1.68680501,1.390151978,big batch single csv load from scratch
+GUT_GENOME005275,2.912750959,2.451284885,big batch single csv load from scratch
+9120521,1.608989954,1.323648691,big batch single csv load from scratch
+GUT_GENOME224653,1.471659899,1.19877696,big batch single csv load from scratch
+7218921,2.92462492,2.475095272,big batch single csv load from scratch
+8005061,2.648407936,2.156786203,big batch single csv load from scratch
+403701,2.639425039,2.194442034,big batch single csv load from scratch
+7554201,0.637883902,0.458845854,big batch single csv load from scratch
+7990211,6.45950222,5.583939075,big batch single csv load from scratch
+5638591,1.297189713,0.985101938,big batch single csv load from scratch
+682048,1.971371889,1.625459909,big batch single csv load from scratch
+3645881,2.875838041,2.382037163,big batch single csv load from scratch
+7498961,3.012110949,2.565638304,big batch single csv load from scratch
+3029231,3.054141045,2.474320889,big batch single csv load from scratch
+6499721,3.461748838,2.906043053,big batch single csv load from scratch
+22827888,0.267867088,0.149674892,big batch single csv load from scratch
+8735591,3.094366312,2.63259697,big batch single csv load from scratch
+2158361,3.124228239,2.686316967,big batch single csv load from scratch
+uvig_420711,0.184525013,0.08981204,big batch single csv load from scratch
+7493461,1.283167839,1.029832363,big batch single csv load from scratch
+4690411,1.154742002,0.942780972,big batch single csv load from scratch
+4974421,2.748310089,2.376879215,big batch single csv load from scratch
+3036751,2.485232115,2.101012945,big batch single csv load from scratch
+GUT_GENOME131271,1.11068368,0.869383097,big batch single csv load from scratch
+3081631,2.615041018,2.154754162,big batch single csv load from scratch
+uvig_427545,0.218451977,0.118386984,big batch single csv load from scratch
+7608801,3.063573599,2.573774099,big batch single csv load from scratch
+1226211,1.620777845,1.305241108,big batch single csv load from scratch
+7829281,3.30789113,2.819488049,big batch single csv load from scratch
+9019091,3.211863041,2.673576832,big batch single csv load from scratch
+4237521,2.839346886,2.366279125,big batch single csv load from scratch
+4257091,3.225876093,2.639304876,big batch single csv load from scratch
+8677931,2.242937088,1.882715225,big batch single csv load from scratch
+4187511,2.624208212,2.206249952,big batch single csv load from scratch
+7655378,0.273216009,0.167271852,big batch single csv load from scratch
+11474038,0.258133173,0.136863232,big batch single csv load from scratch
+1660181,1.645195723,1.33282423,big batch single csv load from scratch
+7376611,1.380414009,1.078430891,big batch single csv load from scratch
+4699491,2.702846289,2.300455809,big batch single csv load from scratch
+5985521,1.740711927,1.400997162,big batch single csv load from scratch
+7666951,2.915845871,2.469558001,big batch single csv load from scratch
+,178.2213907,147.4394093,
+sample_id,load_time,p2p_edge_time,comment
+8942821,2.174682856,1.630627871,big batch single csv load NOT from scratch
+4822461,2.997825146,2.569293976,big batch single csv load NOT from scratch
+8541061,2.27096796,1.851848841,big batch single csv load NOT from scratch
+uvig_392471,0.240612745,0.07332921,big batch single csv load NOT from scratch
+8152841,1.956828833,1.553336143,big batch single csv load NOT from scratch
+GUT_GENOME097007,2.465239048,2.02956295,big batch single csv load NOT from scratch
+679071,3.188214064,2.671900272,big batch single csv load NOT from scratch
+5016561,1.940122128,1.618876934,big batch single csv load NOT from scratch
+7355811,1.283565044,1.003564119,big batch single csv load NOT from scratch
+5906671,2.832837105,2.394604921,big batch single csv load NOT from scratch
+4893211,2.817315102,2.323150873,big batch single csv load NOT from scratch
+6658001,3.546564102,2.976258993,big batch single csv load NOT from scratch
+3379081,2.916717768,2.415633917,big batch single csv load NOT from scratch
+9062911,2.542415142,2.112596989,big batch single csv load NOT from scratch
+1821971,2.546901941,2.161240101,big batch single csv load NOT from scratch
+GUT_GENOME062488,2.460146904,2.081048965,big batch single csv load NOT from scratch
+5955431,2.809635878,2.397484064,big batch single csv load NOT from scratch
+6449081,3.051637173,2.624855042,big batch single csv load NOT from scratch
+GUT_GENOME262550,1.207167864,0.911539793,big batch single csv load NOT from scratch
+2151601,2.773404837,2.369576931,big batch single csv load NOT from scratch
+GUT_GENOME003003,1.108405113,0.823734999,big batch single csv load NOT from scratch
+GUT_GENOME076291,1.180748224,0.859840155,big batch single csv load NOT from scratch
+uvig_121793,0.145897865,0.048655033,big batch single csv load NOT from scratch
+8326308,0.16087389,0.049978018,big batch single csv load NOT from scratch
+GUT_GENOME074338,1.391232014,1.097237349,big batch single csv load NOT from scratch
+785041,2.004117966,1.65989089,big batch single csv load NOT from scratch
+5501991,3.162036896,2.672714949,big batch single csv load NOT from scratch
+GUT_GENOME152374,1.320246935,0.99161911,big batch single csv load NOT from scratch
+GUT_GENOME084945,1.565858126,1.276671886,big batch single csv load NOT from scratch
+8555501,1.831215858,1.483188152,big batch single csv load NOT from scratch
+19389738,0.179677963,0.080456972,big batch single csv load NOT from scratch
+1226081,2.097724915,1.711342096,big batch single csv load NOT from scratch
+4303631,2.836904049,2.374439955,big batch single csv load NOT from scratch
+GUT_GENOME244208,1.221755028,0.923114061,big batch single csv load NOT from scratch
+GUT_GENOME263752,1.379190922,1.091642141,big batch single csv load NOT from scratch
+6325811,3.128849983,2.694433212,big batch single csv load NOT from scratch
+GUT_GENOME112374,1.97307086,1.647932053,big batch single csv load NOT from scratch
+4380891,3.071416616,2.553201914,big batch single csv load NOT from scratch
+3490051,1.496851921,1.232744932,big batch single csv load NOT from scratch
+uvig_295756,0.20738101,0.092376947,big batch single csv load NOT from scratch
+3452321,3.031093121,2.601374149,big batch single csv load NOT from scratch
+GUT_GENOME112124,1.439675808,1.167305946,big batch single csv load NOT from scratch
+GUT_GENOME005275,3.048808098,2.441390991,big batch single csv load NOT from scratch
+9120521,1.606997967,1.340650082,big batch single csv load NOT from scratch
+GUT_GENOME224653,1.49856019,1.19132185,big batch single csv load NOT from scratch
+7218921,2.718519926,2.273663998,big batch single csv load NOT from scratch
+8005061,2.364707947,1.933075905,big batch single csv load NOT from scratch
+403701,2.616913795,2.228117943,big batch single csv load NOT from scratch
+7554201,0.565764904,0.415988922,big batch single csv load NOT from scratch
+7990211,5.921502352,5.256983995,big batch single csv load NOT from scratch
+5638591,1.080492735,0.825535059,big batch single csv load NOT from scratch
+682048,1.86202693,1.522801161,big batch single csv load NOT from scratch
+3645881,2.760067701,2.309394121,big batch single csv load NOT from scratch
+7498961,2.610780239,2.235496283,big batch single csv load NOT from scratch
+3029231,2.668590069,2.179239273,big batch single csv load NOT from scratch
+6499721,3.043962955,2.531932116,big batch single csv load NOT from scratch
+22827888,0.200905085,0.089941025,big batch single csv load NOT from scratch
+8735591,2.748147011,2.344396114,big batch single csv load NOT from scratch
+2158361,2.816754103,2.422917128,big batch single csv load NOT from scratch
+uvig_420711,0.143039942,0.049773693,big batch single csv load NOT from scratch
+7493461,1.215556145,0.981549025,big batch single csv load NOT from scratch
+4690411,1.018166065,0.817239761,big batch single csv load NOT from scratch
+4974421,2.758186817,2.320266962,big batch single csv load NOT from scratch
+3036751,2.693526983,2.238711834,big batch single csv load NOT from scratch
+GUT_GENOME131271,1.139597893,0.862904072,big batch single csv load NOT from scratch
+3081631,2.699528933,2.216359854,big batch single csv load NOT from scratch
+uvig_427545,0.148926973,0.064736843,big batch single csv load NOT from scratch
+7608801,2.803973198,2.396206141,big batch single csv load NOT from scratch
+1226211,1.430464029,1.173051834,big batch single csv load NOT from scratch
+7829281,3.140147209,2.628046989,big batch single csv load NOT from scratch
+9019091,2.910047054,2.447176218,big batch single csv load NOT from scratch
+4237521,2.587119818,2.134100914,big batch single csv load NOT from scratch
+4257091,2.652067184,2.268290043,big batch single csv load NOT from scratch
+8677931,2.08088541,1.724957943,big batch single csv load NOT from scratch
+4187511,2.528854132,2.141986609,big batch single csv load NOT from scratch
+7655378,0.228328943,0.128559828,big batch single csv load NOT from scratch
+11474038,0.193037033,0.077718019,big batch single csv load NOT from scratch
+1660181,1.688997984,1.367619753,big batch single csv load NOT from scratch
+7376611,1.32232213,1.073791981,big batch single csv load NOT from scratch
+4699491,2.694252968,2.221252918,big batch single csv load NOT from scratch
+5985521,1.612033129,1.280742884,big batch single csv load NOT from scratch
+7666951,2.701675892,2.264898777,big batch single csv load NOT from scratch
+,166.4812646,137.3270147,
