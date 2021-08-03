@@ -39,22 +39,31 @@ def load_CRISPRs(sample_id):
                          "," + str(num_spacers)
             crisprid = re.findall(r"=(.*)", line[8].split(";")[0])[0]
             crisprid_to_crhash[crisprid] = name_truncate
-            if unique_str in done:
+            # if unique_str in done:
+            #     continue
+            # done.add(unique_str)  # is this necessary?
+            if name_truncate in done:
                 continue
-            done.add(unique_str)  # is this necessary?
+            done.add(name_truncate)
             print(unique_str, file=outfile_crispr)
     outfile_crispr.close()
     del done
     conn = graphdb.Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
-    cmd = "LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row MERGE (n:CRISPR {{hashid: row.hashid, " \
-          "repeat_len: row.repeat_len, array_len: row.array_len, " \
-          "num_spacers: row.num_spacers}})".format(csv=abspath(sample_id + '/CRISPRs.tmp.csv')
-    )
+    # to do - make crispr nodes simpler? only include coordinates and pointers to contigs as appropriate
+    # cmd = "LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row MERGE (n:CRISPR {{hashid: row.hashid, " \
+    #       "repeat_len: row.repeat_len, array_len: row.array_len, " \
+    #       "num_spacers: row.num_spacers}})".format(csv=abspath(sample_id + '/CRISPRs.tmp.csv')
+    # )
+    cmd = """
+          LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row
+          MERGE (n:CRISPR {{hashid: row.hashid}})
+          """.format(csv=abspath(sample_id + '/CRISPRs.tmp.csv'))
     print(cmd)
     conn.query(cmd, db=DBNAME)
     conn.close()
     toc = time.time()
-    os.system('rm ' + sample_id + '/CRISPRs.tmp.csv ' + sample_id + '/temp.minced.gff')
+    # to do - uncomment this rm command below
+    # os.system('rm ' + sample_id + '/CRISPRs.tmp.csv ' + sample_id + '/temp.minced.gff')
     print("Loading CRISPRs took %f seconds" % (toc-tic))
     return crisprid_to_crhash
 
@@ -86,7 +95,7 @@ def load_crispr_coords(sample_id):
           USING PERIODIC COMMIT
           LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row 
           MATCH (cr:CRISPR), (c:Contig) 
-          WHERE cr.hashid = row.crhash AND c.hashid = row.chash 
+          WHERE (cr.hashid = row.crhash AND c.hashid = row.chash)
           MERGE (cr)-[r:CrisprCoord {{start: row.start, end: row.end}}]->(c)
           """.format(
         csv=abspath(sample_id_path + 'crispr_coords.tmp.csv')

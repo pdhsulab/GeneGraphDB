@@ -30,7 +30,7 @@ def _single(sample_id, google_bucket, distance, comment, outfile):
         comment = ""
     # print(sample_id + "," + str(toc - tic) + "," + comment)
     print(sample_id + "," + str(toc - tic) + ",null," + comment, file=outfile)
-#229046
+
 def bulk_connect_proteins_crisprs(max_distance):
     # to do - need to create protein2protein csvs from scratch
     print("Loading protein2protein edges...")
