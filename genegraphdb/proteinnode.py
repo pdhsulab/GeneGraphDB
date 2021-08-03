@@ -18,29 +18,50 @@ def connect_proteins_crisprs(sample_id, max_distance):
     sample_id_path = sample_id + "/"
     print("Loading protein2protein edges...")
     tic = time.time()
-    make_merged_coords_csv(sample_id)
-    outfile_prot_pair = open(sample_id_path + "protein2protein.tmp.csv", "w")
-    outfile_prot_crispr_pair = open(sample_id_path + "protein2crispr.tmp.csv", "w")
-    outfile_base_window = open(sample_id_path + "elemen2elemen_window.tmp.csv", "w")
-    print("recid,phash,qhash", file=outfile_prot_pair)
-    print("recid,phash,qhash", file=outfile_prot_crispr_pair)
-    print("recid,phash,qhash", file=outfile_base_window)
-
-    merge_sorted_coords_csv = sample_id_path + "merged_sorted_coords.tmp.csv"
-    # write two distinct functions to create three types of protein edges (3 csvs)
-    create_protein_pair_csv(merge_sorted_coords_csv, outfile_prot_pair, outfile_prot_crispr_pair)
-    create_protein_window_csv(merge_sorted_coords_csv, max_distance, outfile_base_window)
-
-    outfile_prot_pair.close(), outfile_base_window.close(), outfile_prot_crispr_pair.close()
+    # make_merged_coords_csv(sample_id)
+    # outfile_prot_pair = open(sample_id_path + "protein2protein.tmp.csv", "w")
+    # outfile_prot_crispr_pair = open(sample_id_path + "protein2crispr.tmp.csv", "w")
+    # outfile_base_window = open(sample_id_path + "elemen2elemen_window.tmp.csv", "w")
+    # print("recid,phash,qhash", file=outfile_prot_pair)
+    # print("recid,phash,qhash", file=outfile_prot_crispr_pair)
+    # print("recid,phash,qhash", file=outfile_base_window)
+    #
+    # merge_sorted_coords_csv = sample_id_path + "merged_sorted_coords.tmp.csv"
+    # # write two distinct functions to create three types of protein edges (3 csvs)
+    # create_protein_pair_csv(merge_sorted_coords_csv, outfile_prot_pair, outfile_prot_crispr_pair)
+    # create_protein_window_csv(merge_sorted_coords_csv, max_distance, outfile_base_window)
+    #
+    # outfile_prot_pair.close(), outfile_base_window.close(), outfile_prot_crispr_pair.close()
+    create_all_protein_crispr_edge_csv(sample_id, max_distance)
     load_csv(sample_id_path + "protein2protein.tmp.csv",
              sample_id_path + "protein2crispr.tmp.csv",
-             sample_id_path + "elemen2elemen_window.tmp.csv")
+             sample_id_path + "protein2protein_window.tmp.csv",
+             sample_id_path + "protein2crispr_window.tmp.csv")
 
     toc = time.time()
     # remove("protein2protein.tmp.csv")
     # remove(merge_sorted_coords_csv)
     print("Loading protein2protein edges took %f seconds" % (toc - tic))
     return toc-tic
+
+def create_all_protein_crispr_edge_csv(sample_id, max_distance):
+    sample_id_path = sample_id + "/"
+    make_merged_coords_csv(sample_id)
+    outfile_prot_pair = open(sample_id_path + "protein2protein.tmp.csv", "w")
+    outfile_prot_crispr_pair = open(sample_id_path + "protein2crispr.tmp.csv", "w")
+    outfile_p2p_base_window = open(sample_id_path + "protein2protein_window.tmp.csv", "w")
+    outfile_p2c_base_window = open(sample_id_path + "protein2crispr_window.tmp.csv", "w")
+    print("recid,phash,qhash", file=outfile_prot_pair)
+    print("recid,phash,qhash", file=outfile_prot_crispr_pair)
+    print("recid,phash,qhash", file=outfile_p2p_base_window)
+    print("recid,phash,qhash", file=outfile_p2c_base_window)
+
+    merge_sorted_coords_csv = sample_id_path + "merged_sorted_coords.tmp.csv"
+    # write two distinct functions to create three types of protein edges (3 csvs)
+    create_protein_pair_csv(merge_sorted_coords_csv, outfile_prot_pair, outfile_prot_crispr_pair)
+    create_protein_window_csv(merge_sorted_coords_csv, max_distance, outfile_p2p_base_window, outfile_p2c_base_window)
+
+    outfile_prot_pair.close(), outfile_prot_crispr_pair.close(), outfile_p2p_base_window.close(), outfile_p2c_base_window.close()
 
 def make_merged_coords_csv(sample_id):
     sample_id_path = sample_id + "/"
@@ -74,26 +95,33 @@ def create_protein_pair_csv(gene_coords_csv, outfile_prot_pair, outfile_prot_cri
                 old_is_crispr = cur_is_crispr
 
 # create protein-protein edges within a base-defined window
-def create_protein_window_csv(merge_coords_csv, max_distance, outfile):
+def create_protein_window_csv(merge_coords_csv, max_distance, outfile_p2p, outfile_p2c):
     base_neigh_queue = deque()
     with open(merge_coords_csv, 'r') as f:
         # else:
         infile = reader(f)
         header = next(infile)
         row1 = next(infile)
-        recid, old_phash, old_chash, old_start_coord = row1[0], row1[1], row1[2], row1[3]
+        recid, old_phash, old_chash, old_start_coord, old_is_crispr = row1[0], row1[1], row1[2], row1[3], row1[5]
         base_neigh_queue.appendleft({"phash": old_phash, "start_coord": old_start_coord})
         if header is not None:
             for line in infile:
-                recid, cur_phash, cur_chash, cur_start_coord = line[0], line[1], line[2], line[3]
+
+                recid, cur_phash, cur_chash, cur_start_coord, cur_is_crispr = line[0], line[1], line[2], line[3], line[5]
                 for _dict in base_neigh_queue:
                     old_phash = _dict["phash"]
-                    print(recid + "," + cur_phash + "," + old_phash, file=outfile)
+                    if newGene_is_same_contig(old_chash, cur_chash) and is_protein2protein(old_is_crispr, cur_is_crispr):
+                        print(recid + "," + cur_phash + "," + old_phash, file=outfile_p2p)
+                    # to do - keep this condition for crispr to protein? or also want crispr to crispr?
+                    elif newGene_is_same_contig(old_chash, cur_chash) and is_protein2crispr(old_is_crispr, cur_is_crispr) and int(cur_is_crispr):
+                        print(recid + "," + cur_phash + "," + old_phash, file=outfile_p2c)
+
                 base_neigh_queue = update_base_neigh_queue(base_neigh_queue, cur_phash, old_chash,
                                                        cur_chash, max_distance, cur_start_coord,
                                                        old_start_coord)
                 old_start_coord = cur_start_coord
                 old_chash = cur_chash
+                old_is_crispr = cur_is_crispr
 
 def update_base_neigh_queue(queue, cur_phash, old_chash, cur_chash, max_distance, new_coord,
                         old_coord):
@@ -109,10 +137,13 @@ def update_base_neigh_queue(queue, cur_phash, old_chash, cur_chash, max_distance
     return queue
 
 def newGene_is_same_contig(old_chash, cur_chash):
-        return old_chash == cur_chash
+    return old_chash == cur_chash
 
 def is_protein2protein(old_node_is_crispr, cur_node_is_crispr):
     return not (int(old_node_is_crispr) or int(cur_node_is_crispr))
+
+def is_protein2crispr(old_node_is_crispr, cur_node_is_crispr):
+    return (int(old_node_is_crispr) and not int(cur_node_is_crispr)) or (not int(old_node_is_crispr) and int(cur_node_is_crispr))
 
 def load_protein_coords(sample_id):
     conn = graphdb.Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
@@ -130,7 +161,7 @@ def load_protein_coords(sample_id):
     conn.close()
 
 # all input csvs will have two columns - one for donor protein's phash, other for recipient
-def load_csv(csv_path_p2p, csv_path_p2c, csv_path_e2e):
+def load_csv(csv_path_p2p, csv_path_p2c, csv_path_p2p_window, csv_path_p2c_window):
     conn = graphdb.Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
     # create constrain, or "index"
     # conn.query("CREATE CONSTRAINT unique_phashid ON (p:Protein) ASSERT p.hashid IS UNIQUE", db=DBNAME)
@@ -145,57 +176,66 @@ def load_csv(csv_path_p2p, csv_path_p2c, csv_path_e2e):
         csv=abspath(csv_path_p2p)
     )
     # to do - this query can be sped up. test period commit sizes
+    # cmd_protein2crispr_edges = """
+    #           USING PERIODIC COMMIT 10000
+    #           LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row
+    #           MATCH (p:Protein), (c:CRISPR)
+    #           WHERE (p.hashid = row.phash AND c.hashid = row.qhash)
+    #           OR (p.hashid = row.qhash AND c.hashid = row.phash)
+    #           MERGE (p)-[f:protein2crispr]->(c)
+    #           """.format(
+    #     csv=abspath(csv_path_p2c)
+    # )
     cmd_protein2crispr_edges = """
               USING PERIODIC COMMIT 10000
               LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row 
               MATCH (p:Protein), (c:CRISPR)
               WHERE (p.hashid = row.phash AND c.hashid = row.qhash)
-              OR (p.hashid = row.qhash AND c.hashid = row.phash)
               MERGE (p)-[f:protein2crispr]->(c)
               """.format(
         csv=abspath(csv_path_p2c)
     )
     # to do - speed up the next 3 queries + make the edges the same label
     # currently different labels for testing purposes.
-    cmd_elem2elem_p2cedges = """
+    cmd_p2c_window_edges = """
               USING PERIODIC COMMIT 10000
               LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row 
               MATCH (p:Protein), (c:CRISPR)
               WHERE (p.hashid = row.phash AND c.hashid = row.qhash)
               OR (p.hashid = row.qhash AND c.hashid = row.phash)
-              MERGE (p)-[f:elem_in_basewindow_of_p2c]->(c)
+              MERGE (p)-[f:protein2crispr_window]->(c)
               """.format(
-        csv=abspath(csv_path_e2e)
+        csv=abspath(csv_path_p2c_window)
     )
-    cmd_elem2elem_p2pedges = """
+    cmd_p2p_window_edges = """
               USING PERIODIC COMMIT 10000
               LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row 
               MATCH (p:Protein), (q:Protein)
               WHERE (p.hashid = row.phash AND q.hashid = row.qhash)
-              MERGE (p)-[g:elem_in_basewindow_of_p2p]->(q)
+              MERGE (p)-[g:protein2protein_window]->(q)
               """.format(
-        csv=abspath(csv_path_e2e)
+        csv=abspath(csv_path_p2p_window)
     )
-    #to do - do i need this?
-    cmd_elem2elem_c2cedges = """
-              USING PERIODIC COMMIT 10000
-              LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row 
-              MATCH (c:CRISPR), (k:CRISPR)
-              WHERE (c.hashid = row.phash AND k.hashid = row.qhash)
-              MERGE (k)-[h:elem_in_basewindow_of_c2c]->(c)
-              """.format(
-        csv=abspath(csv_path_e2e)
-    )
+    # to do - do i need this?
+    # cmd_elem2elem_c2cedges = """
+    #           USING PERIODIC COMMIT 10000
+    #           LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row
+    #           MATCH (c:CRISPR), (k:CRISPR)
+    #           WHERE (c.hashid = row.phash AND k.hashid = row.qhash)
+    #           MERGE (k)-[h:elem_in_basewindow_of_c2c]->(c)
+    #           """.format(
+    #     csv=abspath(____??)
+    # )
     print(cmd_protein2protein_edges)
     conn.query(cmd_protein2protein_edges, db=DBNAME)
     print(cmd_protein2crispr_edges)
     conn.query(cmd_protein2crispr_edges, db=DBNAME)
 
-    print(cmd_elem2elem_p2cedges)
-    conn.query(cmd_elem2elem_p2cedges, db=DBNAME)
+    print(cmd_p2c_window_edges)
+    conn.query(cmd_p2c_window_edges, db=DBNAME)
 
-    print(cmd_elem2elem_p2pedges)
-    conn.query(cmd_elem2elem_p2pedges, db=DBNAME)
+    print(cmd_p2p_window_edges)
+    conn.query(cmd_p2p_window_edges, db=DBNAME)
 
     # print(cmd_elem2elem_c2cedges)
     # conn.query(cmd_elem2elem_c2cedges, db=DBNAME)
