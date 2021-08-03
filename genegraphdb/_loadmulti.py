@@ -30,7 +30,7 @@ def _single(sample_id, google_bucket, distance, comment, outfile):
         comment = ""
     # print(sample_id + "," + str(toc - tic) + "," + comment)
     print(sample_id + "," + str(toc - tic) + ",null," + comment, file=outfile)
-
+#229046
 def bulk_connect_proteins_crisprs(max_distance):
     # to do - need to create protein2protein csvs from scratch
     print("Loading protein2protein edges...")
@@ -42,19 +42,6 @@ def bulk_connect_proteins_crisprs(max_distance):
             os.chdir(sample_id)
             os.chdir("..")
             sample_id_path = sample_id + "/"
-            # proteinnode.make_merged_coords_csv(sample_id)
-            # outfile_prot_pair = open(sample_id_path + "protein2protein.tmp.csv", "w")
-            # outfile_base_window = open(sample_id_path + "elemen2elemen_window.tmp.csv", "w")
-            # outfile_prot_crispr_pair = open(sample_id_path + "protein2crispr.tmp.csv", "w")
-            # print("recid,phash,qhash", file=outfile_prot_pair)
-            # print("recid,phash,qhash", file=outfile_base_window)
-            # print("recid,phash,qhash", file=outfile_prot_crispr_pair)
-            #
-            # merge_sorted_coords_csv = sample_id_path + "merged_sorted_coords.tmp.csv"
-            # # write two distinct functions to create three types of protein edges (3 csvs)
-            # proteinnode.create_protein_pair_csv(merge_sorted_coords_csv, outfile_prot_pair, outfile_prot_crispr_pair)
-            # proteinnode.create_protein_window_csv(merge_sorted_coords_csv, max_distance, outfile_base_window)
-            # outfile_prot_pair.close(), outfile_base_window.close(), outfile_prot_crispr_pair.close()
             proteinnode.create_all_protein_crispr_edge_csv(sample_id, max_distance)
 
             p2pcsv_paths.append(sample_id_path + "protein2protein.tmp.csv")

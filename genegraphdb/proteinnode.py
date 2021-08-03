@@ -18,20 +18,6 @@ def connect_proteins_crisprs(sample_id, max_distance):
     sample_id_path = sample_id + "/"
     print("Loading protein2protein edges...")
     tic = time.time()
-    # make_merged_coords_csv(sample_id)
-    # outfile_prot_pair = open(sample_id_path + "protein2protein.tmp.csv", "w")
-    # outfile_prot_crispr_pair = open(sample_id_path + "protein2crispr.tmp.csv", "w")
-    # outfile_base_window = open(sample_id_path + "elemen2elemen_window.tmp.csv", "w")
-    # print("recid,phash,qhash", file=outfile_prot_pair)
-    # print("recid,phash,qhash", file=outfile_prot_crispr_pair)
-    # print("recid,phash,qhash", file=outfile_base_window)
-    #
-    # merge_sorted_coords_csv = sample_id_path + "merged_sorted_coords.tmp.csv"
-    # # write two distinct functions to create three types of protein edges (3 csvs)
-    # create_protein_pair_csv(merge_sorted_coords_csv, outfile_prot_pair, outfile_prot_crispr_pair)
-    # create_protein_window_csv(merge_sorted_coords_csv, max_distance, outfile_base_window)
-    #
-    # outfile_prot_pair.close(), outfile_base_window.close(), outfile_prot_crispr_pair.close()
     create_all_protein_crispr_edge_csv(sample_id, max_distance)
     load_csv(sample_id_path + "protein2protein.tmp.csv",
              sample_id_path + "protein2crispr.tmp.csv",
@@ -175,27 +161,17 @@ def load_csv(csv_path_p2p, csv_path_p2c, csv_path_p2p_window, csv_path_p2c_windo
               """.format(
         csv=abspath(csv_path_p2p)
     )
-    # to do - this query can be sped up. test period commit sizes
-    # cmd_protein2crispr_edges = """
-    #           USING PERIODIC COMMIT 10000
-    #           LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row
-    #           MATCH (p:Protein), (c:CRISPR)
-    #           WHERE (p.hashid = row.phash AND c.hashid = row.qhash)
-    #           OR (p.hashid = row.qhash AND c.hashid = row.phash)
-    #           MERGE (p)-[f:protein2crispr]->(c)
-    #           """.format(
-    #     csv=abspath(csv_path_p2c)
-    # )
     cmd_protein2crispr_edges = """
               USING PERIODIC COMMIT 10000
               LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row 
               MATCH (p:Protein), (c:CRISPR)
               WHERE (p.hashid = row.phash AND c.hashid = row.qhash)
+              OR (p.hashid = row.qhash AND c.hashid = row.phash)
               MERGE (p)-[f:protein2crispr]->(c)
               """.format(
         csv=abspath(csv_path_p2c)
     )
-    # to do - speed up the next 3 queries + make the edges the same label
+    # to do - speed up the next 2 queries + make the edges the same label
     # currently different labels for testing purposes.
     cmd_p2c_window_edges = """
               USING PERIODIC COMMIT 10000
@@ -216,29 +192,15 @@ def load_csv(csv_path_p2p, csv_path_p2c, csv_path_p2p_window, csv_path_p2c_windo
               """.format(
         csv=abspath(csv_path_p2p_window)
     )
-    # to do - do i need this?
-    # cmd_elem2elem_c2cedges = """
-    #           USING PERIODIC COMMIT 10000
-    #           LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row
-    #           MATCH (c:CRISPR), (k:CRISPR)
-    #           WHERE (c.hashid = row.phash AND k.hashid = row.qhash)
-    #           MERGE (k)-[h:elem_in_basewindow_of_c2c]->(c)
-    #           """.format(
-    #     csv=abspath(____??)
-    # )
+
     print(cmd_protein2protein_edges)
     conn.query(cmd_protein2protein_edges, db=DBNAME)
     print(cmd_protein2crispr_edges)
     conn.query(cmd_protein2crispr_edges, db=DBNAME)
-
     print(cmd_p2c_window_edges)
     conn.query(cmd_p2c_window_edges, db=DBNAME)
-
     print(cmd_p2p_window_edges)
     conn.query(cmd_p2p_window_edges, db=DBNAME)
-
-    # print(cmd_elem2elem_c2cedges)
-    # conn.query(cmd_elem2elem_c2cedges, db=DBNAME)
     conn.close()
 
 
