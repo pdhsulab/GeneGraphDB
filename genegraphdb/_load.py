@@ -11,23 +11,29 @@ from os import remove
 from os.path import abspath
 import time
 
-def _single(sample_id, fasta, protein, protein_gff, crispr_gff, contigs, google_bucket, gene_neighbors, distance):
-    # merge .gffs
+def _single(sample_id, google_bucket, distance, comment, outfile):
+    sample_id_path = sample_id + "/"
+    fasta, protein, contigs = sample_id_path + sample_id + ".fna.gz", \
+                              sample_id_path + sample_id + ".prodigal.faa.gz", \
+                              sample_id_path + sample_id + ".contigs.tsv.gz"
+    tic = time.time()
     sorted_gff_name = crisprnode.merge_gff(sample_id)
-    load_proteins(protein)
+    load_proteins(sample_id, protein)
     crisprid2crhash = crisprnode.load_CRISPRs(sample_id)
-    recid2contig = load_fasta(fasta, contigs)
+    recid2contig = load_fasta(sample_id, fasta, contigs)
     load_contig2sample(sample_id, contigs)
-    #load_gene_coords(protein_gff, recid2contig)
-    load_coords(sorted_gff_name, recid2contig, crisprid2crhash)
-    proteinnode.connect_proteins("gene_coords.tmp.csv", distance, gene_neighbors)
-    #connect_crisprs("crispr_coords.tmp.csv", distance, gene_neighbors)
+    load_coords(sample_id, sorted_gff_name, recid2contig, crisprid2crhash)
+    p2p_edge_load_time = proteinnode.connect_proteins_crisprs(sample_id, distance)
+    toc = time.time()
+    print("Loading the entire database took %f seconds" % (toc - tic) + "\n")
+    if comment is None:
+        comment = ""
+    print(sample_id + "," + str(toc - tic) + "," + str(p2p_edge_load_time) + "," + comment, file=outfile)
 
-
-def load_proteins(protein):
+def load_proteins(sample_id, protein):
     print("Loading proteins...")
     tic = time.time()
-    outfile = open("proteins.tmp.csv", "w")
+    outfile = open(sample_id + "/proteins.tmp.csv", "w")
     print("hashid,length", file=outfile)
 
     done = set()
@@ -44,18 +50,18 @@ def load_proteins(protein):
 
     conn = graphdb.Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
     cmd = "LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row MERGE (n:Protein {{hashid: row.hashid, length:row.length}})".format(
-        csv=abspath('proteins.tmp.csv')
+        csv=abspath(sample_id + '/proteins.tmp.csv')
     )
     print(cmd)
     conn.query(cmd, db=DBNAME)
     conn.close()
     toc = time.time()
-    remove('proteins.tmp.csv')
+    remove(sample_id + '/proteins.tmp.csv')
     print("Loading proteins took %f seconds" % (toc-tic))
 
 
 
-def load_fasta(fasta, contigs):
+def load_fasta(sample_id, fasta, contigs):
     print("Loading contigs...")
     tic = time.time()
     recid2contig = dict()
@@ -65,7 +71,7 @@ def load_fasta(fasta, contigs):
             line = line.strip().split('\t')
             recid2contig[line[0]] = (line[1], int(line[3]))
 
-    outfile = open("contigs.tmp.csv", "w")
+    outfile = open(sample_id + "/contigs.tmp.csv", "w")
     print("hashid,length", file=outfile)
 
     done = set()
@@ -85,7 +91,7 @@ def load_fasta(fasta, contigs):
     cmd = """LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row
           MERGE (n:Contig {{hashid: row.hashid, length:row.length}})
           """.format(
-        csv=abspath('contigs.tmp.csv')
+        csv=abspath(sample_id + '/contigs.tmp.csv')
     )
     print(cmd)
     conn.query(cmd, db=DBNAME)
@@ -93,14 +99,14 @@ def load_fasta(fasta, contigs):
     toc = time.time()
 
     print("Loading contigs took %f seconds" % (toc-tic))
-    remove('contigs.tmp.csv')
+    remove(sample_id + '/contigs.tmp.csv')
 
     return recid2contig
 
 def load_contig2sample(sample_id, contigs):
     print("Loading contig2sample edges...")
     tic = time.time()
-    outfile = open("contig2sample.tmp.csv", "w")
+    outfile = open(sample_id + "/contig2sample.tmp.csv", "w")
     print("chash,sampleid", file=outfile)
     with gzip.open(contigs, 'rt') as infile:
         infile.readline()
@@ -110,15 +116,15 @@ def load_contig2sample(sample_id, contigs):
     outfile.close()
     conn = graphdb.Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
     cmd_make_node = """
-                   MERGE (s:Sample {{sampleID: {id}}})
+                   MERGE (s:Sample {{sampleID: "{id}"}})
                     """.format(id=str(sample_id))
     cmd_load_edges = """
           LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row 
           MATCH (c:Contig), (s:Sample)
-          WHERE c.hashid = row.chash AND toString(s.sampleID) = toString(row.sampleid)
+          WHERE c.hashid = row.chash AND s.sampleID = row.sampleid
           MERGE (c)-[e:contig2sample]->(s)
           """.format(
-        csv=abspath('contig2sample.tmp.csv')
+        csv=abspath(sample_id + '/contig2sample.tmp.csv')
     )
     print(cmd_make_node)
     conn.query(cmd_make_node, db=DBNAME)
@@ -131,10 +137,10 @@ def load_contig2sample(sample_id, contigs):
 
     #remove("contig2sample.tmp.csv")
 
-def load_coords(gff, recid2contig, crisprid2crhash):
+def load_coords(sample_id, gff, recid2contig, crisprid2crhash):
     print("Loading gene and crispr coords...")
     tic = time.time()
-    with open("gene_coords.tmp.csv", "w") as g_out, open("crispr_coords.tmp.csv", "w") as cr_out:
+    with open(sample_id + "/gene_coords.tmp.csv", "w") as g_out, open(sample_id + "/crispr_coords.tmp.csv", "w") as cr_out:
         print("recid,phash,chash,start,end,orient", file=g_out)
         print("recid,crhash,chash,start,end", file=cr_out)
         with open(gff, "rt") as infile:
@@ -154,8 +160,8 @@ def load_coords(gff, recid2contig, crisprid2crhash):
                     crhash = crisprid2crhash[old_id]
                     chash = recid2contig[line[0]][0][:20]
                     print(line[0], crhash, chash, line[3], line[4], sep=',', file=cr_out)
-    crisprnode.load_crispr_coords()
-    proteinnode.load_protein_coords()
+    crisprnode.load_crispr_coords(sample_id)
+    proteinnode.load_protein_coords(sample_id)
     toc = time.time()
 
     print("Loading gene and crispr coords took %f seconds" % (toc-tic))

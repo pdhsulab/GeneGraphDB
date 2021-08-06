@@ -2,6 +2,10 @@ import click
 from genegraphdb import *
 from genegraphdb import graphdb
 from genegraphdb import _load
+from genegraphdb import _loadmulti
+from genegraphdb import testing
+from genegraphdb import dl_test_data
+import os
 
 @click.group()
 def cli():
@@ -31,27 +35,64 @@ def load():
     pass
 
 @load.command(short_help='Load a single sample into the database.')
-@click.option('--sample_id', '-s', required=True, help='The nucleotide FASTA file of the genome.')
-@click.option('--fasta', '-f', required=True, help='The nucleotide FASTA file of the genome.', type=click.Path(exists=True))
-@click.option('--protein', '-p', required=True, help='The protein FASTA file.', type=click.Path(exists=True))
-@click.option('--protein-gff', '-pg', required=True, help='The protein GFF file.', type=click.Path(exists=True))
-@click.option('--crispr-gff', '-crg', required=True, help='The CRISPR array GFF file.', type=click.Path(exists=True))
-@click.option('--contigs', '-c', required=True, help='The contigs file.', type=click.Path(exists=True))
+@click.option('--sample_id', '-s', required=True, type=str, help='The id of this genome or metagenomic sample.')
 @click.option('--google-bucket', '-gb', default=None, help='The Google bucket to store sequences.')
-@click.option('--gene-neighbors/--gene-window', default=True, help='Calculate neighbors using number of genes away vs. base pair window.')
 @click.option('--distance', '-d', default=None, type=int, help='The distance in number of neighbors or base pairs')
-def single(sample_id, fasta, protein, protein_gff, crispr_gff, contigs, google_bucket, gene_neighbors, distance):
-
-    if gene_neighbors and distance is None:
-        distance = 3
-    elif not gene_neighbors and distance is None:
+@click.option('--comment', '-c', default=None, type=str, help='Any notes on a particular load script runtime')
+def single(sample_id, google_bucket, distance, comment):
+    # to do - comment out first condition?
+    if distance is None:
         distance = 5000
-
-    _load._single(sample_id, fasta, protein, protein_gff, crispr_gff, contigs, google_bucket, gene_neighbors, distance)
+    outfile = open(sample_id + "/ggdb_load_stats.csv", "w")
+    print("sample_id,load_time,p2p_edge_time,comment", file=outfile)
+    _load._single(sample_id, google_bucket, distance, comment, outfile)
+    outfile.close()
+    testing.get_runtime_summarystats(comment, infile_name=sample_id + "/ggdb_load_stats.csv",
+                                     outfile_name=sample_id + "/ggdb_summary_stats.csv")
 
 @load.command(short_help='Load multiple samples into the database.')
-def multi():
-    pass
+@click.option('--samples_id_path', '-s', required=True, help='The path to directory with genome and metagenomic samples.')
+@click.option('--google-bucket', '-gb', default=None, help='The Google bucket to store sequences.')
+@click.option('--distance', '-d', default=None, type=int, help='The distance in number of neighbors or base pairs')
+@click.option('--comment', '-c', default=None, type=str, help='Any notes on a particular load script runtime')
+@click.option('--load_indiv/--load_bulk', default=True, help='Load one or multiple samples with a single csv import')
+def multi(samples_id_path, google_bucket, distance, comment, load_indiv):
+    try:
+        os.chdir(samples_id_path)
+    except:
+        # all test data is one directory up
+        os.chdir("..")
+        test_data_dir = samples_id_path.replace("../", "")
+        dl_test_data.download_dir(test_data_dir)
+        os.chdir(test_data_dir)
+    if distance is None:
+        distance = 5000
+    outfile = open("ggdb_load_stats.csv", "w")
+    print("sample_id,load_time,p2p_edge_time,comment", file=outfile)
+    if load_indiv:
+        for sample_id in os.listdir():
+            try:
+                # to do - implement better way to check if the sample_id is actually a directory
+                os.chdir(sample_id)
+                os.chdir("..")
+                _load._single(sample_id, google_bucket, distance, comment, outfile)
+            except NotADirectoryError:
+                print(sample_id + " is not a directory")
+        outfile.close()
+        testing.get_runtime_summarystats(comment)
+    elif not load_indiv:
+        for sample_id in os.listdir():
+            try:
+                # to do - implement better way to check if the sample_id is actually a directory
+                os.chdir(sample_id)
+                os.chdir("..")
+                _loadmulti._single(sample_id, google_bucket, distance, comment, outfile)
+            except NotADirectoryError:
+                print(sample_id + " is not a directory")
+        outfile.close()
+        prot_edge_load_time = _loadmulti.bulk_connect_proteins_crisprs(distance)
+        testing.get_runtime_summarystats(comment, prot_edge_load_time)
+    os.chdir("..")
 
 @cli.command(short_help='Ådd clusters to protein nodes in the database.')
 def addclusters():
