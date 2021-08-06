@@ -1,2 +1,0 @@
-EF675243.1	Prodigal_v2.6.3	CDS	3	995	55.2	+	0	ID=9d31c63f4a7aec2edb7c3cd78d5e3d82b6ab56a2b85c5ccff01b93d705e1c380;partial=10;start_type=Edge;rbs_motif=None;rbs_spacer=None;gc_cont=0.483;conf=100.00;score=55.17;cscore=51.95;sscore=3.22;rscore=0.00;uscore=0.00;tscore=3.22;
-EF675243.1	Prodigal_v2.6.3	CDS	1195	1767	13.1	-	0	ID=313d5be667a7b1c105581ae0b2ba1c5e4be66ba1382a320cfabd3850c454a1e5;partial=01;start_type=Edge;rbs_motif=None;rbs_spacer=None;gc_cont=0.531;conf=95.35;score=13.14;cscore=9.92;sscore=3.22;rscore=0.00;uscore=0.00;tscore=3.22;

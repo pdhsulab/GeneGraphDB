@@ -4,6 +4,7 @@ from genegraphdb import graphdb
 from genegraphdb import _load
 from genegraphdb import _loadmulti
 from genegraphdb import testing
+from genegraphdb import dl_test_data
 import os
 
 @click.group()
@@ -56,7 +57,14 @@ def single(sample_id, google_bucket, distance, comment):
 @click.option('--comment', '-c', default=None, type=str, help='Any notes on a particular load script runtime')
 @click.option('--load_indiv/--load_bulk', default=True, help='Load one or multiple samples with a single csv import')
 def multi(samples_id_path, google_bucket, distance, comment, load_indiv):
-    os.chdir(samples_id_path)
+    try:
+        os.chdir(samples_id_path)
+    except:
+        # all test data is one directory up
+        os.chdir("..")
+        test_data_dir = samples_id_path.replace("../", "")
+        dl_test_data.download_dir(test_data_dir)
+        os.chdir(test_data_dir)
     if distance is None:
         distance = 5000
     outfile = open("ggdb_load_stats.csv", "w")
