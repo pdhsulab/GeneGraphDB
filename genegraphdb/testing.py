@@ -1,8 +1,12 @@
 from genegraphdb import *
 import csv
 import os
-
-def get_runtime_summarystats(comment, prot_time = 0, infile_name = "ggdb_load_stats.csv", outfile_name = "ggdb_summary_stats.csv"):
+# To do: ordering of arguments is super unscalable: fix
+def get_runtime_summarystats(comment, prot_time = 0, samples_path = "", infile_name = "ggdb_load_stats.csv", outfile_name = "ggdb_summary_stats.csv"):
+    if samples_path != "":
+        infile_name = samples_path + infile_name
+        outfile_name = samples_path + outfile_name
+    print(infile_name) #REMOVE THIS
     outfile = open(outfile_name, "a")
     with open(infile_name, newline='') as f:
         reader = csv.reader(f)
