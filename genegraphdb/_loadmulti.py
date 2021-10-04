@@ -24,6 +24,7 @@ def _single(sample_id, google_bucket, distance, comment, outfile):
     recid2contig = _load.load_fasta(sample_id, fasta, contigs)
     _load.load_contig2sample(sample_id, contigs)
     _load.load_coords(sample_id, sorted_gff_name, recid2contig, crisprid2crhash)
+    proteinnode.create_all_protein_crispr_edge_csv(sample_id, distance) # TO do - verify i need this
     toc = time.time()
     print("Loading the entire database, sans prot-prot and prot-crispr edges, took %f seconds" % (toc - tic) + "\n")
     if comment is None:
@@ -31,7 +32,7 @@ def _single(sample_id, google_bucket, distance, comment, outfile):
     # print(sample_id + "," + str(toc - tic) + "," + comment)
     print(sample_id + "," + str(toc - tic) + ",null," + comment, file=outfile)
 
-def bulk_connect_proteins_crisprs(max_distance):
+def bulk_connect_proteins_crisprs(sample_id, max_distance):
     # to do - need to create protein2protein csvs from scratch
     print("Loading protein2protein edges...")
     tic = time.time()
@@ -69,6 +70,7 @@ def bulk_connect_proteins_crisprs(max_distance):
     os.system(os_cmd_p2p_window)
     os.system(os_cmd_p2c_window)
     # to do - stop timer here. print output
+
     proteinnode.load_csv("bigfile_p2p.csv", "bigfile_p2c.csv", "bigfile_p2p_window.csv", "bigfile_p2c_window.csv")
     toc = time.time()
     print("Loading protein2protein edges took %f seconds" % (toc - tic))

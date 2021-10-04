@@ -13,16 +13,18 @@ import time
 from collections import deque
 import csv
 from csv import reader
+import sqlite3
 
-def connect_proteins_crisprs(sample_id, max_distance):
-    sample_id_path = sample_id + "/"
+def connect_proteins_crisprs(sample_id, max_distance, samples_path = ''):
+    sample_id_path = samples_path + sample_id + "/"
     print("Loading protein2protein edges...")
     tic = time.time()
-    create_all_protein_crispr_edge_csv(sample_id, max_distance)
-    load_csv(sample_id_path + "protein2protein.tmp.csv",
-             sample_id_path + "protein2crispr.tmp.csv",
-             sample_id_path + "protein2protein_window.tmp.csv",
-             sample_id_path + "protein2crispr_window.tmp.csv")
+    create_all_protein_crispr_edge_csv(sample_id, max_distance, samples_path)
+    load_csv(sample_id_path + "protein2protein.tmp.sql.csv",
+             sample_id_path + "protein2crispr.tmp.sql.csv",
+             sample_id_path + "protein2protein_window.tmp.sql.csv",
+             sample_id_path + "protein2crispr_window.tmp.sql.csv")
+
 
     toc = time.time()
     # remove("protein2protein.tmp.csv")
@@ -30,37 +32,37 @@ def connect_proteins_crisprs(sample_id, max_distance):
     print("Loading protein2protein edges took %f seconds" % (toc - tic))
     return toc-tic
 
-def create_all_protein_crispr_edge_csv(sample_id, max_distance):
-    sample_id_path = sample_id + "/"
-    make_merged_coords_csv(sample_id)
-    outfile_prot_pair = open(sample_id_path + "protein2protein.tmp.csv", "w")
-    outfile_prot_crispr_pair = open(sample_id_path + "protein2crispr.tmp.csv", "w")
-    outfile_p2p_base_window = open(sample_id_path + "protein2protein_window.tmp.csv", "w")
-    outfile_p2c_base_window = open(sample_id_path + "protein2crispr_window.tmp.csv", "w")
+def create_all_protein_crispr_edge_csv(sample_id, max_distance, samples_path = ''):
+    sample_id_path = samples_path + sample_id + "/"
+    make_merged_coords_csv(sample_id, samples_path)
+    outfile_prot_pair = open(sample_id_path + "protein2protein.tmp.sql.csv", "w")
+    outfile_prot_crispr_pair = open(sample_id_path + "protein2crispr.tmp.sql.csv", "w")
+    outfile_p2p_base_window = open(sample_id_path + "protein2protein_window.tmp.sql.csv", "w")
+    outfile_p2c_base_window = open(sample_id_path + "protein2crispr_window.tmp.sql.csv", "w")
     print("recid,phash,qhash", file=outfile_prot_pair)
     print("recid,phash,qhash", file=outfile_prot_crispr_pair)
     print("recid,phash,qhash", file=outfile_p2p_base_window)
     print("recid,phash,qhash", file=outfile_p2c_base_window)
 
-    merge_sorted_coords_csv = sample_id_path + "merged_sorted_coords.tmp.csv"
+    merge_sorted_coords_csv = sample_id_path + "merged_sorted_coords.tmp.sql.csv" #To do - does this cause bugs?
     # write two distinct functions to create three types of protein edges (3 csvs)
     create_protein_pair_csv(merge_sorted_coords_csv, outfile_prot_pair, outfile_prot_crispr_pair)
     create_protein_window_csv(merge_sorted_coords_csv, max_distance, outfile_p2p_base_window, outfile_p2c_base_window)
 
     outfile_prot_pair.close(), outfile_prot_crispr_pair.close(), outfile_p2p_base_window.close(), outfile_p2c_base_window.close()
 
-def make_merged_coords_csv(sample_id):
-    sample_id_path = sample_id + "/"
-    os.system("cat " + sample_id_path + "gene_coords.tmp.csv | sed -e '1s/phash/hash/' | cut -d',' -f 1-5 | "
-                                        "sed '1s/$/,is_crispr/; 2,$s/$/,0/' > " + sample_id_path + "gene_coords_m.tmp.csv")
-    os.system("cat " + sample_id_path + "crispr_coords.tmp.csv | awk 'FNR > 1' | sed '1,$s/$/,1/' > "
-              + sample_id_path + "tmp.crispr_coords.csv")
-    os.system("cat " + sample_id_path + "gene_coords_m.tmp.csv " + sample_id_path + "tmp.crispr_coords.csv > "
-              + sample_id_path + "merged_coords.tmp.csv")
-    os.system("head -n1 " + sample_id_path + "merged_coords.tmp.csv > " + sample_id_path +
-              "merged_sorted_coords.tmp.csv && tail -n+2 " + sample_id_path + "merged_coords.tmp.csv | sort "
-              "--field-separator=',' -k1,1 -k4,4n >> " + sample_id_path + "merged_sorted_coords.tmp.csv")
-    os.system("rm " + sample_id_path + "gene_coords_m.tmp.csv " + sample_id_path + "tmp.crispr_coords.csv " + sample_id_path + "merged_coords.tmp.csv")
+def make_merged_coords_csv(sample_id, samples_path = ''):
+    sample_id_path = samples_path + sample_id + "/"
+    os.system("cat " + sample_id_path + "gene_coords.tmp.sql.csv | sed -e '1s/phash/hash/' | cut -d',' -f 1-5 | "
+                                        "sed '1s/$/,is_crispr/; 2,$s/$/,0/' > " + sample_id_path + "gene_coords_m.tmp.sql.csv")
+    os.system("cat " + sample_id_path + "crispr_coords.tmp.sql.csv | awk 'FNR > 1' | sed '1,$s/$/,1/' > "
+              + sample_id_path + "tmp.crispr_coords.sql.csv")
+    os.system("cat " + sample_id_path + "gene_coords_m.tmp.sql.csv " + sample_id_path + "tmp.crispr_coords.sql.csv > "
+              + sample_id_path + "merged_coords.tmp.sql.csv")
+    os.system("head -n1 " + sample_id_path + "merged_coords.tmp.sql.csv > " + sample_id_path +
+              "merged_sorted_coords.tmp.sql.csv && tail -n+2 " + sample_id_path + "merged_coords.tmp.sql.csv | sort "
+              "--field-separator=',' -k1,1 -k4,4n >> " + sample_id_path + "merged_sorted_coords.tmp.sql.csv")
+    os.system("rm " + sample_id_path + "gene_coords_m.tmp.sql.csv " + sample_id_path + "tmp.crispr_coords.sql.csv " + sample_id_path + "merged_coords.tmp.sql.csv")
 
 # create adjacent protein-protein edges, saves edges as csv
 def create_protein_pair_csv(gene_coords_csv, outfile_prot_pair, outfile_prot_crispr_pair):
@@ -131,72 +133,45 @@ def is_protein2protein(old_node_is_crispr, cur_node_is_crispr):
 def is_protein2crispr(old_node_is_crispr, cur_node_is_crispr):
     return (int(old_node_is_crispr) and not int(cur_node_is_crispr)) or (not int(old_node_is_crispr) and int(cur_node_is_crispr))
 
-def load_protein_coords(sample_id):
-    conn = graphdb.Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
-    cmd = """
-          USING PERIODIC COMMIT
-          LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row
-          MATCH (p:Protein), (c:Contig)
-          WHERE p.hashid = row.phash AND c.hashid = row.chash
-          MERGE (p)-[r:GeneCoord {{start: row.start, end: row.end, orient: row.orient}}]->(c)
-          """.format(
-        csv=abspath(sample_id + '/gene_coords.tmp.csv')
-    )
-    print(cmd)
-    conn.query(cmd, db=DBNAME)
-    conn.close()
+def load_protein_coords(sample_id, samples_path=''):
+    con = sqlite3.connect('genegraph.db')
+    cur = con.cursor()
+    gene_coords_csv_path = samples_path + sample_id + '/gene_coords.tmp.sql.csv'
+    gene_coords_csv = open(gene_coords_csv_path)
+    rows = csv.reader(gene_coords_csv)
+    next(rows)
+    cmd = '''
+        INSERT INTO proteincoords (phash, contighash, start, end, orientation) VALUES (?,?,?,?,?)
+        '''
+    cur.executemany(cmd, ((rec[1], rec[2], rec[3], rec[4], rec[5]) for rec in rows))
+    con.commit()
+    con.close()
 
 # all input csvs will have two columns - one for donor protein's phash, other for recipient
 def load_csv(csv_path_p2p, csv_path_p2c, csv_path_p2p_window, csv_path_p2c_window):
-    conn = graphdb.Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
-    cmd_protein2protein_edges = """
-              USING PERIODIC COMMIT 10000
-              LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row 
-              MATCH (p:Protein), (q:Protein)
-              WHERE p.hashid = row.phash AND q.hashid = row.qhash
-              MERGE (p)-[f:protein2protein]->(q)
-              """.format(
-        csv=abspath(csv_path_p2p)
-    )
-    cmd_protein2crispr_edges = """
-              USING PERIODIC COMMIT 10000
-              LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row 
-              MATCH (p:Protein), (c:CRISPR)
-              WHERE (p.hashid = row.phash AND c.hashid = row.qhash)
-              OR (p.hashid = row.qhash AND c.hashid = row.phash)
-              MERGE (p)-[f:protein2crispr]->(c)
-              """.format(
-        csv=abspath(csv_path_p2c)
-    )
-    # to do - speed up the next 2 queries + make the edges the same label
-    # currently different labels for testing purposes.
-    cmd_p2c_window_edges = """
-              USING PERIODIC COMMIT 10000
-              LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row 
-              MATCH (p:Protein), (c:CRISPR)
-              WHERE (p.hashid = row.phash AND c.hashid = row.qhash)
-              OR (p.hashid = row.qhash AND c.hashid = row.phash)
-              MERGE (p)-[f:protein2crispr_window]->(c)
-              """.format(
-        csv=abspath(csv_path_p2c_window)
-    )
-    cmd_p2p_window_edges = """
-              USING PERIODIC COMMIT 10000
-              LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row 
-              MATCH (p:Protein), (q:Protein)
-              WHERE (p.hashid = row.phash AND q.hashid = row.qhash)
-              MERGE (p)-[g:protein2protein_window]->(q)
-              """.format(
-        csv=abspath(csv_path_p2p_window)
-    )
+    con = sqlite3.connect('genegraph.db')
+    cur = con.cursor()
+    p2p_csv, p2c_csv, p2pwindow_csv, p2cwindow_csv= open(csv_path_p2p), open(csv_path_p2c), \
+                                                    open(csv_path_p2p_window), open(csv_path_p2c_window)
 
-    print(cmd_protein2protein_edges)
-    conn.query(cmd_protein2protein_edges, db=DBNAME)
-    print(cmd_protein2crispr_edges)
-    conn.query(cmd_protein2crispr_edges, db=DBNAME)
-    print(cmd_p2c_window_edges)
-    conn.query(cmd_p2c_window_edges, db=DBNAME)
-    print(cmd_p2p_window_edges)
-    conn.query(cmd_p2p_window_edges, db=DBNAME)
-    conn.close()
+    p2p_rows = csv.reader(p2p_csv)
+    next(p2p_rows)
+    p2c_rows = csv.reader(p2c_csv)
+    next(p2c_rows)
+    p2pwindow_rows = csv.reader(p2pwindow_csv)
+    next(p2pwindow_rows)
+    p2cwindow_rows = csv.reader(p2cwindow_csv)
+    next(p2cwindow_rows)
+    p2p_cmd = '''INSERT INTO prot2prot (p1hash, p2hash) VALUES (?,?)'''
+    p2c_cmd = '''INSERT INTO prot2crispr (p1hash, crisprhash) VALUES (?,?)'''
+    p2pwindow_cmd = '''INSERT INTO prot2protwindow (p1hash, p2hash) VALUES (?,?)'''
+    p2cwindow_cmd = '''INSERT INTO prot2crisprwindow (p1hash, crisprhash) VALUES (?,?)'''
+
+    cur.executemany(p2p_cmd, ((rec[1], rec[2]) for rec in p2p_rows))
+    cur.executemany(p2c_cmd, ((rec[1], rec[2]) for rec in p2c_rows))
+    cur.executemany(p2pwindow_cmd, ((rec[1], rec[2]) for rec in p2pwindow_rows))
+    cur.executemany(p2cwindow_cmd, ((rec[1], rec[2]) for rec in p2cwindow_rows))
+    con.commit()
+    con.close()
+
 
