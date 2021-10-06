@@ -4,6 +4,7 @@ from genegraphdb import proteinnode
 from genegraphdb import proteinnodesql
 from genegraphdb import crisprnode
 from genegraphdb import _load
+from genegraphdb import testing
 from genegraphdb import _loadsql
 from genegraphdb import crisprnodesql
 from Bio import SeqIO
@@ -15,7 +16,7 @@ from os import remove
 from os.path import abspath
 import time
 
-def _single(sample_id, google_bucket, distance, comment, outfile, samples_path=""):
+def _single(sample_id, google_bucket, distance, comment, outfile, samples_path="", clean_files=False):
     sample_id_path = sample_id + "/"
     fasta, protein, contigs = samples_path + sample_id_path + sample_id + ".fna.gz", \
                               samples_path + sample_id_path + sample_id + ".prodigal.faa.gz", \
@@ -33,6 +34,8 @@ def _single(sample_id, google_bucket, distance, comment, outfile, samples_path="
     print("Loading the entire sql database, sans prot-prot and prot-crispr edges, took %f seconds" % (toc - tic) + "\n")
     if comment is None:
         comment = ""
+    if clean_files:
+        testing.clean_files(sample_id, samples_path)
     # print(sample_id + "," + str(toc - tic) + "," + comment)
     print(sample_id + "," + str(toc - tic) + ",null," + comment, file=outfile)
 

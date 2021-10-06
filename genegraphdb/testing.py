@@ -1,8 +1,8 @@
 from genegraphdb import *
 import csv
 import os
-# To do: ordering of arguments is super unscalable: fix
-def get_runtime_summarystats(comment, prot_time = 0, samples_path = "", infile_name = "ggdb_load_stats.csv", outfile_name = "ggdb_summary_stats.csv"):
+# To do: ordering of arguments is super confusing: fix
+def get_runtime_summarystats(comment="", prot_time = 0, samples_path = "", infile_name = "ggdb_load_stats.csv", outfile_name = "ggdb_summary_stats.csv"):
     if samples_path != "":
         infile_name = samples_path + infile_name
         outfile_name = samples_path + outfile_name
@@ -32,3 +32,11 @@ def get_runtime_summarystats(comment, prot_time = 0, samples_path = "", infile_n
         if p2p_edge_time == "null":
             cur_load_time += cur_p2p_edge_time
         print(str(cur_load_time) + "," + str(cur_p2p_edge_time) + "," + comment, file=outfile)
+
+def clean_files(sample_id, samples_path):
+    files_to_remove = ["protein2protein_window.tmp.csv"]
+    cmd = "rm "
+    for file in files_to_remove:
+        cmd += samples_path + sample_id + "/" + file + " "
+    print(cmd)
+    #os.system(cmd)
