@@ -76,12 +76,14 @@ def singlesql(sample_id, google_bucket, distance, comment):
 
 @load.command(short_help='Load multiple samples into the sqldatabase.')
 @click.option('--samples_path', '-s', required=True, help='The path to directory with genome and metagenomic samples. '
-                                                             'Must include / at the end')
+                                                          'Must include / at the end')
 @click.option('--google-bucket', '-gb', default=None, help='The Google bucket to store sequences.')
 @click.option('--distance', '-d', default=None, type=int, help='The distance in number of neighbors or base pairs')
 @click.option('--comment', '-c', default=None, type=str, help='Any notes on a particular load script runtime')
 @click.option('--load_indiv/--load_bulk', default=True, help='Load one or multiple samples with a single csv import')
-def multisql(samples_path, google_bucket, distance, comment, load_indiv):
+@click.option('--clean_files/--show_temp_files', default=False, help='Remove all temp files generated when loading data into sql '
+                                                         'database')
+def multisql(samples_path, google_bucket, distance, comment, load_indiv, clean_files):
     # try:
     #     os.chdir(samples_path)
     # except:
@@ -100,7 +102,7 @@ def multisql(samples_path, google_bucket, distance, comment, load_indiv):
                 # to do - implement better way to check if the sample_id is actually a directory
                 os.chdir(samples_path + sample_id)
                 os.chdir("../..")
-                _loadsql._single(sample_id, google_bucket, distance, comment, outfile, samples_path)
+                _loadsql._single(sample_id, google_bucket, distance, comment, outfile, samples_path, clean_files)
             except NotADirectoryError:
                 print(sample_id + " is not a directory")
         outfile.close()
@@ -111,7 +113,7 @@ def multisql(samples_path, google_bucket, distance, comment, load_indiv):
                 # to do - implement better way to check if the sample_id is actually a directory
                 os.chdir(samples_path + sample_id)
                 os.chdir("../..")
-                _loadmultisql._single(sample_id, google_bucket, distance, comment, outfile, samples_path)
+                _loadmultisql._single(sample_id, google_bucket, distance, comment, outfile, samples_path, clean_files)
             except NotADirectoryError:
                 print(sample_id + " is not a directory")
         outfile.close()

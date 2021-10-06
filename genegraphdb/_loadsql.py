@@ -4,6 +4,7 @@ from genegraphdb import proteinnode
 from genegraphdb import proteinnodesql
 from genegraphdb import crisprnode
 from genegraphdb import crisprnodesql
+from genegraphdb import testing
 from Bio import SeqIO
 import gzip
 import re
@@ -15,7 +16,7 @@ from os.path import abspath
 import time
 import sqlite3
 
-def _single(sample_id, google_bucket, distance, comment, outfile, samples_path = ''):
+def _single(sample_id, google_bucket, distance, comment, outfile, samples_path = '', clean_files=False):
     sample_id_path = sample_id + "/"
     fasta, protein, contigs = samples_path + sample_id_path + sample_id + ".fna.gz", \
                               samples_path + sample_id_path + sample_id + ".prodigal.faa.gz", \
@@ -33,6 +34,8 @@ def _single(sample_id, google_bucket, distance, comment, outfile, samples_path =
     print("Loading the entire database took %f seconds" % (toc - tic) + "\n")
     if comment is None:
         comment = ""
+    if clean_files:
+        testing.clean_files(sample_id, samples_path)
     print(sample_id + "," + str(toc - tic) + "," + str(p2p_edge_load_time) + "," + comment, file=outfile)
 
 def load_proteins(sample_id, protein, samples_path = ''):
