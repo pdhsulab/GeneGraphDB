@@ -1,4 +1,4 @@
-from genegraphdb import *
+from genegraphdb import * 
 from genegraphdb import graphdb
 from genegraphdb import proteinnode
 from genegraphdb import crisprnode
