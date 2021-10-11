@@ -1,3 +1,5 @@
 .DS_Store
 genomes_annot
+genomes_annot_copy/
 genomes_annot_2
+genegraphdb/__pycache__/
