@@ -102,9 +102,12 @@ def multisql(samples_path, google_bucket, distance, comment, load_indiv, clean_f
                 # to do - implement better way to check if the sample_id is actually a directory
                 os.chdir(samples_path + sample_id)
                 os.chdir("../..")
-                _loadsql._single(sample_id, google_bucket, distance, comment, outfile, samples_path, clean_files)
+                try:
+                    _loadsql._single(sample_id, google_bucket, distance, comment, outfile, samples_path, clean_files)
+                except Exception as e:
+                    testing.log_errors_multisql_loadsql(samples_path, sample_id, e)
             except NotADirectoryError:
-                print(sample_id + " is not a directory")
+                pass
         outfile.close()
         testing.get_runtime_summarystats(comment, samples_path=samples_path)
     elif not load_indiv:
@@ -115,7 +118,7 @@ def multisql(samples_path, google_bucket, distance, comment, load_indiv, clean_f
                 os.chdir("../..")
                 _loadmultisql._single(sample_id, google_bucket, distance, comment, outfile, samples_path, clean_files)
             except NotADirectoryError:
-                print(sample_id + " is not a directory")
+                pass
         outfile.close()
         prot_edge_load_time = _loadmultisql.bulk_connect_proteins_crisprs(distance, samples_path)
         testing.get_runtime_summarystats(comment, prot_time=prot_edge_load_time, samples_path=samples_path)
@@ -165,7 +168,7 @@ def multi(samples_id_path, google_bucket, distance, comment, load_indiv):
                 os.chdir("..")
                 _load._single(sample_id, google_bucket, distance, comment, outfile)
             except NotADirectoryError:
-                print(sample_id + " is not a directory")
+                pass
         outfile.close()
         testing.get_runtime_summarystats(comment, samples_path=samples_path)
     elif not load_indiv:
@@ -176,7 +179,7 @@ def multi(samples_id_path, google_bucket, distance, comment, load_indiv):
                 os.chdir("..")
                 _loadmulti._single(sample_id, google_bucket, distance, comment, outfile)
             except NotADirectoryError:
-                print(sample_id + " is not a directory")
+                pass
         outfile.close()
         prot_edge_load_time = _loadmulti.bulk_connect_proteins_crisprs(distance)
         testing.get_runtime_summarystats(comment, prot_time=prot_edge_load_time, samples_path=samples_path)
