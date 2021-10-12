@@ -2,6 +2,14 @@ from genegraphdb import *
 import csv
 import os
 from datetime import datetime
+import unittest
+
+# class testNodeConnections(unittest.TestCase):
+#     def test_protein2protein(self):
+#         self.assertEqual(1,1)
+# if __name__ == '__main__':
+#     unittest.main()
+
 # To do: ordering of arguments is super confusing: fix
 def get_runtime_summarystats(comment="", prot_time = 0, samples_path = "", infile_name = "ggdb_load_stats.csv", outfile_name = "ggdb_summary_stats.csv"):
     if samples_path != "":

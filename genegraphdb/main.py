@@ -8,6 +8,8 @@ from genegraphdb import _loadmulti
 from genegraphdb import _loadmultisql
 from genegraphdb import testing
 from genegraphdb import dl_test_data
+from genegraphdb import clusternode
+from genegraphdb import variables_global as vars_glob
 import os
 
 @click.group()
@@ -148,20 +150,23 @@ def single(sample_id, google_bucket, distance, comment):
 @click.option('--comment', '-c', default=None, type=str, help='Any notes on a particular load script runtime')
 @click.option('--load_indiv/--load_bulk', default=True, help='Load one or multiple samples with a single csv import')
 def multi(samples_id_path, google_bucket, distance, comment, load_indiv):
-    try:
-        os.chdir(samples_id_path)
-    except:
-        # all test data is one directory up
-        os.chdir("..")
-        test_data_dir = samples_id_path.replace("../", "")
-        dl_test_data.download_dir(test_data_dir)
-        os.chdir(test_data_dir)
+    # try:
+    #     os.chdir(samples_id_path)
+    # except:
+    #     # all test data is one directory up
+    #     os.chdir("..")
+    #     test_data_dir = samples_id_path.replace("../", "")
+    #     dl_test_data.download_dir(test_data_dir)
+    #     os.chdir(test_data_dir)
     if distance is None:
         distance = 5000
     outfile = open(samples_id_path + "/ggdb_load_stats.csv", "w")
     print("sample_id,load_time,p2p_edge_time,comment", file=outfile)
     if load_indiv:
         for sample_id in os.listdir():
+            if sample_id in vars_glob.exclude_directories:
+                print(sample_id)
+                continue
             try:
                 # to do - implement better way to check if the sample_id is actually a directory
                 os.chdir(sample_id)
@@ -183,6 +188,7 @@ def multi(samples_id_path, google_bucket, distance, comment, load_indiv):
         outfile.close()
         prot_edge_load_time = _loadmulti.bulk_connect_proteins_crisprs(distance)
         testing.get_runtime_summarystats(comment, prot_time=prot_edge_load_time, samples_path=samples_path)
+    clusternode.load_cluster_nodes()
     os.chdir("..")
 
 @cli.command(short_help='Ådd clusters to protein nodes in the database.')
