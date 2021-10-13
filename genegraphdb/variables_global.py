@@ -1,0 +1,1 @@
+exclude_directories = [".git", ".idea"]

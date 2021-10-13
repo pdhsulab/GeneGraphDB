@@ -2,12 +2,33 @@ from genegraphdb import *
 import csv
 import os
 from datetime import datetime
+import unittest
+import pandas as pd
+
+class testSQLiteNodeConnections(unittest.TestCase):
+    def test_100crispr2prot(self):
+        pass
+    def test_100prot2prot(self):
+        # number edges per protein = 2
+        # protein window in protein2protein_window.tmp.sql.csv matches
+        test_prot2prot_path = "genomes_annot/561291/protein2protein.tmp.sql.csv"
+        prot2prot_df = pd.read_csv(test_prot2prot_path).head(500)
+        phash_s = prot2prot_df["phash"]
+        print(type(phash_s))
+        self.assertTrue(phash_s.is_unique)
+
+    def test_protein2protein(self):
+        self.assertEqual(1, 1)
+        self.assertEqual(1, 1)
+        self.assertEqual(1, 1)
+if __name__ == '__main__':
+    unittest.main()
+
 # To do: ordering of arguments is super confusing: fix
 def get_runtime_summarystats(comment="", prot_time = 0, samples_path = "", infile_name = "ggdb_load_stats.csv", outfile_name = "ggdb_summary_stats.csv"):
     if samples_path != "":
         infile_name = samples_path + infile_name
         outfile_name = samples_path + outfile_name
-    print(infile_name) #REMOVE THIS
     outfile = open(outfile_name, "a")
     with open(infile_name, newline='') as f:
         reader = csv.reader(f)
