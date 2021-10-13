@@ -71,7 +71,7 @@ def load_CRISPRs(sample_id, samples_path):
                 continue
             done.add(name_truncate)
             # print(unique_str, file=outfile_crispr)
-            print(crhash, file=outfile_crispr)
+            print(name_truncate, file=outfile_crispr)
     outfile_crispr.close()
     del done
 

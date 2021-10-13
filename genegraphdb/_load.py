@@ -11,29 +11,31 @@ from os import remove
 from os.path import abspath
 import time
 
-def _single(sample_id, google_bucket, distance, comment, outfile):
+def _single(sample_id, google_bucket, distance, comment, outfile, samples_path = '', clean_files=False):
     sample_id_path = sample_id + "/"
-    fasta, protein, contigs = sample_id_path + sample_id + ".fna.gz", \
-                              sample_id_path + sample_id + ".prodigal.faa.gz", \
-                              sample_id_path + sample_id + ".contigs.tsv.gz"
+    fasta, protein, contigs = samples_path + sample_id_path + sample_id + ".fna.gz", \
+                              samples_path + sample_id_path + sample_id + ".prodigal.faa.gz", \
+                              samples_path + sample_id_path + sample_id + ".contigs.tsv.gz"
     tic = time.time()
-    sorted_gff_name = crisprnode.merge_gff(sample_id)
-    load_proteins(sample_id, protein)
-    crisprid2crhash = crisprnode.load_CRISPRs(sample_id)
-    recid2contig = load_fasta(sample_id, fasta, contigs)
-    load_contig2sample(sample_id, contigs)
-    load_coords(sample_id, sorted_gff_name, recid2contig, crisprid2crhash)
-    p2p_edge_load_time = proteinnode.connect_proteins_crisprs(sample_id, distance)
+    sorted_gff_name = crisprnode.merge_gff(sample_id, samples_path)
+    load_proteins(sample_id, protein, samples_path)
+    crisprid2crhash = crisprnode.load_CRISPRs(sample_id, samples_path)
+    recid2contig = load_fasta(sample_id, fasta, contigs, samples_path)
+    load_contig2sample(sample_id, contigs, samples_path)
+    load_coords(sample_id, sorted_gff_name, recid2contig, crisprid2crhash, samples_path)
+    p2p_edge_load_time = proteinnode.connect_proteins_crisprs(sample_id, distance, samples_path)
     toc = time.time()
     print("Loading the entire database took %f seconds" % (toc - tic) + "\n")
     if comment is None:
         comment = ""
+    if clean_files:
+        testing.clean_files(sample_id, samples_path)
     print(sample_id + "," + str(toc - tic) + "," + str(p2p_edge_load_time) + "," + comment, file=outfile)
 
-def load_proteins(sample_id, protein):
+def load_proteins(sample_id, protein, samples_path = ''):
     print("Loading proteins...")
     tic = time.time()
-    outfile = open(sample_id + "/proteins.tmp.csv", "w")
+    outfile = open(samples_path + sample_id + "/proteins.tmp.csv", "w")
     print("hashid,length", file=outfile)
 
     done = set()
@@ -50,18 +52,18 @@ def load_proteins(sample_id, protein):
 
     conn = graphdb.Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
     cmd = "LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row MERGE (n:Protein {{hashid: row.hashid, length:row.length}})".format(
-        csv=abspath(sample_id + '/proteins.tmp.csv')
+        csv=abspath(samples_path + sample_id + '/proteins.tmp.csv')
     )
     print(cmd)
     conn.query(cmd, db=DBNAME)
     conn.close()
     toc = time.time()
-    remove(sample_id + '/proteins.tmp.csv')
+    #remove(sample_id + '/proteins.tmp.csv')
     print("Loading proteins took %f seconds" % (toc-tic))
 
 
 
-def load_fasta(sample_id, fasta, contigs):
+def load_fasta(sample_id, fasta, contigs, samples_path = ''):
     print("Loading contigs...")
     tic = time.time()
     recid2contig = dict()
@@ -71,9 +73,8 @@ def load_fasta(sample_id, fasta, contigs):
             line = line.strip().split('\t')
             recid2contig[line[0]] = (line[1], int(line[3]))
 
-    outfile = open(sample_id + "/contigs.tmp.csv", "w")
+    outfile = open(samples_path + sample_id + "/contigs.tmp.csv", "w")
     print("hashid,length", file=outfile)
-
     done = set()
     handle = gzip.open(fasta, 'rt')
     for rec in SeqIO.parse(handle, 'fasta'):
@@ -91,7 +92,7 @@ def load_fasta(sample_id, fasta, contigs):
     cmd = """LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row
           MERGE (n:Contig {{hashid: row.hashid, length:row.length}})
           """.format(
-        csv=abspath(sample_id + '/contigs.tmp.csv')
+        csv=abspath(samples_path + sample_id + '/contigs.tmp.csv')
     )
     print(cmd)
     conn.query(cmd, db=DBNAME)
@@ -99,14 +100,14 @@ def load_fasta(sample_id, fasta, contigs):
     toc = time.time()
 
     print("Loading contigs took %f seconds" % (toc-tic))
-    remove(sample_id + '/contigs.tmp.csv')
+    # remove(sample_id + '/contigs.tmp.csv')
 
     return recid2contig
 
-def load_contig2sample(sample_id, contigs):
+def load_contig2sample(sample_id, contigs, samples_path = ''):
     print("Loading contig2sample edges...")
     tic = time.time()
-    outfile = open(sample_id + "/contig2sample.tmp.csv", "w")
+    outfile = open(samples_path + sample_id + "/contig2sample.tmp.csv", "w")
     print("chash,sampleid", file=outfile)
     with gzip.open(contigs, 'rt') as infile:
         infile.readline()
@@ -124,7 +125,7 @@ def load_contig2sample(sample_id, contigs):
           WHERE c.hashid = row.chash AND s.sampleID = row.sampleid
           MERGE (c)-[e:contig2sample]->(s)
           """.format(
-        csv=abspath(sample_id + '/contig2sample.tmp.csv')
+        csv=abspath(samples_path + sample_id + '/contig2sample.tmp.csv')
     )
     print(cmd_make_node)
     conn.query(cmd_make_node, db=DBNAME)
@@ -137,10 +138,11 @@ def load_contig2sample(sample_id, contigs):
 
     #remove("contig2sample.tmp.csv")
 
-def load_coords(sample_id, gff, recid2contig, crisprid2crhash):
+def load_coords(sample_id, gff, recid2contig, crisprid2crhash, samples_path = ''):
     print("Loading gene and crispr coords...")
     tic = time.time()
-    with open(sample_id + "/gene_coords.tmp.csv", "w") as g_out, open(sample_id + "/crispr_coords.tmp.csv", "w") as cr_out:
+    with open(samples_path + sample_id + "/gene_coords.tmp.csv", "w") as g_out, \
+            open(samples_path + sample_id + "/crispr_coords.tmp.csv", "w") as cr_out:
         print("recid,phash,chash,start,end,orient", file=g_out)
         print("recid,crhash,chash,start,end", file=cr_out)
         with open(gff, "rt") as infile:
@@ -160,8 +162,8 @@ def load_coords(sample_id, gff, recid2contig, crisprid2crhash):
                     crhash = crisprid2crhash[old_id]
                     chash = recid2contig[line[0]][0][:20]
                     print(line[0], crhash, chash, line[3], line[4], sep=',', file=cr_out)
-    crisprnode.load_crispr_coords(sample_id)
-    proteinnode.load_protein_coords(sample_id)
+    crisprnode.load_crispr_coords(sample_id, samples_path)
+    proteinnode.load_protein_coords(sample_id, samples_path)
     toc = time.time()
 
     print("Loading gene and crispr coords took %f seconds" % (toc-tic))

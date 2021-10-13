@@ -113,7 +113,7 @@ def load_fasta(sample_id, fasta, contigs, samples_path = ''):
     toc = time.time()
 
     print("Loading contigs took %f seconds" % (toc-tic))
-    remove(samples_path + sample_id + '/contigs.tmp.sql.csv')
+    # remove(samples_path + sample_id + '/contigs.tmp.sql.csv')
 
     return recid2contig
 
@@ -138,6 +138,10 @@ def load_contig2sample(sample_id, contigs, samples_path = ''):
     INSERT INTO contig2sample (contighashid, sampleid) VALUES (?,?)
     '''
     cur.executemany(cmd, rows)
+    cmd2 = '''
+    INSERT INTO samples (sampleid) VALUES {}
+    '''.format(sample_id)
+    cur.execute(cmd2)
     con.commit()
     con.close()
     toc = time.time()

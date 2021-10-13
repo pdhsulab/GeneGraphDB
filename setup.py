@@ -16,7 +16,7 @@ setup(
         'pytz==2021.1',
         'biopython==1.79',
         'numpy==1.21.0',
-        'pybedtools'
+        'bedtools==2.27.1'
     ],
     zip_safe=False,
     entry_points = {

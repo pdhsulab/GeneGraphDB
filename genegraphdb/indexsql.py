@@ -1,20 +1,9 @@
-from genegraphdb import *
-from genegraphdb import graphdb
-import os
-import subprocess
 import sqlite3
-
-def hasdb():
-    if "genegraph.db" in os.listdir():
-        return True
-    return False
-
-def createdb():
+def index_main():
     print("Creating database: %s" % DBNAME)
     con = sqlite3.connect('genegraph.db')
     cur = con.cursor()
     cur.execute('''CREATE TABLE proteins (hashid text, length real)''')
-    cur.execute('''CREATE TABLE samples (sampleID text)''')
     cur.execute('''CREATE TABLE crisprs (hashid text)''')
     cur.execute('''CREATE TABLE contigs (hashid text, length real)''')
     cur.execute('''CREATE TABLE contig2sample (contighashid text, sampleid text)''')
@@ -27,24 +16,6 @@ def createdb():
     con.close()
     #os.system("sqlite3 genegraph.db")
 
-    print("SQL database created")
+    print("Indexes created")
 
-def cleardb():
-    os.system("rm genegraph.db")
-    pass
-
-# def num_nodes():
-#     con = sqlite3.connect('genegraph.db')
-#     cur = con.cursor()
-#     num_nodes = cur.execute() #conn.query("MATCH (n) RETURN count(*)", db=DBNAME)[0]['count(*)']
-#     con.close()
-#
-#     return num_nodes
-#
-# def num_rels():
-#     con = sqlite3.connect('genegraph.db')
-#     cur = con.cursor()
-#     num_rels = cur.execute() #conn.query("MATCH ()-[r]->() RETURN count(r) as count", db=DBNAME)[0]['count']
-#     con.close()
-#
-#     return num_rels
+def index_helper():
