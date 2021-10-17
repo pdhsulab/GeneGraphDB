@@ -4,23 +4,92 @@ import os
 from datetime import datetime
 import unittest
 import pandas as pd
+from genegraphdb import variables_global as vars_glob
+import sqlite3
+import numpy as np
 
-class testSQLiteNodeConnections(unittest.TestCase):
-    def test_100crispr2prot(self):
+class testSQLiteNodeConnections(unittest.TestCase): # to do - change class name; outdated
+    #All tables are populated
+    # Neo4J file sizes match SQL file sizes
+    # All files are updated properly
+    # (After indexing)
+        # Number of rows per table is stable between load runs
+        # Something duplicate related
+    def test_allSQLite_tables_full(self):
+        sql_tables = vars_glob.sql_tables
+        con = sqlite3.connect('genegraph.db')
+        cur = con.cursor()
+        for table in sql_tables:
+            cmd = "SELECT count(*) FROM {}".format(table)
+            cur.execute(cmd)
+            rv = cur.fetchall()
+            # print(rv,rv[0][0])
+            self.assertTrue(rv[0][0] > 0)
+    def test_neo4J_SQL_filesizematch(self):
+        paths_genomes_annot = []
+        for dir in os.listdir("genomes_annot_2/"):
+            if dir not in vars_glob.exclude_directories:
+                sample_path = "genomes_annot_2/" + dir + "/"
+                # to do - use this is_dir check in other files!!
+                if os.path.isdir(sample_path):
+                    paths_genomes_annot.append(sample_path)
+        tempSQLfiles_list = vars_glob.temp_files
+        allfiles_list = [(file.replace("sql.",""), file) for file in tempSQLfiles_list]
+        for sample_path in paths_genomes_annot:
+            for filepair in allfiles_list:
+                filepaths = (sample_path + filepair[0], sample_path + filepair[1])
+                self.assertEqual(os.path.getsize(filepaths[0]), os.path.getsize(filepaths[1]))
+    def test_all_sqlfiles_updated(self):
+        paths_genomes_annot = []
+        mtimes_sqlfiles = []
+        for dir in os.listdir("genomes_annot/"):
+            if dir not in vars_glob.exclude_directories:
+                sample_path = "genomes_annot/" + dir + "/"
+                # to do - use this is_dir check in other files!!
+                if os.path.isdir(sample_path):
+                    paths_genomes_annot.append(sample_path)
+        tempSQLfiles_list = vars_glob.temp_files
+        for sample_path in paths_genomes_annot:
+            for filename in tempSQLfiles_list:
+                filepath = sample_path + filename
+                mtimes_sqlfiles.append(os.path.getmtime(filepath))
+        mtime_ref = mtimes_sqlfiles[0]
+        for mtime in mtimes_sqlfiles:
+            # print(mtime, mtime_ref, mtime-mtime_ref) # to do - delete
+            self.assertTrue(np.abs(mtime - mtime_ref) < 100) # ~100 mtime units is the around the observed time it takes to load samples in SQLite
+    def test_sqlite_dbsize_stable(self):
+        init_db_size = os.path.getsize("genegraph.db")
+        os.system("ggdb load multisql -s genomes_annot/ -c '' ")
+        final_db_size = os.path.getsize("genegraph.db")
+        self.assertEqual(init_db_size, final_db_size)
+    # def test_num_prot2prot(self):
+    #     num_prot2prot_csv =
+    #
+    #     num_prot2prot_sql =
+    def test_example_queries(self):
+        querysuccess = True
+        con = sqlite3.connect('genegraph.db')
+        cur = con.cursor()
+        # find a protein's neighbours based on protein's hashid
+        # account for duplicate proteins in other contigs
+        query_prot2prot = """
+        SELECT * FROM proteins as p 
+        WHERE p.hashid = fff55abded2d1e9cf4dd 
+        INNER JOIN prot2prot as p2p 
+        ON p.hashid = p2p.p1hash OR p.hashid = p2p.p2hash
+        """
+        query_prot2crispr = """
+        """
+        try:
+            cur.execute(query_prot2prot)
+            #cur.execute(query_prot2crispr)
+        except:
+            querysuccess = False
+        #rv = cur.fetchall()
+        con.close()
+        self.assertTrue(querysuccess)
         pass
-    def test_100prot2prot(self):
-        # number edges per protein = 2
-        # protein window in protein2protein_window.tmp.sql.csv matches
-        test_prot2prot_path = "genomes_annot/561291/protein2protein.tmp.sql.csv"
-        prot2prot_df = pd.read_csv(test_prot2prot_path).head(500)
-        phash_s = prot2prot_df["phash"]
-        print(type(phash_s))
-        self.assertTrue(phash_s.is_unique)
 
-    def test_protein2protein(self):
-        self.assertEqual(1, 1)
-        self.assertEqual(1, 1)
-        self.assertEqual(1, 1)
 if __name__ == '__main__':
     unittest.main()
 
@@ -57,10 +126,7 @@ def get_runtime_summarystats(comment="", prot_time = 0, samples_path = "", infil
         print(str(cur_load_time) + "," + str(p2p_edge_time) + "," + comment, file=outfile)
 
 def clean_files(sample_id, samples_path):
-    files_to_remove = ["contig2sample.tmp.sql.csv", "crispr_coords.tmp.sql.csv", "CRISPRs.tmp.sql.csv",
-                       "gene_coords.tmp.sql.csv", "merged_sorted_coords.tmp.sql.csv", "merged.sorted.tmp.sql.gff",
-                       "protein2crispr_window.tmp.sql.csv", "protein2crispr.tmp.sql.csv", "protein2protein_window.tmp.sql.csv",
-                       "protein2protein.tmp.sql.csv", "proteins.tmp.sql.csv", "temp.minced.sql.gff"]
+    files_to_remove = vars_glob.temp_files
     cmd = "rm "
     for file in files_to_remove:
         cmd += samples_path + sample_id + "/" + file + " "

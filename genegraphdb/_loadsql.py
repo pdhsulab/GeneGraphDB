@@ -63,7 +63,7 @@ def load_proteins(sample_id, protein, samples_path = ''):
     rows = csv.reader(protein_csv)
     next(rows)
     cmd = '''
-    INSERT INTO proteins (hashid, length) VALUES (?,?)
+    INSERT OR IGNORE INTO proteins (hashid, length) VALUES (?,?)
     '''
     cur.executemany(cmd, rows)
     con.commit()
@@ -105,7 +105,7 @@ def load_fasta(sample_id, fasta, contigs, samples_path = ''):
     rows = csv.reader(contig_csv)
     next(rows)
     cmd = '''
-    INSERT INTO contigs (hashid, length) VALUES (?,?)
+    INSERT OR IGNORE INTO contigs (hashid, length) VALUES (?,?)
     '''
     cur.executemany(cmd, rows)
     con.commit()
@@ -135,13 +135,14 @@ def load_contig2sample(sample_id, contigs, samples_path = ''):
     rows = csv.reader(contig2sample_csv)
     next(rows)
     cmd = '''
-    INSERT INTO contig2sample (contighashid, sampleid) VALUES (?,?)
+    INSERT OR IGNORE INTO contig2sample (contighashid, sampleid) VALUES (?,?)
     '''
     cur.executemany(cmd, rows)
     cmd2 = '''
-    INSERT INTO samples (sampleid) VALUES {}
+    INSERT OR IGNORE INTO samples (sampleid) VALUES ("{}")
     '''.format(sample_id)
     cur.execute(cmd2)
+
     con.commit()
     con.close()
     toc = time.time()

@@ -141,7 +141,7 @@ def load_protein_coords(sample_id, samples_path=''):
     rows = csv.reader(gene_coords_csv)
     next(rows)
     cmd = '''
-        INSERT INTO proteincoords (phash, contighash, start, end, orientation) VALUES (?,?,?,?,?)
+        INSERT OR IGNORE INTO proteincoords (phash, contighash, start, end, orientation) VALUES (?,?,?,?,?)
         '''
     cur.executemany(cmd, ((rec[1], rec[2], rec[3], rec[4], rec[5]) for rec in rows))
     con.commit()
@@ -162,10 +162,10 @@ def load_csv(csv_path_p2p, csv_path_p2c, csv_path_p2p_window, csv_path_p2c_windo
     next(p2pwindow_rows)
     p2cwindow_rows = csv.reader(p2cwindow_csv)
     next(p2cwindow_rows)
-    p2p_cmd = '''INSERT INTO prot2prot (p1hash, p2hash) VALUES (?,?)'''
-    p2c_cmd = '''INSERT INTO prot2crispr (p1hash, crisprhash) VALUES (?,?)'''
-    p2pwindow_cmd = '''INSERT INTO prot2protwindow (p1hash, p2hash) VALUES (?,?)'''
-    p2cwindow_cmd = '''INSERT INTO prot2crisprwindow (p1hash, crisprhash) VALUES (?,?)'''
+    p2p_cmd = '''INSERT OR IGNORE INTO prot2prot (p1hash, p2hash) VALUES (?,?)'''
+    p2c_cmd = '''INSERT OR IGNORE INTO prot2crispr (p1hash, crisprhash) VALUES (?,?)'''
+    p2pwindow_cmd = '''INSERT OR IGNORE INTO prot2protwindow (p1hash, p2hash) VALUES (?,?)'''
+    p2cwindow_cmd = '''INSERT OR IGNORE INTO prot2crisprwindow (p1hash, crisprhash) VALUES (?,?)'''
 
     cur.executemany(p2p_cmd, ((rec[1], rec[2]) for rec in p2p_rows))
     cur.executemany(p2c_cmd, ((rec[1], rec[2]) for rec in p2c_rows))

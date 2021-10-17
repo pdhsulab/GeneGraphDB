@@ -82,7 +82,7 @@ def load_CRISPRs(sample_id, samples_path):
     rows = csv.reader(crispr_csv)
     next(rows)
     cmd = '''
-    INSERT INTO crisprs VALUES (?)
+    INSERT OR IGNORE INTO crisprs VALUES (?)
     '''
     cur.executemany(cmd, rows)
     con.commit()
@@ -102,7 +102,7 @@ def load_crispr_coords(sample_id, samples_path):
     rows = csv.reader(crispr_coords_csv)
     next(rows)
     cmd = '''
-        INSERT INTO crisprcoords (crisprhash, contighash, start, end) VALUES (?,?,?,?)
+        INSERT OR IGNORE INTO crisprcoords (crisprhash, contighash, start, end) VALUES (?,?,?,?)
         '''
     cur.executemany(cmd, ((rec[1], rec[2], rec[3], rec[4]) for rec in rows))
     con.commit()
