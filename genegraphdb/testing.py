@@ -33,7 +33,7 @@ class testSQLiteNodeConnections(unittest.TestCase): # to do - change class name;
                 # to do - use this is_dir check in other files!!
                 if os.path.isdir(sample_path):
                     paths_genomes_annot.append(sample_path)
-        tempSQLfiles_list = vars_glob.temp_files
+        tempSQLfiles_list = vars_glob.temp_files_list
         allfiles_list = [(file.replace("sql.",""), file) for file in tempSQLfiles_list]
         for sample_path in paths_genomes_annot:
             for filepair in allfiles_list:
@@ -48,7 +48,7 @@ class testSQLiteNodeConnections(unittest.TestCase): # to do - change class name;
                 # to do - use this is_dir check in other files!!
                 if os.path.isdir(sample_path):
                     paths_genomes_annot.append(sample_path)
-        tempSQLfiles_list = vars_glob.temp_files
+        tempSQLfiles_list = vars_glob.temp_files_list
         for sample_path in paths_genomes_annot:
             for filename in tempSQLfiles_list:
                 filepath = sample_path + filename
@@ -62,6 +62,7 @@ class testSQLiteNodeConnections(unittest.TestCase): # to do - change class name;
         os.system("ggdb load multisql -s genomes_annot/ -c '' ")
         final_db_size = os.path.getsize("genegraph.db")
         self.assertEqual(init_db_size, final_db_size)
+
     # def test_num_prot2prot(self):
     #     num_prot2prot_csv =
     #
@@ -70,13 +71,14 @@ class testSQLiteNodeConnections(unittest.TestCase): # to do - change class name;
         querysuccess = True
         con = sqlite3.connect('genegraph.db')
         cur = con.cursor()
+        # *optional* find contigs with many proteins (single protein contigs won't join with prot2prot)
         # find a protein's neighbours based on protein's hashid
         # account for duplicate proteins in other contigs
         query_prot2prot = """
-        SELECT * FROM proteins as p 
-        WHERE p.hashid = fff55abded2d1e9cf4dd 
-        INNER JOIN prot2prot as p2p 
-        ON p.hashid = p2p.p1hash OR p.hashid = p2p.p2hash
+        SELECT * FROM proteins as p
+        INNER JOIN prot2prot as p2p
+        ON (p.hashid = p2p.p1hash OR p.hashid = p2p.p2hash)
+        WHERE p.hashid = '188f3c7cbdf9c81f121f|'
         """
         query_prot2crispr = """
         """
@@ -126,7 +128,7 @@ def get_runtime_summarystats(comment="", prot_time = 0, samples_path = "", infil
         print(str(cur_load_time) + "," + str(p2p_edge_time) + "," + comment, file=outfile)
 
 def clean_files(sample_id, samples_path):
-    files_to_remove = vars_glob.temp_files
+    files_to_remove = vars_glob.temp_files_list
     cmd = "rm "
     for file in files_to_remove:
         cmd += samples_path + sample_id + "/" + file + " "
