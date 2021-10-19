@@ -11,6 +11,8 @@ from genegraphdb import dl_test_data
 from genegraphdb import clusternode
 from genegraphdb import variables_global as vars_glob
 from genegraphdb import indexsql
+from multiprocessing import Pool, cpu_count
+from functools import partial
 import os
 
 @click.group()
@@ -97,31 +99,31 @@ def multisql(samples_path, google_bucket, distance, comment, load_indiv, clean_f
     #     os.chdir(test_data_dir)
     if distance is None:
         distance = 5000
-    outfile = open(samples_path + "ggdb_load_stats.csv", "w")
+    outfile = open(samples_path + "ggdb_load_stats.csv", "w") #to do - messes with multiprocessing
     print("sample_id,load_time,p2p_edge_time,comment", file=outfile)
+    outfile.close()
+    outfilename = samples_path + "ggdb_load_stats.csv"
+    sample_ids = []
     if load_indiv:
         for sample_id in os.listdir(samples_path):
-            try:
-                # to do - implement better way to check if the sample_id is actually a directory
-                os.chdir(samples_path + sample_id)
-                os.chdir("../..")
-                try:
-                    _loadsql._single(sample_id, google_bucket, distance, comment, outfile, samples_path, clean_files)
-                except Exception as e:
-                    testing.log_errors_multisql_loadsql(samples_path, sample_id, e)
-            except NotADirectoryError:
-                pass
-        outfile.close()
+            if os.path.isdir(samples_path + sample_id):
+                sample_ids.append(sample_id)
+                # try:
+                #     _loadsql._single(sample_id, google_bucket, distance, comment, outfile, samples_path, clean_files)
+                # except Exception as e:
+                #     testing.log_errors_multisql_loadsql(samples_path, sample_id, e)
+        loadsql_inputs = [(sampleid, google_bucket, distance, comment, outfilename, samples_path, clean_files)
+                          for sampleid in sample_ids]
+        pool = Pool(cpu_count())
+        results = pool.starmap(_loadsql._single, loadsql_inputs)
+        pool.close()
+        pool.join()
+        #outfile.close()
         testing.get_runtime_summarystats(comment, samples_path=samples_path)
     elif not load_indiv:
         for sample_id in os.listdir(samples_path):
-            try:
-                # to do - implement better way to check if the sample_id is actually a directory
-                os.chdir(samples_path + sample_id)
-                os.chdir("../..")
+            if os.path.isdir(samples_path + sample_id):
                 _loadmultisql._single(sample_id, google_bucket, distance, comment, outfile, samples_path, clean_files)
-            except NotADirectoryError:
-                pass
         outfile.close()
         prot_edge_load_time = _loadmultisql.bulk_connect_proteins_crisprs(distance, samples_path)
         testing.get_runtime_summarystats(comment, prot_time=prot_edge_load_time, samples_path=samples_path)
