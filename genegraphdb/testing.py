@@ -140,3 +140,9 @@ def log_errors_multisql_loadsql(samples_path, sample_id, exception):
     now = datetime.now()
     date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
     print(date_time + "," + samples_path + sample_id + " : " + str(exception), file=outfile)
+
+def log_errors_multi_loadneo4j(samples_path, sample_id, exception):
+    outfile = open("ggdb_multineo4j_errorlog.csv", "a")
+    now = datetime.now()
+    date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
+    print(date_time + "," + samples_path + sample_id + " : " + str(exception), file=outfile)

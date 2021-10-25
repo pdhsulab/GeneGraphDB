@@ -17,7 +17,7 @@ import time
 import sqlite3
 
 def _single(sample_id, google_bucket, distance, comment, outfilename, samples_path = '', clean_files=False):
-    outfile = open(outfilename, "a") #to do - is this the only way to make multithreading work? best practices?
+    outfile = open(outfilename, "a") # to do - is this the only way to make multithreading work? best practices?
     try:
         sample_id_path = sample_id + "/"
         fasta, protein, contigs = samples_path + sample_id_path + sample_id + ".fna.gz", \
@@ -31,7 +31,6 @@ def _single(sample_id, google_bucket, distance, comment, outfilename, samples_pa
         load_contig2sample(sample_id, contigs, samples_path)
         load_coords(sample_id, sorted_gff_name, recid2contig, crisprid2crhash, samples_path)
         p2p_edge_load_time = proteinnodesql.connect_proteins_crisprs(sample_id, distance, samples_path)
-        #p2p_edge_load_time = 0 #TO DO - delete this later
         toc = time.time()
         print("Loading the entire database took %f seconds" % (toc - tic) + "\n")
         if comment is None:
