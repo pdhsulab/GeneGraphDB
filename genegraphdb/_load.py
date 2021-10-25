@@ -2,6 +2,7 @@ from genegraphdb import *
 from genegraphdb import graphdb
 from genegraphdb import proteinnode
 from genegraphdb import crisprnode
+from genegraphdb import testing
 from Bio import SeqIO
 import gzip
 import re
@@ -11,26 +12,31 @@ from os import remove
 from os.path import abspath
 import time
 
-def _single(sample_id, google_bucket, distance, comment, outfile, samples_path = '', clean_files=False):
-    sample_id_path = sample_id + "/"
-    fasta, protein, contigs = samples_path + sample_id_path + sample_id + ".fna.gz", \
-                              samples_path + sample_id_path + sample_id + ".prodigal.faa.gz", \
-                              samples_path + sample_id_path + sample_id + ".contigs.tsv.gz"
-    tic = time.time()
-    sorted_gff_name = crisprnode.merge_gff(sample_id, samples_path)
-    load_proteins(sample_id, protein, samples_path)
-    crisprid2crhash = crisprnode.load_CRISPRs(sample_id, samples_path)
-    recid2contig = load_fasta(sample_id, fasta, contigs, samples_path)
-    load_contig2sample(sample_id, contigs, samples_path)
-    load_coords(sample_id, sorted_gff_name, recid2contig, crisprid2crhash, samples_path)
-    p2p_edge_load_time = proteinnode.connect_proteins_crisprs(sample_id, distance, samples_path)
-    toc = time.time()
-    print("Loading the entire database took %f seconds" % (toc - tic) + "\n")
-    if comment is None:
-        comment = ""
-    if clean_files:
-        testing.clean_files(sample_id, samples_path)
-    print(sample_id + "," + str(toc - tic) + "," + str(p2p_edge_load_time) + "," + comment, file=outfile)
+def _single(sample_id, google_bucket, distance, comment, outfilename, samples_path = '', clean_files=False):
+    outfile = open(outfilename, "a") # to do - is this the only way to make multithreading work? best practices?
+    try:
+        sample_id_path = sample_id + "/"
+        fasta, protein, contigs = samples_path + sample_id_path + sample_id + ".fna.gz", \
+                                  samples_path + sample_id_path + sample_id + ".prodigal.faa.gz", \
+                                  samples_path + sample_id_path + sample_id + ".contigs.tsv.gz"
+        tic = time.time()
+        sorted_gff_name = crisprnode.merge_gff(sample_id, samples_path)
+        load_proteins(sample_id, protein, samples_path)
+        crisprid2crhash = crisprnode.load_CRISPRs(sample_id, samples_path)
+        recid2contig = load_fasta(sample_id, fasta, contigs, samples_path)
+        load_contig2sample(sample_id, contigs, samples_path)
+        load_coords(sample_id, sorted_gff_name, recid2contig, crisprid2crhash, samples_path)
+        p2p_edge_load_time = proteinnode.connect_proteins_crisprs(sample_id, distance, samples_path)
+        toc = time.time()
+        print("Loading the entire database took %f seconds" % (toc - tic) + "\n")
+        if comment is None:
+            comment = ""
+        if clean_files:
+            testing.clean_files(sample_id, samples_path)
+        print(sample_id + "," + str(toc - tic) + "," + str(p2p_edge_load_time) + "," + comment, file=outfile)
+    except Exception as e:
+        testing.log_errors_multi_loadneo4j(samples_path, sample_id, e)
+    outfile.close
 
 def load_proteins(sample_id, protein, samples_path = ''):
     print("Loading proteins...")
