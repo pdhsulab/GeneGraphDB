@@ -88,6 +88,14 @@ def singlesql(sample_id, google_bucket, distance, comment):
 @click.option('--clean_files/--show_temp_files', default=False, help='Remove all temp files generated when loading data into sql '
                                                          'database')
 def multisql(google_bucket, distance, comment, clean_files):
+    # try:
+    #     os.chdir(samples_path)
+    # except:
+    #     # all test data is one directory up
+    #     os.chdir("..")
+    #     test_data_dir = samples_path.replace("../", "")
+    #     dl_test_data.download_dir(test_data_dir)
+    #     os.chdir(test_data_dir)
     if distance is None:
         distance = 5000
     # outfile = open(samples_path + "ggdb_load_stats.csv", "w") #to do - messes with multiprocessing
@@ -97,14 +105,8 @@ def multisql(google_bucket, distance, comment, clean_files):
     #outfilename = samples_path + "ggdb_load_stats.csv"
     outfilename = "ggdb_load_stats.csv"
     sample_ids = []
-    
-    for key in vars_glob.drep_samples.keys():
-        sampleid = key
-        samples_path = vars_glob.drep_samples_error[key]
-        if os.path.isdir(samples_path):
-            _loadsql._single(sampleid, google_bucket, distance, comment, outfilename, samples_path, clean_files)
 
-    # # Code that works for different sample file directory structure - genomes_annot
+    # # Multiprocessing - leads to many errors; to do - figure out how to resolve this
     # for sample_id in os.listdir(samples_path):
     #     if os.path.isdir(samples_path + sample_id):
     #         sample_ids.append(sample_id)
@@ -121,20 +123,19 @@ def multisql(google_bucket, distance, comment, clean_files):
     #     samples_path = vars_glob.drep_samples_error[key]
     #     if os.path.isdir(samples_path):
     #         _loadsql._single(sampleid, google_bucket, distance, comment, outfilename, samples_path, clean_files)
-    
-    # Multiprocessing - leads to many errors; to do - figure out how to resolve this
-    # loadsql_inputs = []
-    # print(vars_glob.drep_samples)
-    # for key in vars_glob.drep_samples.keys():
-    #     sampleid = key
-    #     samples_path = vars_glob.drep_samples[key]
-    #     if os.path.isdir(samples_path):
-    #         loadsql_inputs.append((sampleid, google_bucket, distance, comment, outfilename, samples_path, clean_files))
-    # print(loadsql_inputs)
-    # pool = Pool(cpu_count())
-    # results = pool.starmap(_loadsql._single, loadsql_inputs)
-    # pool.close()
-    # pool.join()
+
+    loadsql_inputs = []
+    print(vars_glob.drep_samples)
+    for key in vars_glob.drep_samples.keys():
+        sampleid = key
+        samples_path = vars_glob.drep_samples[key]
+        if os.path.isdir(samples_path):
+            loadsql_inputs.append((sampleid, google_bucket, distance, comment, outfilename, samples_path, clean_files))
+    print(loadsql_inputs)
+    pool = Pool(cpu_count())
+    results = pool.starmap(_loadsql._single, loadsql_inputs)
+    pool.close()
+    pool.join()
 
     #outfile.close()
     #testing.get_runtime_summarystats(comment, samples_path=samples_path)

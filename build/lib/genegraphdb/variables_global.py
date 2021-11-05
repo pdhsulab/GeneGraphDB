@@ -15,20 +15,18 @@ temp_files_list = ["contig2sample.tmp.sql.csv", "contigs.tmp.sql.csv", "crispr_c
 path_drep = "../drep_genomes/OUTPUT/rep_genomes/"
 drep_samples = {}
 for directory in os.listdir(path_drep):
-    drep_samples[directory] = path_drep + "/" + directory
-# for directory in os.listdir(path_drep):
-#     path_2 = path_drep + directory
-#     if os.path.isdir(path_2):
-#         for directory_2 in os.listdir(path_2):
-#             path_3 = path_2 + "/" + directory_2
-#             if os.path.isdir(path_3):
-#                 for directory_3 in os.listdir(path_3):
-#                     path_4 = path_3 + "/" + directory_3 + "/"
-#                     if os.path.isdir(path_4):
-#                         for directory_samp in os.listdir(path_4):
-#                             samp_dir = path_4 + directory_samp
-#                             if os.path.isdir(samp_dir):
-#                                 drep_samples[directory_samp] = path_4
+    path_2 = path_drep + directory
+    if os.path.isdir(path_2):
+        for directory_2 in os.listdir(path_2):
+            path_3 = path_2 + "/" + directory_2
+            if os.path.isdir(path_3):
+                for directory_3 in os.listdir(path_3):
+                    path_4 = path_3 + "/" + directory_3 + "/"
+                    if os.path.isdir(path_4):
+                        for directory_samp in os.listdir(path_4):
+                            samp_dir = path_4 + directory_samp
+                            if os.path.isdir(samp_dir):
+                                drep_samples[directory_samp] = path_4
                 
 sampleids_error = []
 with open("ggdb_multisql_errorlog.csv", "r") as f:
