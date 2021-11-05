@@ -1,6 +1,6 @@
 # GeneGraphDB
 A command line tool to create and query a gene graph databases.
-
+ 
 # Schema
 
 ## Nodes
