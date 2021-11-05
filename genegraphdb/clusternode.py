@@ -14,6 +14,10 @@ from collections import deque
 import csv
 from csv import reader
 
+# def get_cluster_csv():
+#     # collect .prodigal.faa.gz file paths
+#     # unzip and concat (fast!)
+#     #
 def load_cluster_nodes():
     print("Loading cluster nodes...")
     tic = time.time()

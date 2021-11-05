@@ -24,7 +24,7 @@ for directory in os.listdir(path_drep):
                     path_4 = path_3 + "/" + directory_3 + "/"
                     if os.path.isdir(path_4):
                         for directory_samp in os.listdir(path_4):
-                            samp_dir = path_4 + "/" + directory_samp
+                            samp_dir = path_4 + directory_samp
                             if os.path.isdir(samp_dir):
                                 drep_samples[directory_samp] = path_4
                 
