@@ -22,7 +22,6 @@ def cli():
 
 @cli.command(short_help='Create a new GeneGraphDB')
 def createdb():
-
     if not graphdb.hasdb():
         graphdb.createdb()
     else:
@@ -100,7 +99,7 @@ def multisql(google_bucket, distance, comment, clean_files):
     
     for key in vars_glob.drep_samples.keys():
         sampleid = key
-        samples_path = vars_glob.drep_samples_error[key]
+        samples_path = vars_glob.drep_samples[key]
         if os.path.isdir(samples_path):
             _loadsql._single(sampleid, google_bucket, distance, comment, outfilename, samples_path, clean_files)
 
