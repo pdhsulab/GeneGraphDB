@@ -14,8 +14,6 @@ temp_files_list = ["contig2sample.tmp.sql.csv", "contigs.tmp.sql.csv", "crispr_c
                    "protein2protein.tmp.csv", "proteins.tmp.csv", "temp.minced.gff"]
 path_drep = "../drep_genomes/OUTPUT/rep_genomes/"
 drep_samples = {}
-# for directory in os.listdir(path_drep):
-#     drep_samples[directory] = path_drep + "/" + directory
 for directory in os.listdir(path_drep):
     path_2 = path_drep + directory
     if os.path.isdir(path_2):
