@@ -8,3 +8,8 @@ genegraphdb.egg-info/
 ggdb_multisql_errorlog.csv
 genegraph.db
 genegraphdb/.ipynb_checkpoints/
+clusterRes_all_seqs.fasta
+clusterRes_rep_seq.fasta
+clusterRes_cluster.tsv
+ggdb_summary_stats.csv
+ggdb_load_stats.csv
