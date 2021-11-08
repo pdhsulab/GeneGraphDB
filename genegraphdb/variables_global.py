@@ -7,11 +7,12 @@ sql_tables = ["proteins", "samples", "crisprs", "contigs", "contig2sample", "cri
 temp_files_list = ["contig2sample.tmp.sql.csv", "contigs.tmp.sql.csv", "crispr_coords.tmp.sql.csv", "CRISPRs.tmp.sql.csv",
                        "gene_coords.tmp.sql.csv", "merged_sorted_coords.tmp.sql.csv", "merged.sorted.tmp.sql.gff",
                        "protein2crispr_window.tmp.sql.csv", "protein2crispr.tmp.sql.csv", "protein2protein_window.tmp.sql.csv",
-                       "protein2protein.tmp.sql.csv", "proteins.tmp.sql.csv", "temp.minced.sql.gff",
-                   "contig2sample.tmp.csv", "contigs.tmp.csv", "crispr_coords.tmp.csv", "CRISPRs.tmp.csv",
-                   "gene_coords.tmp.csv", "merged_sorted_coords.tmp.csv", "merged.sorted.tmp.gff",
-                   "protein2crispr_window.tmp.csv", "protein2crispr.tmp.csv", "protein2protein_window.tmp.csv",
-                   "protein2protein.tmp.csv", "proteins.tmp.csv", "temp.minced.gff"]
+                       "protein2protein.tmp.sql.csv", "proteins.tmp.sql.csv", "temp.minced.sql.gff"]
+print(temp_files_list)
+                   # "contig2sample.tmp.csv", "contigs.tmp.csv", "crispr_coords.tmp.csv", "CRISPRs.tmp.csv",
+                   # "gene_coords.tmp.csv", "merged_sorted_coords.tmp.csv", "merged.sorted.tmp.gff",
+                   # "protein2crispr_window.tmp.csv", "protein2crispr.tmp.csv", "protein2protein_window.tmp.csv",
+                   # "protein2protein.tmp.csv", "proteins.tmp.csv", "temp.minced.gff"]
 path_drep = "../drep_genomes/OUTPUT/rep_genomes/"
 drep_samples = {}
 # for directory in os.listdir(path_drep):
