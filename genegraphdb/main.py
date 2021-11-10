@@ -84,8 +84,7 @@ def singlesql(sample_id, google_bucket, distance, comment):
 @click.option('--google-bucket', '-gb', default=None, help='The Google bucket to store sequences.')
 @click.option('--distance', '-d', default=None, type=int, help='The distance in number of neighbors or base pairs')
 @click.option('--comment', '-c', default=None, type=str, help='Any notes on a particular load script runtime')
-@click.option('--clean_files/--show_temp_files', default=False, help='Remove all temp files generated when loading data into sql '
-                                                         'database')
+@click.option('--clean_files/--show_temp_files', default=False, help='Remove all temp files generated when loading data into sql database')
 def multisql(google_bucket, distance, comment, clean_files):
     if distance is None:
         distance = 5000
