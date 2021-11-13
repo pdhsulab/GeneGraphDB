@@ -108,6 +108,7 @@ def load_fasta(sample_id, fasta, contigs, samples_path = ''):
     contig_csv = open(contig_csv_path)
     rows = csv.reader(contig_csv)
     next(rows)
+    #cur.execute("PRAGMA journal_mode=WAL")
     cmd = '''
     INSERT OR IGNORE INTO contigs (hashid, length) VALUES (?,?)
     '''
@@ -138,6 +139,7 @@ def load_contig2sample(sample_id, contigs, samples_path = ''):
     contig2sample_csv = open(contig2sample_csv_path)
     rows = csv.reader(contig2sample_csv)
     next(rows)
+    #cur.execute("PRAGMA journal_mode=WAL")
     cmd = '''
     INSERT OR IGNORE INTO contig2sample (contighashid, sampleid) VALUES (?,?)
     '''

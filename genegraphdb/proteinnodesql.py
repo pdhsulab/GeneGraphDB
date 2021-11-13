@@ -140,6 +140,7 @@ def load_protein_coords(sample_id, samples_path=''):
     gene_coords_csv = open(gene_coords_csv_path)
     rows = csv.reader(gene_coords_csv)
     next(rows)
+    #cur.execute("PRAGMA journal_mode=WAL")
     cmd = '''
         INSERT OR IGNORE INTO proteincoords (phash, contighash, start, end, orientation) VALUES (?,?,?,?,?)
         '''
@@ -162,6 +163,7 @@ def load_csv(csv_path_p2p, csv_path_p2c, csv_path_p2p_window, csv_path_p2c_windo
     next(p2pwindow_rows)
     p2cwindow_rows = csv.reader(p2cwindow_csv)
     next(p2cwindow_rows)
+    #cur.execute("PRAGMA journal_mode=WAL")
     p2p_cmd = '''INSERT OR IGNORE INTO prot2prot (p1hash, p2hash) VALUES (?,?)'''
     p2c_cmd = '''INSERT OR IGNORE INTO prot2crispr (p1hash, crisprhash) VALUES (?,?)'''
     p2pwindow_cmd = '''INSERT OR IGNORE INTO prot2protwindow (p1hash, p2hash) VALUES (?,?)'''

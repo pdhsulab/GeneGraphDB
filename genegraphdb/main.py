@@ -96,9 +96,9 @@ def multisql(google_bucket, distance, comment, clean_files):
     outfilename = "ggdb_load_stats.csv"
     sample_ids = []
     
-    for key in vars_glob.drep_samples.keys():
+    for key in vars_glob.drep_samples_error.keys():
         sampleid = key
-        samples_path = vars_glob.drep_samples[key]
+        samples_path = vars_glob.drep_samples_error[key]
         if os.path.isdir(samples_path):
             _loadsql._single(sampleid, google_bucket, distance, comment, outfilename, samples_path, clean_files)
 
