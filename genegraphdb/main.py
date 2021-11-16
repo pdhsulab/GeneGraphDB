@@ -94,8 +94,9 @@ def multisql(google_bucket, distance, comment, clean_files):
     outfile.close()
     #outfilename = samples_path + "ggdb_load_stats.csv"
     outfilename = "ggdb_load_stats.csv"
-    sample_ids = []
     
+    # # load samples that errored out - to slow
+    sample_ids = []
     for key in vars_glob.drep_samples_error.keys():
         sampleid = key
         samples_path = vars_glob.drep_samples_error[key]
@@ -120,16 +121,16 @@ def multisql(google_bucket, distance, comment, clean_files):
     #     if os.path.isdir(samples_path):
     #         _loadsql._single(sampleid, google_bucket, distance, comment, outfilename, samples_path, clean_files)
     
-    # Multiprocessing - leads to many errors; to do - figure out how to resolve this
+    # # Multiprocessing - leads to many errors; to do - figure out how to resolve this
     # loadsql_inputs = []
-    # print(vars_glob.drep_samples)
-    # for key in vars_glob.drep_samples.keys():
+    # #print(vars_glob.drep_samples_error)
+    # for key in vars_glob.drep_samples_error.keys():
     #     sampleid = key
-    #     samples_path = vars_glob.drep_samples[key]
+    #     samples_path = vars_glob.drep_samples_error[key]
     #     if os.path.isdir(samples_path):
     #         loadsql_inputs.append((sampleid, google_bucket, distance, comment, outfilename, samples_path, clean_files))
-    # print(loadsql_inputs)
-    # pool = Pool(cpu_count())
+    # #print(loadsql_inputs)
+    # pool = Pool(4)
     # results = pool.starmap(_loadsql._single, loadsql_inputs)
     # pool.close()
     # pool.join()

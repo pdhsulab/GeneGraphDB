@@ -77,7 +77,7 @@ def load_CRISPRs(sample_id, samples_path):
     #       "repeat_len: row.repeat_len, array_len: row.array_len, " \
     #       "num_spacers: row.num_spacers}})".format(csv=abspath(sample_id + '/CRISPRs.tmp.csv')
     # )
-    #conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute("PRAGMA journal_mode=WAL")
     cmd = """
           LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row
           MERGE (n:CRISPR {{hashid: row.hashid}})
@@ -94,7 +94,7 @@ def load_CRISPRs(sample_id, samples_path):
 def load_crispr_coords(sample_id, samples_path):
     sample_id_path = samples_path + sample_id + "/"
     conn = graphdb.Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
-    #conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute("PRAGMA journal_mode=WAL")
     cmd = """
           USING PERIODIC COMMIT
           LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row 
