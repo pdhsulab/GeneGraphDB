@@ -22,10 +22,11 @@ def cli():
 
 @cli.command(short_help='Create a new GeneGraphDB')
 def createdb():
-    if not graphdb.hasdb():
-        graphdb.createdb()
-    else:
-        print("Database %s already exists." % DBNAME)
+    graphdb.createdb()
+    # if not graphdb.hasdb():
+    #     graphdb.createdb()
+    # else:
+    #     print("Database %s already exists." % DBNAME)
 
 @cli.command(short_help='Create a new GeneGraphDB')
 def dbinfo():

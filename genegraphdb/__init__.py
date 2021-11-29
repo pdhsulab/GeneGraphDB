@@ -1,4 +1,5 @@
 DBNAME = "genegraphdb" 
-DBURI = "bolt://localhost:7687"
+#DBURI = "bolt://localhost:7687"
+DBURI = "bolt://35.232.49.56:7687"
 DBUSER = "neo4j"
-DBPASSWORD = "neo4j"
+DBPASSWORD = "genegraphdb"
