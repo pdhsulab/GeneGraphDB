@@ -32,19 +32,3 @@ def createdb():
 def cleardb():
     os.system("rm genegraph.db")
     pass
-
-# def num_nodes():
-#     con = sqlite3.connect('genegraph.db')
-#     cur = con.cursor()
-#     num_nodes = cur.execute() #conn.query("MATCH (n) RETURN count(*)", db=DBNAME)[0]['count(*)']
-#     con.close()
-#
-#     return num_nodes
-#
-# def num_rels():
-#     con = sqlite3.connect('genegraph.db')
-#     cur = con.cursor()
-#     num_rels = cur.execute() #conn.query("MATCH ()-[r]->() RETURN count(r) as count", db=DBNAME)[0]['count']
-#     con.close()
-#
-#     return num_rels

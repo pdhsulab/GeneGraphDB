@@ -39,4 +39,4 @@ with open("ggdb_multisql_errorlog.csv", "r") as f:
 keys = set(sampleids_error).intersection(set(drep_samples.keys()))
 
 drep_samples_error = {k:drep_samples[k] for k in keys}
-#drep_samples_error = {"EARTH_3300025421_6": "../drep_genomes/OUTPUT/rep_genomes/A011/B026/C033/"} # to do - comment out
+#drep_samples_error = {"EARTH_3300025421_6": "../drep_genomes/OUTPUT/rep_genomes/A011/B026/C033/"}

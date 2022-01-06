@@ -17,7 +17,7 @@ import time
 import sqlite3
 
 def _single(sample_id, google_bucket, distance, comment, outfilename, samples_path = '', clean_files=False):
-    outfile = open(outfilename, "a") # to do - is this the only way to make multithreading work? best practices?
+    outfile = open(outfilename, "a")
     try:
         sample_id_path = sample_id + "/"
         fasta, protein, contigs = samples_path + sample_id_path + sample_id + ".fna.gz", \
@@ -51,7 +51,7 @@ def load_proteins(sample_id, protein, samples_path = ''):
     done = set()
     handle = gzip.open(protein, 'rt')
     for rec in SeqIO.parse(handle, 'fasta'):
-        name_truncate = rec.id[:20]
+        name_truncate = rec.id[:18]
         if name_truncate in done:
                 continue
         done.add(name_truncate)
@@ -93,7 +93,7 @@ def load_fasta(sample_id, fasta, contigs, samples_path = ''):
     handle = gzip.open(fasta, 'rt')
     for rec in SeqIO.parse(handle, 'fasta'):
         contig, clength = recid2contig[rec.id]
-        name_truncate = contig[:20]
+        name_truncate = contig[:18]
         if name_truncate in done:
             continue
         done.add(name_truncate)
@@ -131,7 +131,7 @@ def load_contig2sample(sample_id, contigs, samples_path = ''):
         infile.readline()
         for line in infile:
             line = line.strip().split('\t')
-            print(line[1][:20]+','+str(sample_id), file=outfile)
+            print(line[1][:18]+','+str(sample_id), file=outfile)
     outfile.close()
     con = sqlite3.connect('genegraph.db')
     cur = con.cursor()
@@ -173,13 +173,13 @@ def load_coords(sample_id, gff, recid2contig, crisprid2crhash, samples_path = ''
                     print(len(line))
                     continue
                 if "Prodigal" in line[1]:
-                    phash = line[-1].split("ID=")[-1].split(';')[0][:20]
-                    chash = recid2contig[line[0]][0][:20]
+                    phash = line[-1].split("ID=")[-1].split(';')[0][:18]
+                    chash = recid2contig[line[0]][0][:18]
                     print(line[0], phash, chash, line[3], line[4], line[6], sep=',', file=g_out)
                 elif "minced" in line[1]:
-                    old_id = line[-1].split("ID=")[-1].split(';')[0][:20]
+                    old_id = line[-1].split("ID=")[-1].split(';')[0][:18]
                     crhash = crisprid2crhash[old_id]
-                    chash = recid2contig[line[0]][0][:20]
+                    chash = recid2contig[line[0]][0][:18]
                     print(line[0], crhash, chash, line[3], line[4], sep=',', file=cr_out)
     crisprnodesql.load_crispr_coords(sample_id, samples_path)
     # To do - debug this. why does gene_coords have a repeat? How can I get SQL to skip vs error out
