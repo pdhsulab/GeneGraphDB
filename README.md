@@ -32,9 +32,9 @@ CREATE TABLE crisprs (hashid text, PRIMARY KEY (hashid));
 
 ### clusters
 CREATE TABLE stringent (reppid text, pid text, PRIMARY KEY(pid));
-* pid is p100 protein, reppid is p90 cluster representative
+- pid is p100 protein, reppid is p90 cluster representative
 CREATE TABLE permissive (reppid text, pid text, PRIMARY KEY(pid));
-* pid is p90 cluster representative, reppid is p30 cluster representative
+- pid is p90 cluster representative, reppid is p30 cluster representative
 
 ## Edges
 
@@ -49,9 +49,9 @@ CREATE TABLE proteincoords (phash text, contighash text, start real, end real, o
 CREATE TABLE prot2prot (p1hash text, p2hash text, PRIMARY KEY (p1hash, p2hash));
 CREATE TABLE prot2crispr (p1hash text, crisprhash text, PRIMARY KEY (p1hash, crisprhash));
 CREATE TABLE prot2protwindow (p1hash text, p2hash text, PRIMARY KEY (p1hash, p2hash));
-* window size is 5kb
+- window size is 5kb
 CREATE TABLE prot2crisprwindow (p1hash text, crisprhash text, PRIMARY KEY (p1hash, crisprhash));
-* window size is 5kb
+- window size is 5kb
 
 ### Protein2Stringent2permissive
 CREATE TABLE clusters (p100, p90, p30, PRIMARY KEY(p100));
@@ -65,19 +65,19 @@ ggdb load multisql ...
 ## Making cluster nodes / relationships
 ### Run scripts in this order
 get_mmseqs_input.ipynb
-* Make multifasta files for mmseqs input
+- Make multifasta files for mmseqs input
 01.stringent_clusters.sh 
-* Make stringent clusters
+- Make stringent clusters
 get_testdb_protein_stats.ipynb
-* Make 80kprotein_stats.db
+- Make 80kprotein_stats.db
 get_stringent_cluster_rep.ipynb
-* Define which proteins are good stringent clusters
-* Output clu_rep_stringent_final.csv
-* Output clu_badrep_stringent.csv
+- Define which proteins are good stringent clusters
+- Output clu_rep_stringent_final.csv
+- Output clu_badrep_stringent.csv
 make_permissive_clusters.ipynb
-* Output clu_perm_mmseqs_input.faa
-* This multifasta file is input for mmseqs
+- Output clu_perm_mmseqs_input.faa
+- This multifasta file is input for mmseqs
 02.permissive_clusters.sh
-* Make permissive clusters
+- Make permissive clusters
 03.combine_clusters.py
-* Combines stringent and permissive clusters into one .csv file, complete_clusters.tsv
+- Combines stringent and permissive clusters into one .csv file, complete_clusters.tsv
