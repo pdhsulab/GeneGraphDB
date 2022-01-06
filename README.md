@@ -50,6 +50,7 @@ CREATE TABLE prot2prot (p1hash text, p2hash text, PRIMARY KEY (p1hash, p2hash));
 CREATE TABLE prot2crispr (p1hash text, crisprhash text, PRIMARY KEY (p1hash, crisprhash));
 CREATE TABLE prot2protwindow (p1hash text, p2hash text, PRIMARY KEY (p1hash, p2hash));
 - window size is 5kb
+
 CREATE TABLE prot2crisprwindow (p1hash text, crisprhash text, PRIMARY KEY (p1hash, crisprhash));
 - window size is 5kb
 
