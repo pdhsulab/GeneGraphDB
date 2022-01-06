@@ -56,7 +56,7 @@ def load_CRISPRs(sample_id, samples_path):
                 continue
             array_repeat = re.findall(r"=(.*)", line[8].split(";")[3])[0]
             crhash = hashlib.sha256(array_repeat.encode()).hexdigest()
-            name_truncate = crhash[:20]
+            name_truncate = crhash[:18]
             repeat_len = len(array_repeat)
             array_len = abs(int(line[4]) - int(line[3])) + 1
             num_spacers = line[5]

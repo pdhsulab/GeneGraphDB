@@ -8,13 +8,9 @@ from genegraphdb import variables_global as vars_glob
 import sqlite3
 import numpy as np
 
+# all of these tests were performed locally before implementing the graph database on gcloud
+# some tests rely on sample directories that are organized differently from the sample directories on gcloud
 class testSQLiteNodeConnections(unittest.TestCase): # to do - change class name; outdated
-    #All tables are populated
-    # Neo4J file sizes match SQL file sizes
-    # All files are updated properly
-    # (After indexing)
-        # Number of rows per table is stable between load runs
-        # Something duplicate related
     def test_allSQLite_tables_full(self):
         sql_tables = vars_glob.sql_tables
         con = sqlite3.connect('genegraph.db')
@@ -23,7 +19,6 @@ class testSQLiteNodeConnections(unittest.TestCase): # to do - change class name;
             cmd = "SELECT count(*) FROM {}".format(table)
             cur.execute(cmd)
             rv = cur.fetchall()
-            # print(rv,rv[0][0])
             self.assertTrue(rv[0][0] > 0)
     def test_neo4J_SQL_filesizematch(self):
         paths_genomes_annot = []
@@ -39,6 +34,8 @@ class testSQLiteNodeConnections(unittest.TestCase): # to do - change class name;
             for filepair in allfiles_list:
                 filepaths = (sample_path + filepair[0], sample_path + filepair[1])
                 self.assertEqual(os.path.getsize(filepaths[0]), os.path.getsize(filepaths[1]))
+                
+    # mtime describes the time a file was last modified
     def test_all_sqlfiles_updated(self):
         paths_genomes_annot = []
         mtimes_sqlfiles = []
@@ -55,47 +52,16 @@ class testSQLiteNodeConnections(unittest.TestCase): # to do - change class name;
                 mtimes_sqlfiles.append(os.path.getmtime(filepath))
         mtime_ref = mtimes_sqlfiles[0]
         for mtime in mtimes_sqlfiles:
-            # print(mtime, mtime_ref, mtime-mtime_ref) # to do - delete
-            self.assertTrue(np.abs(mtime - mtime_ref) < 100) # ~100 mtime units is the around the observed time it takes to load samples in SQLite
+            self.assertTrue(np.abs(mtime - mtime_ref) < 100) # all samples from genomes_annot directory should be loaded in the ggdb in under 100 mtime units
     def test_sqlite_dbsize_stable(self):
         init_db_size = os.path.getsize("genegraph.db")
         os.system("ggdb load multisql -s genomes_annot/ -c '' ")
         final_db_size = os.path.getsize("genegraph.db")
         self.assertEqual(init_db_size, final_db_size)
 
-    # def test_num_prot2prot(self):
-    #     num_prot2prot_csv =
-    #
-    #     num_prot2prot_sql =
-    def test_example_queries(self):
-        querysuccess = True
-        con = sqlite3.connect('genegraph.db')
-        cur = con.cursor()
-        # *optional* find contigs with many proteins (single protein contigs won't join with prot2prot)
-        # find a protein's neighbours based on protein's hashid
-        # account for duplicate proteins in other contigs
-        query_prot2prot = """
-        SELECT * FROM proteins as p
-        INNER JOIN prot2prot as p2p
-        ON (p.hashid = p2p.p1hash OR p.hashid = p2p.p2hash)
-        WHERE p.hashid = '188f3c7cbdf9c81f121f|'
-        """
-        query_prot2crispr = """
-        """
-        try:
-            cur.execute(query_prot2prot)
-            #cur.execute(query_prot2crispr)
-        except:
-            querysuccess = False
-        #rv = cur.fetchall()
-        con.close()
-        self.assertTrue(querysuccess)
-        pass
-
 if __name__ == '__main__':
     unittest.main()
 
-# To do: ordering of arguments is super confusing: fix
 def get_runtime_summarystats(comment="", prot_time = 0, samples_path = "", infile_name = "ggdb_load_stats.csv", outfile_name = "ggdb_summary_stats.csv"):
     if samples_path != "":
         infile_name = samples_path + infile_name

@@ -26,8 +26,6 @@ def connect_proteins_crisprs(sample_id, max_distance, samples_path = ''):
 
 
     toc = time.time()
-    # remove("protein2protein.tmp.csv")
-    # remove(merge_sorted_coords_csv)
     print("Loading protein2protein edges took %f seconds" % (toc - tic))
     return toc-tic
 
@@ -43,13 +41,15 @@ def create_all_protein_crispr_edge_csv(sample_id, max_distance, samples_path = '
     print("recid,phash,qhash", file=outfile_p2p_base_window)
     print("recid,phash,qhash", file=outfile_p2c_base_window)
 
-    merge_sorted_coords_csv = sample_id_path + "merged_sorted_coords.tmp.csv" #To do - does this cause bugs?
-    # write two distinct functions to create three types of protein edges (3 csvs)
+    merge_sorted_coords_csv = sample_id_path + "merged_sorted_coords.tmp.csv"
+    
+    # creates csvs with all pairings between proteins and CRISPRs that are either adjacent ('pairs') or within a genomic neighbourhood ('neighbours')
     create_protein_pair_csv(merge_sorted_coords_csv, outfile_prot_pair, outfile_prot_crispr_pair)
     create_protein_window_csv(merge_sorted_coords_csv, max_distance, outfile_p2p_base_window, outfile_p2c_base_window)
 
     outfile_prot_pair.close(), outfile_prot_crispr_pair.close(), outfile_p2p_base_window.close(), outfile_p2c_base_window.close()
 
+# allows proteins near CRISPRs to be mapped to each other as neighbours
 def make_merged_coords_csv(sample_id, samples_path = ''):
     sample_id_path = samples_path + sample_id + "/"
     os.system("cat " + sample_id_path + "gene_coords.tmp.csv | sed -e '1s/phash/hash/' | cut -d',' -f 1-5 | "
@@ -63,7 +63,7 @@ def make_merged_coords_csv(sample_id, samples_path = ''):
               "--field-separator=',' -k1,1 -k4,4n >> " + sample_id_path + "merged_sorted_coords.tmp.csv")
     os.system("rm " + sample_id_path + "gene_coords_m.tmp.csv " + sample_id_path + "tmp.crispr_coords.csv " + sample_id_path + "merged_coords.tmp.csv")
 
-# create adjacent protein-protein edges, saves edges as csv
+
 def create_protein_pair_csv(gene_coords_csv, outfile_prot_pair, outfile_prot_crispr_pair):
     with open(gene_coords_csv, 'r') as g:
         infile = reader(g)
@@ -81,11 +81,9 @@ def create_protein_pair_csv(gene_coords_csv, outfile_prot_pair, outfile_prot_cri
                 old_chash = cur_chash
                 old_is_crispr = cur_is_crispr
 
-# create protein-protein edges within a base-defined window
 def create_protein_window_csv(merge_coords_csv, max_distance, outfile_p2p, outfile_p2c):
     base_neigh_queue = deque()
     with open(merge_coords_csv, 'r') as f:
-        # else:
         infile = reader(f)
         header = next(infile)
         row1 = next(infile)
@@ -99,7 +97,6 @@ def create_protein_window_csv(merge_coords_csv, max_distance, outfile_p2p, outfi
                     old_phash = _dict["phash"]
                     if newGene_is_same_contig(old_chash, cur_chash) and is_protein2protein(old_is_crispr, cur_is_crispr):
                         print(recid + "," + cur_phash + "," + old_phash, file=outfile_p2p)
-                    # to do - keep this condition for crispr to protein? or also want crispr to crispr?
                     elif newGene_is_same_contig(old_chash, cur_chash) and is_protein2crispr(old_is_crispr, cur_is_crispr) and int(cur_is_crispr):
                         print(recid + "," + cur_phash + "," + old_phash, file=outfile_p2c)
 
@@ -110,6 +107,7 @@ def create_protein_window_csv(merge_coords_csv, max_distance, outfile_p2p, outfi
                 old_chash = cur_chash
                 old_is_crispr = cur_is_crispr
 
+# the queue is a sliding window that defines a query protein or crispr's genomic neighbourhood
 def update_base_neigh_queue(queue, cur_phash, old_chash, cur_chash, max_distance, new_coord,
                         old_coord):
     if newGene_is_same_contig(old_chash, cur_chash):
@@ -147,7 +145,7 @@ def load_protein_coords(sample_id, samples_path=''):
     conn.query(cmd, db=DBNAME)
     conn.close()
 
-# all input csvs will have two columns - one for donor protein's phash, other for recipient
+# all input csvs have two columns - one for donor protein's phash, other for recipient
 def load_csv(csv_path_p2p, csv_path_p2c, csv_path_p2p_window, csv_path_p2c_window):
     conn = graphdb.Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
     cmd_protein2protein_edges = """
@@ -169,8 +167,6 @@ def load_csv(csv_path_p2p, csv_path_p2c, csv_path_p2p_window, csv_path_p2c_windo
               """.format(
         csv=abspath(csv_path_p2c)
     )
-    # to do - speed up the next 2 queries + make the edges the same label
-    # currently different labels for testing purposes.
     cmd_p2c_window_edges = """
               USING PERIODIC COMMIT 10000
               LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row 

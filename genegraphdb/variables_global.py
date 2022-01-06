@@ -8,7 +8,6 @@ temp_files_list = ["contig2sample.tmp.sql.csv", "contigs.tmp.sql.csv", "crispr_c
                        "gene_coords.tmp.sql.csv", "merged_sorted_coords.tmp.sql.csv", "merged.sorted.tmp.sql.gff",
                        "protein2crispr_window.tmp.sql.csv", "protein2crispr.tmp.sql.csv", "protein2protein_window.tmp.sql.csv",
                        "protein2protein.tmp.sql.csv", "proteins.tmp.sql.csv", "temp.minced.sql.gff"]
-print(temp_files_list)
                    # "contig2sample.tmp.csv", "contigs.tmp.csv", "crispr_coords.tmp.csv", "CRISPRs.tmp.csv",
                    # "gene_coords.tmp.csv", "merged_sorted_coords.tmp.csv", "merged.sorted.tmp.gff",
                    # "protein2crispr_window.tmp.csv", "protein2crispr.tmp.csv", "protein2protein_window.tmp.csv",
@@ -38,4 +37,6 @@ with open("ggdb_multisql_errorlog.csv", "r") as f:
         sampleid = line[2].split(' : ')[0].split('/')[-1]
         sampleids_error.append(sampleid)
 keys = set(sampleids_error).intersection(set(drep_samples.keys()))
+
 drep_samples_error = {k:drep_samples[k] for k in keys}
+#drep_samples_error = {"EARTH_3300025421_6": "../drep_genomes/OUTPUT/rep_genomes/A011/B026/C033/"}
