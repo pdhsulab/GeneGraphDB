@@ -4,7 +4,7 @@ import sqlite3
 
 def p30_to_p100(p30_id, dbpath):
 
-    con = join(dbpath, CLUSTERS_DB)
+    con = sqlite3.connect(join(dbpath, CLUSTERS_DB))
     cur = con.cursor()
     cmd = 'SELECT p100 FROM clusters WHERE p30_id="{}"'.format(p30_id)
 
