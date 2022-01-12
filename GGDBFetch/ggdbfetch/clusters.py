@@ -2,7 +2,7 @@ from ggdbfetch import CLUSTERS_DB
 from os.path import join
 import sqlite3
 
-def p30_to_p100(p30_id, dbpath):
+def get_clusters(p30_id, dbpath):
 
     con = sqlite3.connect(join(dbpath, CLUSTERS_DB))
     cur = con.cursor()
