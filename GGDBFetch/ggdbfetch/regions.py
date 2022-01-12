@@ -22,7 +22,7 @@ def get_regions(sample_path, p100s, p100_to_p90, p100_to_p30, dbpath):
             print(sample, contig_id, contig_seq, sep='\t')
         contig_range_seqs[contig_id] = contig_seq
 
-    return coords, contig_range_seqs
+    return contig_range_seqs, coords
 
 
 def flip_coords(coords, contig_range):
