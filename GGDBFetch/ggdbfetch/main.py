@@ -1,6 +1,8 @@
 import click
 import os
 from ggdbfetch.retrieve import _targets_and_baits
+import shutil
+import sys
 
 @click.group()
 def cli():
@@ -13,9 +15,19 @@ def retrieve():
 
 @retrieve.command(short_help='Retrieve by target and baits.')
 @click.argument('infile')
+@click.option('--outdir', '-o', default='ggdbfetch')
 @click.option('--dbpath', default='/home/mdurrant/GeneGraphDB/data/rep_genomes')
-def targets_and_baits(infile, dbpath):
+@click.option('--force/--no-force', default=False)
+def targets_and_baits(infile, outdir, dbpath, force):
 
-    _targets_and_baits(infile, dbpath)
+    if os.path.isdir(outdir) and not force:
+        print("Output directory already exists, exiting...")
+        sys.exit()
+    elif os.path.isdir(outdir):
+        print("Output directory exists, but removing because --force flag is given...")
+        shutil.rmtree(outdir)
+
+    os.makedirs(outdir)
+    _targets_and_baits(infile, dbpath, outdir)
 
 
