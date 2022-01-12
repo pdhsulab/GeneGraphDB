@@ -2,14 +2,14 @@ from ggdbfetch import SAMPLE2PROTEIN_DB
 from os.path import join
 import sqlite3
 from collections import defaultdict
-
+import tqdm
 
 def get_sample_to_p100s(p100s, dbpath, sample2path, threads):
     con = sqlite3.connect(join(dbpath, SAMPLE2PROTEIN_DB))
     cur = con.cursor()
 
     sample2p100s = defaultdict(set)
-    for p100 in p100s:
+    for p100 in tqdm(p100s):
         cmd = 'SELECT sample_id FROM sample2protein WHERE p100="{}"'.format(p100)
         for res in cur.execute(cmd):
             samp = res[0]
