@@ -1,6 +1,7 @@
 from ggdbfetch import misc
 from pyfastx import Fasta
 from os.path import basename, join
+import sqlite3
 
 def get_regions(sample_path, p100s, p100_to_p90, p100_to_p30, dbpath):
 
