@@ -27,7 +27,6 @@ def retrieve_target_and_bait(target_id, bait_ids, dbpath, sample2path, outdir, t
 
     print(sample2p100s)
     args = [(sample2path[samp], sample2p100s[samp], p100_to_p90, p100_to_p30, dbpath) for samp in sample2p100s]
-    args = args[:2]
     with Pool(threads) as pool:
         results = pool.starmap(regions.get_regions, args)
 
