@@ -23,8 +23,8 @@ def retrieve_target_and_bait(target_id, bait_ids, dbpath, sample2path, outdir, t
 
     print('\tGetting clusters...')
     all_p100, p100_to_p90, p100_to_p30 = clusters.get_clusters(target_id, dbpath)
-    print('\tGetting samples...')
-    sample2p100s = sample2protein.get_sample_to_p100s(all_p100, dbpath, sample2path)
+    print('\tGetting samples for {} p100s...'.format(len(all_p100)))
+    sample2p100s = sample2protein.get_sample_to_p100s(all_p100, dbpath, sample2path, threads)
 
     print('\tGetting regions...')
     args = [(sample2path[samp], sample2p100s[samp], p100_to_p90, p100_to_p30, dbpath) for samp in sample2p100s]
