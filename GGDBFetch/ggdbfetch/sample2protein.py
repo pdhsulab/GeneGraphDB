@@ -1,10 +1,10 @@
-from ggdbfetch import CLUSTERS_DB
+from ggdbfetch import SAMPLE2PROTEIN_DB
 from os.path import join
 import sqlite3
 from collections import defaultdict
 
 def get_sample_to_p100s(p100s, dbpath):
-    con = sqlite3.connect(join(dbpath, CLUSTERS_DB))
+    con = sqlite3.connect(join(dbpath, SAMPLE2PROTEIN_DB))
     cur = con.cursor()
 
     sample2p100s = defaultdict(set)
