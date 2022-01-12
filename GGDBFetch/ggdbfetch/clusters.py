@@ -15,6 +15,7 @@ def get_clusters(p30_id, dbpath):
         p100, p90 = res
         p100_to_p90[p100] = p90
         p100_to_p30[p100] = p30_id
+        p100s.add(p100)
 
     cur.close()
     con.close()
