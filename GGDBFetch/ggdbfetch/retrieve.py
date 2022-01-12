@@ -24,6 +24,4 @@ def retrieve_target_and_bait(target_id, bait_ids, dbpath, sample2path):
     sample2p100s = sample2protein.get_sample_to_p100s(all_p100, dbpath, sample2path)
 
     for samp in sample2p100s:
-        print(samp)
-
-    print(sample2p100s)
+        print(samp, len(sample2p100s[samp]))
