@@ -21,9 +21,12 @@ def _targets_and_baits(infile, dbpath, outdir, threads):
 
 def retrieve_target_and_bait(target_id, bait_ids, dbpath, sample2path, outdir, threads):
 
+    print('\tGetting clusters...')
     all_p100, p100_to_p90, p100_to_p30 = clusters.get_clusters(target_id, dbpath)
+    print('\tGetting samples...')
     sample2p100s = sample2protein.get_sample_to_p100s(all_p100, dbpath, sample2path)
 
+    print('\tGetting regions...')
     args = [(sample2path[samp], sample2p100s[samp], p100_to_p90, p100_to_p30, dbpath) for samp in sample2p100s]
     with Pool(threads) as pool:
         results = pool.starmap(regions.get_regions, args)
