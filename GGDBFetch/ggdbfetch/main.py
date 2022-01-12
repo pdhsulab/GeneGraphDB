@@ -12,6 +12,11 @@ def retrieve():
 
 @retrieve.command(short_help='Retrieve by target and baits.')
 @click.argument('infile')
-def targets_and_baits(infile):
-    pass
+@click.option('--dbpath', default='/home/mdurrant/GeneGraphDB/data/rep_genomes')
+def targets_and_baits(infile, dbpath):
+    with open(infile) as inf:
+        for line in inf:
+            target_id, bait_ids = line.strip().split('\t')
+            print(target_id, bait_ids)
+            break
 
