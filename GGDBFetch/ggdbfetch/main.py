@@ -1,5 +1,6 @@
 import click
 import os
+from ggdbfetch.retrieve import _targets_and_baits
 
 @click.group()
 def cli():
@@ -14,9 +15,7 @@ def retrieve():
 @click.argument('infile')
 @click.option('--dbpath', default='/home/mdurrant/GeneGraphDB/data/rep_genomes')
 def targets_and_baits(infile, dbpath):
-    with open(infile) as inf:
-        for line in inf:
-            target_id, bait_ids = line.strip().split('\t')
-            print(target_id, bait_ids)
-            break
+
+    _targets_and_baits(infile, dbpath)
+
 
