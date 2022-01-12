@@ -15,7 +15,7 @@ def retrieve():
 
 @retrieve.command(short_help='Retrieve by target and baits.')
 @click.argument('infile')
-@click.option('--outdir', '-o', default='ggdbfetch')
+@click.option('--outdir', '-o', default='ggdbfetch_output')
 @click.option('--dbpath', default='/home/mdurrant/GeneGraphDB/data/rep_genomes')
 @click.option('--force/--no-force', default=False)
 def targets_and_baits(infile, outdir, dbpath, force):
