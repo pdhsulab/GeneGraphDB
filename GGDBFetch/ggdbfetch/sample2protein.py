@@ -16,7 +16,7 @@ def get_sample_to_p100s(p100s, dbpath, sample2path):
             if samp in sample2path:
                 sample2p100s[res[0]].add(p100)
         if len(sample2p100s) > 0:
-            break
+            break # DELETE THIS
     cur.close()
     con.close()
 
