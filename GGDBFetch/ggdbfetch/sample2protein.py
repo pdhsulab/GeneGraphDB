@@ -2,7 +2,7 @@ from ggdbfetch import SAMPLE2PROTEIN_DB
 from os.path import join
 import sqlite3
 from collections import defaultdict
-import tqdm
+from tqdm import tqdm
 
 def get_sample_to_p100s(p100s, dbpath, sample2path, threads):
     con = sqlite3.connect(join(dbpath, SAMPLE2PROTEIN_DB))
