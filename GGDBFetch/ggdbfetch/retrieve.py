@@ -3,11 +3,11 @@ from ggdbfetch import sample2protein
 from ggdbfetch import SAMPLE2PATH
 from os.path import join
 
-def _targets_and_baits(infile, dbpath, ):
+def _targets_and_baits(infile, dbpath):
 
     print("Loading sample2path")
     sample2path = dict()
-    with open(join(SAMPLE2PATH, '')) as inf:
+    with open(join(dbpath, SAMPLE2PATH)) as inf:
         for line in inf:
             sample, spath = line.strip().split()
             sample2path[sample] = spath
