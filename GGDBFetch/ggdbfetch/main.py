@@ -18,7 +18,8 @@ def retrieve():
 @click.option('--outdir', '-o', default='ggdbfetch_output')
 @click.option('--dbpath', default='/home/mdurrant/GeneGraphDB/data/rep_genomes')
 @click.option('--force/--no-force', default=False)
-def targets_and_baits(infile, outdir, dbpath, force):
+@click.option('--threads', '-t', default=1)
+def targets_and_baits(infile, outdir, dbpath, force, threads):
 
     if os.path.isdir(outdir) and not force:
         print("Output directory already exists, exiting...")
@@ -28,6 +29,6 @@ def targets_and_baits(infile, outdir, dbpath, force):
         shutil.rmtree(outdir)
 
     os.makedirs(outdir)
-    _targets_and_baits(infile, dbpath, outdir)
+    _targets_and_baits(infile, dbpath, outdir, threads)
 
 
