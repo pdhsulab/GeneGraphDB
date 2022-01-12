@@ -6,11 +6,12 @@ def cli():
     """A command line tool to fetch ggdb data"""
     pass
 
-@cli.command(short_help='Create a new Neo4j GeneGraphDB')
-@click.argument('cluster1')
-def createdb():
-    if not graphdb.hasdb():
-        graphdb.createdb()
-    else:
-        print("Database %s already exists." % DBNAME)
+@cli.group(short_help='Retrieve stuff.')
+def retrieve():
+    pass
+
+@retrieve.command(short_help='Retrieve by target and baits.')
+@click.argument('infile')
+def targets_and_baits(infile):
+    pass
 
