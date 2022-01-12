@@ -20,4 +20,4 @@ def get_sample_to_p100s(p100s, dbpath, sample2path):
     cur.close()
     con.close()
 
-    return sample2p100s
+    return dict(sample2p100s)
