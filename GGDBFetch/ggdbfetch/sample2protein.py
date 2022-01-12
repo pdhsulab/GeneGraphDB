@@ -3,7 +3,8 @@ from os.path import join
 import sqlite3
 from collections import defaultdict
 
-def get_sample_to_p100s(p100s, dbpath):
+
+def get_sample_to_p100s(p100s, dbpath, sample2path):
     con = sqlite3.connect(join(dbpath, SAMPLE2PROTEIN_DB))
     cur = con.cursor()
 
@@ -11,8 +12,10 @@ def get_sample_to_p100s(p100s, dbpath):
     for p100 in p100s:
         cmd = 'SELECT sample_id FROM sample2protein WHERE p100="{}"'.format(p100)
         for res in cur.execute(cmd):
-            sample2p100s[res[0]].add(p100)
-
+            samp = res[0]
+            if samp in sample2path:
+                sample2p100s[res[0]].add(p100)
+                break # REMOVE THIS!!!!!!
     cur.close()
     con.close()
 
