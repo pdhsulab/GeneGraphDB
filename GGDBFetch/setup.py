@@ -12,6 +12,9 @@ setup(
     include_package_data=True,
     install_requires=[
         'click==8.0.1',
+        'pyfastx',
+        'pandas'
+        'tqdm'
     ],
     zip_safe=False,
     entry_points = {
