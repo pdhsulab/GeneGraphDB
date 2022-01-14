@@ -94,5 +94,12 @@ make_permissive_clusters.ipynb
 02.permissive_clusters.sh
 - Make permissive clusters
 
+get_stringent_cluster_stats.ipynb
+- Make clusters.db with stringent and permissive cluster mappings
+- Add permissive_stats and stringent_stats tables that describe stringent/permissive representatives
+
+move_clusters_ggdb.ipynb
+- move cluster mappings from clusters.db to genegraph.db
+
 03.combine_clusters.py
 - Combines stringent and permissive clusters into one .csv file, complete_clusters.tsv

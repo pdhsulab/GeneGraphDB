@@ -1,5 +1,6 @@
 import sqlite3
 
+
 conn = sqlite3.connect('genegraph.db')
 cursor = conn.cursor()
 def get_permissive_rep(stringent_rep):
@@ -10,6 +11,7 @@ def get_permissive_rep(stringent_rep):
 
 print("loading stringent...")
 p100p90 = dict()
+
 with open("../clusters/stringent.csv") as infile:
     next(infile)
     for line in infile:
@@ -31,5 +33,3 @@ with open("../clusters/OUTPUT/complete_clusters.tsv", "w") as outfile, open("../
             print(p100, p100p90[p100], sep = ",", file=err_outfile)
 
 conn.close()
-
-
