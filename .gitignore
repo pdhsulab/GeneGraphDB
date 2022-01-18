@@ -12,6 +12,8 @@ ggdb_load_stats.csv
 ggdb_multisql_errorlog.csv
 ggdb_summary_stats.csv
 
+docker.bash_history
+
 ######## Python ########
 # Byte-compiled / optimized / DLL files
 __pycache__/
