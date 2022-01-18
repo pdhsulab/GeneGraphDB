@@ -6,7 +6,7 @@ if [ -n "$BASH_VERSION" ]; then
 elif [ -n "$ZSH_VERSION" ]; then
     DIR=${0:a:h}  # https://unix.stackexchange.com/a/115431
 else
-	echo "Error: Unknown shell; cannot determine path to icitydb local repository"
+	echo "Error: Unknown shell; cannot determine path to GeneGraphDB local repository"
 fi
 export GENEGRAPHDB_REPO_DIR="$(dirname $DIR)"
 

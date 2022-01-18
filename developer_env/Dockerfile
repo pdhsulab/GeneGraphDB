@@ -38,7 +38,7 @@ ENV TERM=xterm
 
 # In docker run commands, we mount local repo to /GeneGraphDB.
 # Make this the default working directory and add to PYTHONPATH.
-WORKDIR /icitydb
+WORKDIR /GeneGraphDB
 ENV PYTHONPATH="/GeneGraphDB:$PYTHONPATH"
 
 CMD ["/bin/bash"]
