@@ -13,6 +13,7 @@ RUN apt-get update && \
     moreutils \
     screen \
     software-properties-common \
+    sqlite3 \
     vim \
     wget \
     zip \
