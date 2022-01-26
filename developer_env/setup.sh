@@ -27,15 +27,14 @@ alias genegraphdb_docker_run="docker run -it --rm \
     -v $GENEGRAPHDB_REPO_DIR:/GeneGraphDB \
     -v $HOME/.config/gcloud:/root/.config/gcloud \
     -v $GENEGRAPHDB_REPO_DIR/data/docker.bash_history:/root/.bash_history \
-    -v /home/jupyter/GeneGraphDB/genegraph.db:/GeneGraphDB/data/genegraph.db \
     $DOCKER_IMAGE"
+    # -v /home/jupyter/GeneGraphDB/genegraph.db:/GeneGraphDB/data/genegraph.db \
 
 alias genegraphdb_docker_jupyter="docker run -it --rm \
     --hostname localhost \
     -v $GENEGRAPHDB_REPO_DIR:/GeneGraphDB \
     -v $HOME/.config/gcloud:/root/.config/gcloud \
     -v $GENEGRAPHDB_REPO_DIR/data/docker.bash_history:/root/.bash_history \
-    -v /home/jupyter/GeneGraphDB/genegraph.db:/GeneGraphDB/data/genegraph.db \
     -p 0.0.0.0:8888:8888 \
     $DOCKER_IMAGE \
     jupyter notebook \
