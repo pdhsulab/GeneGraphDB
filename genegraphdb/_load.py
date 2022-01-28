@@ -1,16 +1,15 @@
-from genegraphdb import * 
+import gzip
+import time
+from os.path import abspath
+
+from Bio import SeqIO
+
+from genegraphdb import *
+from genegraphdb import crisprnode
 from genegraphdb import graphdb
 from genegraphdb import proteinnode
-from genegraphdb import crisprnode
 from genegraphdb import testing
-from Bio import SeqIO
-import gzip
-import re
-import sys
-import os
-from os import remove
-from os.path import abspath
-import time
+
 
 def _single(sample_id, google_bucket, distance, comment, outfilename, samples_path = '', clean_files=False):
     outfile = open(outfilename, "a")

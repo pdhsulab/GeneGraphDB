@@ -1,12 +1,13 @@
-from collections import defaultdict
-from genegraphdb import *
-from neo4j import GraphDatabase
-from Bio import SeqIO
 import hashlib
-import time
-from os.path import abspath
 import sqlite3
+import time
+from collections import defaultdict
+from os.path import abspath
+
+from Bio import SeqIO
 from cassandra.cluster import Cluster
+
+from genegraphdb import *
 
 #Global variables
 hash_size = 25

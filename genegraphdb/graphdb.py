@@ -1,11 +1,9 @@
-from genegraphdb import *
-from neo4j import GraphDatabase
-import time
 import re
-import hashlib
-from os.path import abspath
-from collections import defaultdict
-import uuid
+
+from neo4j import GraphDatabase
+
+from genegraphdb import *
+
 
 class Neo4jConnection:
 

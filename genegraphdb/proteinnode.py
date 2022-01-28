@@ -1,18 +1,12 @@
-from genegraphdb import *
-from genegraphdb import graphdb
-from genegraphdb import _load
-from genegraphdb import testing
-from Bio import SeqIO
-import gzip
-import re
-import sys
 import os
-from os import remove
-from os.path import abspath
 import time
 from collections import deque
-import csv
 from csv import reader
+from os.path import abspath
+
+from genegraphdb import *
+from genegraphdb import graphdb
+
 
 def connect_proteins_crisprs(sample_id, max_distance, samples_path = ''):
     sample_id_path = samples_path + sample_id + "/"

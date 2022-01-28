@@ -1,5 +1,4 @@
 import os
-from csv import reader
 
 exclude_directories = [".git", ".idea", "venv"]
 sql_tables = ["proteins", "samples", "crisprs", "contigs", "contig2sample", "crisprcoords", "proteincoords", "prot2prot",

@@ -1,17 +1,12 @@
+import hashlib
+import os
+import re
+import time
+from os.path import abspath
+
 from genegraphdb import *
 from genegraphdb import graphdb
-from genegraphdb import _load
-from Bio import SeqIO
-import gzip
-import re
-import sys
-import os
-from os import remove
-from os.path import abspath
-import hashlib
-import time
-from collections import deque, ChainMap
-from csv import reader
+
 
 def merge_gff(sample_id, samples_path):
     # parse through minced.gff

@@ -1,16 +1,16 @@
+import os
+from multiprocessing import Pool, cpu_count
+
 import click
+
 from genegraphdb import *
-from genegraphdb import graphdb
-from genegraphdb import sqldb
 from genegraphdb import _load
 from genegraphdb import _loadsql
+from genegraphdb import graphdb
+from genegraphdb import sqldb
 from genegraphdb import testing
-from genegraphdb import dl_test_data
-from genegraphdb import clusternode
 from genegraphdb import variables_global as vars_glob
-from multiprocessing import Pool, cpu_count
-from functools import partial
-import os
+
 
 @click.group()
 def cli():

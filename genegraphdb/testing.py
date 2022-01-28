@@ -1,12 +1,13 @@
-from genegraphdb import *
 import csv
 import os
-from datetime import datetime
-import unittest
-import pandas as pd
-from genegraphdb import variables_global as vars_glob
 import sqlite3
+import unittest
+from datetime import datetime
+
 import numpy as np
+
+from genegraphdb import variables_global as vars_glob
+
 
 # all of these tests were performed locally before implementing the graph database on gcloud
 # some tests rely on sample directories that are organized differently from the sample directories on gcloud
