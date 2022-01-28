@@ -32,7 +32,8 @@ class SimplifiedSqlDb:
             for key in row.keys():
                 neighbor_hashes.add(row[key])
         cur.close()
-        neighbor_hashes.remove(p100_hash)
+        if p100_hash in neighbor_hashes:
+            neighbor_hashes.remove(p100_hash)
         return list(sorted(neighbor_hashes))
 
     def get_p30_cluster_for_p100(self, p100_hash) -> sqlite3.Row:
