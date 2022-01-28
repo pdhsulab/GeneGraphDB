@@ -16,13 +16,11 @@ class SimplifiedSqlDb:
     def get_tables(self) -> List[str]:
         """List available database tables"""
         tables = []
-
         cur = self.conn.cursor()
         cur.execute("SELECT name FROM sqlite_master WHERE type='table';")
         for table_tup in cur.fetchall():
             tables.append(table_tup[0])
         cur.close()
-
         return tables
 
     def get_p100_windowed_neighbors(self, p100_hash) -> List[str]:
