@@ -20,4 +20,3 @@ def get_sample_to_p100s(p100s, dbpath):
     con.close()
 
     return dict(sample2p100s)
-

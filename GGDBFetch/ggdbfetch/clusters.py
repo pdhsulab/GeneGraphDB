@@ -23,4 +23,3 @@ def get_clusters(p30_id, dbpath):
     con.close()
 
     return p100s, p100_to_p90, p100_to_p30
-
