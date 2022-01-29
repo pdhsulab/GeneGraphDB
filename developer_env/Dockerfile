@@ -1,0 +1,46 @@
+# TODO: split this out to separate genegraphdb_docker_build_mac_m1 command
+FROM arm64v8/python:3.9.10
+
+# install apt-get packages
+# set apt-get to non-interactive so it doesn't prompt for configuration (will use the defaults instead)
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive \
+    apt-get install -y \
+    build-essential \
+    curl \
+    ca-certificates \
+    git \
+    htop \
+    moreutils \
+    screen \
+    software-properties-common \
+    sqlite3 \
+    vim \
+    wget \
+    zip \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Install the Google Cloud SDK, which gives us `gcloud`, `gsutil`, `bq`.
+# See https://cloud.google.com/sdk/downloads#apt-get
+#RUN apt-get update && apt-get -y install apt-transport-https && \
+#    export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
+#    echo "deb https://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" \
+#        | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
+#    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
+#    apt-get update && \
+#    apt-get install -y google-cloud-sdk \
+#    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+COPY ./requirements.txt /requirements.txt
+RUN pip install --upgrade pip && \
+    pip install -r /requirements.txt && \
+    rm -r ~/.cache/pip
+
+ENV TERM=xterm
+
+# In docker run commands, we mount local repo to /GeneGraphDB.
+# Make this the default working directory and add to PYTHONPATH.
+WORKDIR /GeneGraphDB
+ENV PYTHONPATH="/GeneGraphDB:$PYTHONPATH"
+
+CMD ["/bin/bash"]

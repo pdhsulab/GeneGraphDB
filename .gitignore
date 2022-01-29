@@ -1,15 +1,126 @@
-.DS_Store
-genomes_annot
-genomes_annot_copy/
-genomes_annot_2
-genegraphdb/__pycache__/
-genegraphdb.egg-info/
-.idea/
-ggdb_multisql_errorlog.csv
-genegraph.db
-genegraphdb/.ipynb_checkpoints/
 clusterRes_all_seqs.fasta
-clusterRes_rep_seq.fasta
 clusterRes_cluster.tsv
-ggdb_summary_stats.csv
+clusterRes_rep_seq.fasta
+genegraph.db
+genegraphdb.egg-info/
+genegraphdb/.ipynb_checkpoints/
+genegraphdb/__pycache__/
+genomes_annot
+genomes_annot_2
+genomes_annot_copy/
 ggdb_load_stats.csv
+ggdb_multisql_errorlog.csv
+ggdb_summary_stats.csv
+
+docker.bash_history
+
+######## Python ########
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+node_modules/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*,cover
+.hypothesis/
+
+# PyBuilder
+target/
+
+# IPython Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# dotenv
+.env
+
+# virtualenv
+venv/
+ENV/
+
+######## PYCHARM ########
+.idea
+
+######## vscode ########
+.vscode
+.devcontainer
+
+######## OSX ########
+*.DS_Store
+.AppleDouble
+.LSOverride
+.xprocess/
+.Trash-0/
+.pytest_cache/
+
+# Icon must end with two \r
+Icon
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+####### Misc #######
+# Vim
+*.swp
+*.swo
+
+# Terraform
+.terraform
+terraform.tfstate*
