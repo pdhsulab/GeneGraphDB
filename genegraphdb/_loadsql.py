@@ -1,20 +1,15 @@
-from genegraphdb import *
-from genegraphdb import graphdb
-from genegraphdb import proteinnode
-from genegraphdb import proteinnodesql
-from genegraphdb import crisprnode
-from genegraphdb import crisprnodesql
-from genegraphdb import testing
-from Bio import SeqIO
-import gzip
-import re
-import sys
 import csv
-import os
-from os import remove
-from os.path import abspath
-import time
+import gzip
 import sqlite3
+import time
+
+from Bio import SeqIO
+
+from genegraphdb import crisprnodesql
+from genegraphdb import proteinnodesql
+from genegraphdb import proteinnodesql
+from genegraphdb import testing
+
 
 def _single(sample_id, google_bucket, distance, comment, outfilename, samples_path = '', clean_files=False):
     outfile = open(outfilename, "a")

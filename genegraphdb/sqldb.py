@@ -1,8 +1,8 @@
-from genegraphdb import *
-from genegraphdb import graphdb
 import os
-import subprocess
 import sqlite3
+
+from genegraphdb import *
+
 
 def hasdb():
     if "genegraph.db" in os.listdir():
