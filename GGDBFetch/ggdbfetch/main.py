@@ -1,8 +1,10 @@
-import click
 import os
-from ggdbfetch.retrieve import _targets_and_baits
 import shutil
 import sys
+
+import click
+from ggdbfetch.retrieve import _targets_and_baits
+
 
 @click.group()
 def cli():

@@ -1,7 +1,9 @@
-from ggdbfetch import clusters, sample2protein, regions
-from ggdbfetch import SAMPLE2PATH
-from os.path import join
 from multiprocessing import Pool
+from os.path import join
+
+from ggdbfetch import SAMPLE2PATH
+from ggdbfetch import clusters, regions, sample2protein
+
 
 def _targets_and_baits(infile, dbpath, outdir, threads):
 
