@@ -19,22 +19,33 @@ def merge_gff(sample_id, samples_path):
     os.system("gunzip -d -c " + protein_path + ".gz > " + protein_path)
     minced_gff_path = samples_path + sample_id_path + str(sample_id) + ".minced.gff"
     os.system("gunzip -d -c " + protein_path + ".gz > " + protein_path)
-    os.system("gunzip -d -c " + minced_gff_path + ".gz > " + minced_gff_path) 
+    os.system("gunzip -d -c " + minced_gff_path + ".gz > " + minced_gff_path)
     os.system("cat " + minced_gff_path + " | grep ID=CRISPR > " + samples_path + sample_id_path + "temp.minced.gff")
-    os.system("cat " + protein_path + " " + samples_path + sample_id_path + "temp.minced.gff > " + samples_path + sample_id_path + "temp.merged.gff")
+    os.system(
+        "cat "
+        + protein_path
+        + " "
+        + samples_path
+        + sample_id_path
+        + "temp.minced.gff > "
+        + samples_path
+        + sample_id_path
+        + "temp.merged.gff"
+    )
     return_filename = samples_path + sample_id_path + "merged.sorted.tmp.gff"
     os.system("sortBed -i " + samples_path + sample_id_path + "temp.merged.gff > " + return_filename)
     os.system("rm " + samples_path + sample_id_path + "temp.merged.gff " + protein_path)
     # os.system("rm " + return_filename)
     print("finished merging gffs")
-    return(return_filename)
+    return return_filename
+
 
 def load_CRISPRs(sample_id, samples_path):
     # create fasta from minced.gff
     print("Loading CRISPRs...")
     tic = time.time()
     outfile_crispr = open(samples_path + sample_id + "/CRISPRs.tmp.csv", "w")
-    #print("hashid,repeat_len,array_len,num_spacers", file=outfile_crispr)
+    # print("hashid,repeat_len,array_len,num_spacers", file=outfile_crispr)
     print("hashid", file=outfile_crispr)
     done = set()
     crisprid_to_crhash = dict()
@@ -42,7 +53,7 @@ def load_CRISPRs(sample_id, samples_path):
         for line in infile:
             if line.startswith("#"):
                 continue
-            line = line.strip().split('\t')
+            line = line.strip().split("\t")
             if len(line) != 9:
                 print(len(line))
                 continue
@@ -52,8 +63,7 @@ def load_CRISPRs(sample_id, samples_path):
             repeat_len = len(array_repeat)
             array_len = abs(int(line[4]) - int(line[3])) + 1
             num_spacers = line[5]
-            unique_str = name_truncate + "," + str(repeat_len) + "," + str(array_len) + \
-                         "," + str(num_spacers)
+            unique_str = name_truncate + "," + str(repeat_len) + "," + str(array_len) + "," + str(num_spacers)
             crisprid = re.findall(r"=(.*)", line[8].split(";")[0])[0]
             crisprid_to_crhash[crisprid] = name_truncate
             if name_truncate in done:
@@ -67,13 +77,16 @@ def load_CRISPRs(sample_id, samples_path):
     cmd = """
           LOAD CSV WITH HEADERS FROM 'file:///{csv}' AS row
           MERGE (n:CRISPR {{hashid: row.hashid}})
-          """.format(csv=abspath(samples_path + sample_id + '/CRISPRs.tmp.csv'))
+          """.format(
+        csv=abspath(samples_path + sample_id + "/CRISPRs.tmp.csv")
+    )
     print(cmd)
     conn.query(cmd, db=DBNAME)
     conn.close()
     toc = time.time()
-    print("Loading CRISPRs took %f seconds" % (toc-tic))
+    print("Loading CRISPRs took %f seconds" % (toc - tic))
     return crisprid_to_crhash
+
 
 def load_crispr_coords(sample_id, samples_path):
     sample_id_path = samples_path + sample_id + "/"
@@ -86,7 +99,7 @@ def load_crispr_coords(sample_id, samples_path):
           WHERE (cr.hashid = row.crhash AND c.hashid = row.chash)
           MERGE (cr)-[r:CrisprCoord {{start: row.start, end: row.end}}]->(c)
           """.format(
-        csv=abspath(sample_id_path + 'crispr_coords.tmp.csv')
+        csv=abspath(sample_id_path + "crispr_coords.tmp.csv")
     )
     print(cmd)
     conn.query(cmd, db=DBNAME)

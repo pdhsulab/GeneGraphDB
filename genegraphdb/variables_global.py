@@ -1,16 +1,39 @@
 import os
 
 exclude_directories = [".git", ".idea", "venv"]
-sql_tables = ["proteins", "samples", "crisprs", "contigs", "contig2sample", "crisprcoords", "proteincoords", "prot2prot",
-                 "prot2crispr", "prot2protwindow", "prot2crisprwindow"]
-temp_files_list = ["contig2sample.tmp.sql.csv", "contigs.tmp.sql.csv", "crispr_coords.tmp.sql.csv", "CRISPRs.tmp.sql.csv",
-                       "gene_coords.tmp.sql.csv", "merged_sorted_coords.tmp.sql.csv", "merged.sorted.tmp.sql.gff",
-                       "protein2crispr_window.tmp.sql.csv", "protein2crispr.tmp.sql.csv", "protein2protein_window.tmp.sql.csv",
-                       "protein2protein.tmp.sql.csv", "proteins.tmp.sql.csv", "temp.minced.sql.gff"]
-                   # "contig2sample.tmp.csv", "contigs.tmp.csv", "crispr_coords.tmp.csv", "CRISPRs.tmp.csv",
-                   # "gene_coords.tmp.csv", "merged_sorted_coords.tmp.csv", "merged.sorted.tmp.gff",
-                   # "protein2crispr_window.tmp.csv", "protein2crispr.tmp.csv", "protein2protein_window.tmp.csv",
-                   # "protein2protein.tmp.csv", "proteins.tmp.csv", "temp.minced.gff"]
+sql_tables = [
+    "proteins",
+    "samples",
+    "crisprs",
+    "contigs",
+    "contig2sample",
+    "crisprcoords",
+    "proteincoords",
+    "prot2prot",
+    "prot2crispr",
+    "prot2protwindow",
+    "prot2crisprwindow",
+]
+temp_files_list = [
+    "contig2sample.tmp.sql.csv",
+    "contigs.tmp.sql.csv",
+    "crispr_coords.tmp.sql.csv",
+    "CRISPRs.tmp.sql.csv",
+    "gene_coords.tmp.sql.csv",
+    "merged_sorted_coords.tmp.sql.csv",
+    "merged.sorted.tmp.sql.gff",
+    "protein2crispr_window.tmp.sql.csv",
+    "protein2crispr.tmp.sql.csv",
+    "protein2protein_window.tmp.sql.csv",
+    "protein2protein.tmp.sql.csv",
+    "proteins.tmp.sql.csv",
+    "temp.minced.sql.gff",
+]
+# "contig2sample.tmp.csv", "contigs.tmp.csv", "crispr_coords.tmp.csv", "CRISPRs.tmp.csv",
+# "gene_coords.tmp.csv", "merged_sorted_coords.tmp.csv", "merged.sorted.tmp.gff",
+# "protein2crispr_window.tmp.csv", "protein2crispr.tmp.csv", "protein2protein_window.tmp.csv",
+# "protein2protein.tmp.csv", "proteins.tmp.csv", "temp.minced.gff"]
+
 
 def get_sampleid_to_path_dict(path_drep):
     drep_samples = {}
@@ -30,6 +53,8 @@ def get_sampleid_to_path_dict(path_drep):
                                 if os.path.isdir(samp_dir):
                                     drep_samples[directory_samp] = path_4
     return drep_samples
+
+
 # sampleids_error = []
 # with open("ggdb_multisql_errorlog.csv", "r") as f:
 #     infile = reader(f)

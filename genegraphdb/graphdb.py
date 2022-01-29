@@ -6,7 +6,6 @@ from genegraphdb import *
 
 
 class Neo4jConnection:
-
     def __init__(self, uri, user, pwd):
         self.__uri = uri
         self.__user = user
@@ -35,16 +34,19 @@ class Neo4jConnection:
                 session.close()
         return response
 
+
 def showdatabases():
     conn = Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
     return conn.query("SHOW DATABASES")
     conn.close()
 
+
 def hasdb():
     for rec in showdatabases():
-        if rec['name'] == DBNAME:
+        if rec["name"] == DBNAME:
             return True
     return False
+
 
 def createdb():
     print("Creating database: %s" % DBNAME)
@@ -54,21 +56,23 @@ def createdb():
     conn.query("CREATE CONSTRAINT uniq_protein_hashid ON (n:Protein) ASSERT n.hashid IS UNIQUE", db=DBNAME)
     # ENTERPRISE ONLY: conn.query("CREATE CONSTRAINT exist_protein_hashid ON (n:Protein) ASSERT exists(n.hashid)", db=DBNAME)
     conn.query("CREATE CONSTRAINT uniq_contig_hashid ON (n:Contig) ASSERT n.hashid IS UNIQUE", db=DBNAME)
-     # ENTERPRISE ONLY: conn.query("CREATE CONSTRAINT exist_contig_hashid ON (n:Contig) ASSERT exists(n.hashid)", db=DBNAME)
+    # ENTERPRISE ONLY: conn.query("CREATE CONSTRAINT exist_contig_hashid ON (n:Contig) ASSERT exists(n.hashid)", db=DBNAME)
     conn.close()
 
     print("Database created")
 
+
 def num_nodes():
     conn = Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
-    num_nodes = conn.query("MATCH (n) RETURN count(*)", db=DBNAME)[0]['count(*)']
+    num_nodes = conn.query("MATCH (n) RETURN count(*)", db=DBNAME)[0]["count(*)"]
     conn.close()
 
     return num_nodes
 
+
 def num_rels():
     conn = Neo4jConnection(DBURI, DBUSER, DBPASSWORD)
-    num_rels = conn.query("MATCH ()-[r]->() RETURN count(r) as count", db=DBNAME)[0]['count']
+    num_rels = conn.query("MATCH ()-[r]->() RETURN count(r) as count", db=DBNAME)[0]["count"]
     conn.close()
 
     return num_rels
@@ -83,7 +87,7 @@ def add_node(nodetype, properties=None, conn=None):
 
     if properties is not None:
         cmd = "CREATE (n:{ntype} {props})".format(ntype=nodetype, props=str(properties))
-        cmd = re.sub(r"'([^':]+)':", r'\1:', cmd)
+        cmd = re.sub(r"'([^':]+)':", r"\1:", cmd)
     else:
         cmd = "CREATE (n:{ntype} )".format(ntype=nodetype)
 
@@ -91,6 +95,7 @@ def add_node(nodetype, properties=None, conn=None):
 
     if close:
         conn.close()
+
 
 def add_nodes(nodes, conn=None):
     close = False
@@ -105,6 +110,7 @@ def add_nodes(nodes, conn=None):
         conn.close()
     pass
 
+
 def protein_exists(hashid, conn=None):
 
     close = False
@@ -113,10 +119,9 @@ def protein_exists(hashid, conn=None):
         close = True
 
     cmd = "MATCH (n:Protein {hashid: '%s'}) return count(*) as count" % hashid
-    exists = conn.query(cmd, db=DBNAME)[0]['count'] > 0
+    exists = conn.query(cmd, db=DBNAME)[0]["count"] > 0
 
     if close:
         conn.close()
 
     return exists
-    

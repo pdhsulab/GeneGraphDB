@@ -46,4 +46,4 @@ def load_cluster_nodes():
 
     conn.close()
     toc = time.time()
-    print("Loading cluster nodes took %f seconds" % (toc-tic))
+    print("Loading cluster nodes took %f seconds" % (toc - tic))
