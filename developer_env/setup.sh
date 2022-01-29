@@ -23,6 +23,8 @@ DOCKER_IMAGE="genegraphdb"
 # docker aliases
 alias genegraphdb_docker_build="docker build -t $DOCKER_IMAGE $GENEGRAPHDB_REPO_DIR/developer_env"
 
+alias genegraphdb_docker_build_mac_m1="docker build --platform linux/amd64 -t $DOCKER_IMAGE $GENEGRAPHDB_REPO_DIR/developer_env"
+
 alias genegraphdb_docker_run="docker run -it --rm \
     -v $GENEGRAPHDB_REPO_DIR:/GeneGraphDB \
     -v $HOME/.config/gcloud:/root/.config/gcloud \
