@@ -1,6 +1,6 @@
-#Developer Environment 
+# Developer Environment 
 
-##Docker
+## Docker
 
 Use docker to build a consistent development environment.  Docker is a lightweight virtual machine ("container"),
 that lets your run code in a performant sandbox with well defined software dependencies.
@@ -21,7 +21,7 @@ leaving dependencies "floating" (to always grab latest version) can discourage d
 image for fear of tripping over dependency-update bugs.
 
 
-##setup.sh
+## setup.sh
 
 In this directory, setup.sh includes aliases for
 running a local docker container (`genegraphdb_docker_run`),
