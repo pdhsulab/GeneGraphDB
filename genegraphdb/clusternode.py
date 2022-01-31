@@ -1,18 +1,9 @@
+import time
+from os.path import abspath
+
 from genegraphdb import *
 from genegraphdb import graphdb
-from genegraphdb import _load
-from genegraphdb import testing
-from Bio import SeqIO
-import gzip
-import re
-import sys
-import os
-from os import remove
-from os.path import abspath
-import time
-from collections import deque
-import csv
-from csv import reader
+
 
 def load_cluster_nodes():
     print("Loading cluster nodes...")
@@ -55,4 +46,4 @@ def load_cluster_nodes():
 
     conn.close()
     toc = time.time()
-    print("Loading cluster nodes took %f seconds" % (toc-tic))
+    print("Loading cluster nodes took %f seconds" % (toc - tic))

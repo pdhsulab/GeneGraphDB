@@ -1,20 +1,10 @@
-from genegraphdb import *
-from genegraphdb import graphdb
-from genegraphdb import _load
-from genegraphdb import _loadsql
-from Bio import SeqIO
-import gzip
-import re
-import sys
-import os
-from os import remove
-from os.path import abspath
-import hashlib
-import time
-from collections import deque, ChainMap
 import csv
-from csv import reader
+import hashlib
+import os
+import re
 import sqlite3
+import time
+
 
 def merge_gff(sample_id, samples_path):
     # parse through minced.gff
@@ -27,22 +17,33 @@ def merge_gff(sample_id, samples_path):
     os.system("gunzip -d -c " + protein_path + ".gz > " + protein_path)
     minced_gff_path = samples_path + sample_id_path + str(sample_id) + ".minced.gff"
     os.system("gunzip -d -c " + protein_path + ".gz > " + protein_path)
-    os.system("gunzip -d -c " + minced_gff_path + ".gz > " + minced_gff_path) # TO DO - change this file name?
+    os.system("gunzip -d -c " + minced_gff_path + ".gz > " + minced_gff_path)  # TO DO - change this file name?
     os.system("cat " + minced_gff_path + " | grep ID=CRISPR > " + samples_path + sample_id_path + "temp.minced.sql.gff")
-    os.system("cat " + protein_path + " " + samples_path + sample_id_path + "temp.minced.sql.gff > " + samples_path + sample_id_path + "temp.merged.sql.gff")
+    os.system(
+        "cat "
+        + protein_path
+        + " "
+        + samples_path
+        + sample_id_path
+        + "temp.minced.sql.gff > "
+        + samples_path
+        + sample_id_path
+        + "temp.merged.sql.gff"
+    )
     return_filename = samples_path + sample_id_path + "merged.sorted.tmp.sql.gff"
     os.system("sortBed -i " + samples_path + sample_id_path + "temp.merged.sql.gff > " + return_filename)
     os.system("rm " + samples_path + sample_id_path + "temp.merged.sql.gff " + protein_path)
     # os.system("rm " + return_filename)
     print("finished merging gffs")
-    return(return_filename)
+    return return_filename
+
 
 def load_CRISPRs(sample_id, samples_path):
     # create fasta from minced.gff
     print("Loading CRISPRs...")
     tic = time.time()
     outfile_crispr = open(samples_path + sample_id + "/CRISPRs.tmp.sql.csv", "w")
-    #print("hashid,repeat_len,array_len,num_spacers", file=outfile_crispr)
+    # print("hashid,repeat_len,array_len,num_spacers", file=outfile_crispr)
     print("hashid", file=outfile_crispr)
     done = set()
     crisprid_to_crhash = dict()
@@ -50,7 +51,7 @@ def load_CRISPRs(sample_id, samples_path):
         for line in infile:
             if line.startswith("#"):
                 continue
-            line = line.strip().split('\t')
+            line = line.strip().split("\t")
             if len(line) != 9:
                 print(len(line))
                 continue
@@ -60,8 +61,7 @@ def load_CRISPRs(sample_id, samples_path):
             repeat_len = len(array_repeat)
             array_len = abs(int(line[4]) - int(line[3])) + 1
             num_spacers = line[5]
-            unique_str = name_truncate + "," + str(repeat_len) + "," + str(array_len) + \
-                         "," + str(num_spacers)
+            unique_str = name_truncate + "," + str(repeat_len) + "," + str(array_len) + "," + str(num_spacers)
             crisprid = re.findall(r"=(.*)", line[8].split(";")[0])[0]
             crisprid_to_crhash[crisprid] = name_truncate
             # if unique_str in done:
@@ -75,15 +75,15 @@ def load_CRISPRs(sample_id, samples_path):
     outfile_crispr.close()
     del done
 
-    con = sqlite3.connect('genegraph.db')
+    con = sqlite3.connect("genegraph.db")
     cur = con.cursor()
-    crispr_csv_path = samples_path + sample_id + '/CRISPRs.tmp.sql.csv'
+    crispr_csv_path = samples_path + sample_id + "/CRISPRs.tmp.sql.csv"
     crispr_csv = open(crispr_csv_path)
     rows = csv.reader(crispr_csv)
     next(rows)
-    cmd = '''
+    cmd = """
     INSERT OR IGNORE INTO crisprs VALUES (?)
-    '''
+    """
     cur.executemany(cmd, rows)
     con.commit()
     con.close()
@@ -91,19 +91,20 @@ def load_CRISPRs(sample_id, samples_path):
     toc = time.time()
     # to do - uncomment this rm command below
     # os.system('rm ' + samples_path + sample_id + '/CRISPRs.tmp.csv ' + samples_path + sample_id + '/temp.minced.gff')
-    print("Loading CRISPRs took %f seconds" % (toc-tic))
+    print("Loading CRISPRs took %f seconds" % (toc - tic))
     return crisprid_to_crhash
 
+
 def load_crispr_coords(sample_id, samples_path):
-    con = sqlite3.connect('genegraph.db')
+    con = sqlite3.connect("genegraph.db")
     cur = con.cursor()
-    crispr_coords_csv_path = samples_path + sample_id + '/crispr_coords.tmp.sql.csv'
+    crispr_coords_csv_path = samples_path + sample_id + "/crispr_coords.tmp.sql.csv"
     crispr_coords_csv = open(crispr_coords_csv_path)
     rows = csv.reader(crispr_coords_csv)
     next(rows)
-    cmd = '''
+    cmd = """
         INSERT OR IGNORE INTO crisprcoords (crisprhash, contighash, start, end) VALUES (?,?,?,?)
-        '''
+        """
     cur.executemany(cmd, ((rec[1], rec[2], rec[3], rec[4]) for rec in rows))
     con.commit()
     con.close()

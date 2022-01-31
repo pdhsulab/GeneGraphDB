@@ -1,6 +1,7 @@
-from ggdbfetch import CLUSTERS_DB
-from os.path import join
 import sqlite3
+from os.path import join
+
+from ggdbfetch import CLUSTERS_DB
 
 
 def get_clusters(p30_id, dbpath):
@@ -22,4 +23,3 @@ def get_clusters(p30_id, dbpath):
     con.close()
 
     return p100s, p100_to_p90, p100_to_p30
-
