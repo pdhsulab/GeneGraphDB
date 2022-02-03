@@ -6,7 +6,7 @@ from typing import List
 DEFAULT_DATABASE_FILE = "/GeneGraphDB/data/genegraph.db"
 
 
-class SimplifiedSqlDb:
+class SimpleSqlDb:
     def __init__(self, database_file=DEFAULT_DATABASE_FILE):
         if not os.path.exists(database_file):
             raise FileNotFoundError(f"Can't find database file '{database_file}'")

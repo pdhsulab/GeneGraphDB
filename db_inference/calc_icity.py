@@ -1,13 +1,9 @@
-import sqlite3
 from collections import defaultdict
 from typing import Dict, Tuple
 
 import networkx as nx
-from pyvis.network import Network
 
-from utils.sql_query_util import SimplifiedSqlDb
-
-from utils import notebook_util, sql_query_util
+from db_inference.simple_sql_db import SimpleSqlDb
 
 # hex colors (for better graphing in pyvis)
 BLACK = "#000000"
@@ -21,7 +17,7 @@ MAGENTA = "#FF00FF"
 PURPLE = "#A020F0"
 
 
-def build_icity_graph(sql_db: SimplifiedSqlDb, tgt_p30: str, bait_p30: str) -> nx.Graph:
+def build_icity_graph(sql_db: SimpleSqlDb, tgt_p30: str, bait_p30: str) -> nx.Graph:
     """Builds a networkx graph that makes calculating icity relatively clean.  Simplifies visualizing protein."""
     G = nx.Graph()
     p30_to_p100s = defaultdict(set)
@@ -101,7 +97,7 @@ def compute_icity_on_graph(G: nx.Graph, tgt_p30_hash: str) -> Dict:
     return icity_res
 
 
-def calc_icity_tgt_bait(sql_db: SimplifiedSqlDb, tgt_p30: str, bait_p30: str) -> Tuple[Dict, Dict, nx.Graph]:
+def calc_icity_tgt_bait(sql_db: SimpleSqlDb, tgt_p30: str, bait_p30: str) -> Tuple[Dict, Dict, nx.Graph]:
     G = build_icity_graph(sql_db, tgt_p30, bait_p30)
     tgt_res = compute_icity_on_graph(G, tgt_p30)
     bait_res = compute_icity_on_graph(G, bait_p30)
