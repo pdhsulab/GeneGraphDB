@@ -19,3 +19,4 @@ pyvis==0.1.9
 requests==2.27.1
 scipy==1.7.3
 SQLAlchemy==1.4.29
+tqdm==4.62.3

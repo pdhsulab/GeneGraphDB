@@ -21,18 +21,18 @@ touch $DOCKER_BASH_HISTORY
 DOCKER_IMAGE="genegraphdb"
 
 # docker aliases
-alias genegraphdb_docker_build="docker build -t $DOCKER_IMAGE $GENEGRAPHDB_REPO_DIR/developer_env"
+alias ggdb_docker_build="docker build -t $DOCKER_IMAGE $GENEGRAPHDB_REPO_DIR/developer_env"
 
-alias genegraphdb_docker_build_mac_m1="docker build --platform linux/amd64 -t $DOCKER_IMAGE $GENEGRAPHDB_REPO_DIR/developer_env"
+alias ggdb_docker_build_mac_m1="docker build --platform linux/amd64 -t $DOCKER_IMAGE $GENEGRAPHDB_REPO_DIR/developer_env"
 
-alias genegraphdb_docker_run="docker run -it --rm \
+alias ggdb_docker_run="docker run -it --rm \
     -v $GENEGRAPHDB_REPO_DIR:/GeneGraphDB \
     -v $HOME/.config/gcloud:/root/.config/gcloud \
     -v $GENEGRAPHDB_REPO_DIR/data/docker.bash_history:/root/.bash_history \
     $DOCKER_IMAGE"
     # -v /home/jupyter/GeneGraphDB/genegraph.db:/GeneGraphDB/data/genegraph.db \
 
-alias genegraphdb_docker_jupyter="docker run -it --rm \
+alias ggdb_docker_jupyter="docker run -it --rm \
     --hostname localhost \
     -v $GENEGRAPHDB_REPO_DIR:/GeneGraphDB \
     -v $HOME/.config/gcloud:/root/.config/gcloud \
