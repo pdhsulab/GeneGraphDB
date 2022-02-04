@@ -13,7 +13,7 @@ export GENEGRAPHDB_REPO_DIR="$(dirname $DIR)"
 git --git-dir="$GENEGRAPHDB_REPO_DIR/.git" config --local core.autocrlf input
 git --git-dir="$GENEGRAPHDB_REPO_DIR/.git" config filter.prepare_notebook_for_repository.clean 'developer_env/prepare_notebook_for_repository.py'
 
-alias cd_genegraphdb="cd $GENEGRAPHDB_REPO_DIR"
+alias cd_ggdb="cd $GENEGRAPHDB_REPO_DIR"
 
 DOCKER_BASH_HISTORY="$GENEGRAPHDB_REPO_DIR/data/docker.bash_history"
 touch $DOCKER_BASH_HISTORY
