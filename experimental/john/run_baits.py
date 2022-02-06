@@ -61,7 +61,8 @@ def get_all_icicties(baits):
 
 
 def main():
-    INPUT_FILE = "/GeneGraphDB/data/jacob_baits_20220202/cas2.txt"
+    # INPUT_FILE = "/GeneGraphDB/data/jacob_baits_20220202/cas2.txt"
+    INPUT_FILE = "/GeneGraphDB/data/jacob_baits_20220202/tnpBs_in_testdb.p100.1e4.txt"
     OUTPUT_FILE = os.path.join(
         "/GeneGraphDB/data/icity_results/", os.path.basename(INPUT_FILE).replace(".txt", ".json")
     )
@@ -71,8 +72,9 @@ def main():
     # get baits
     with open(INPUT_FILE, "r") as f:
         baits = [line.strip() for line in f.readlines()]
-    # jacob said files here accidentally have 20 chars instead of 18
-    baits = [b[:18] for b in baits]
+    # jacob said cas files accidentally have 20 chars instead of 18
+    if "cas" in INPUT_FILE[:-10]:
+        baits = [b[:18] for b in baits]
     ggdb_logging.info(f"Found {len(baits)} baits in file {INPUT_FILE}")
 
     icity_results = get_all_icicties(baits)
