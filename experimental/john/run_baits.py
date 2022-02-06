@@ -21,9 +21,6 @@ def main():
     baits = [b[:18] for b in baits]
     ggdb_logging.info(f"Found {len(baits)} baits in file {INPUT_FILE}")
 
-    # REMOVE REMOVE (get rid of this limit)
-    baits = baits[:100]
-
     p100_to_p30 = {}  # cache of cluster lookups
     icity_results = {}  # cache of icity results by p30 cluster
 
@@ -66,11 +63,11 @@ def main():
 
             bait_first_key = f"{bait_p30}|{tgt_p30}"
             bait_first_icity = calc_icity.compute_icity_on_graph(icity_graph, bait_p30)
-            tgt_first_icity["tgt_p100"] = bait
+            bait_first_icity["tgt_p100"] = bait
             bait_first_icity["bait_hash"] = tgt_p30
-            tgt_first_icity["bait_p100"] = tgt
-            tgt_first_icity["tgt_type"] = "cas1"
-            tgt_first_icity["tgt_type"] = "cas1_neighbor"
+            bait_first_icity["bait_p100"] = tgt
+            bait_first_icity["tgt_type"] = "cas1"
+            bait_first_icity["tgt_type"] = "cas1_neighbor"
             icity_results[bait_first_key] = bait_first_icity
 
     # save icity results to a json file for later use
