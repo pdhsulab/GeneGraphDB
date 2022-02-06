@@ -5,22 +5,9 @@ from db_inference import calc_icity
 from db_inference.simple_sql_db import SimpleSqlDb
 from utils import ggdb_logging
 
-INPUT_FILE = "/GeneGraphDB/data/jacob_baits_20220202/cas1.txt"
-OUTPUT_FILE = os.path.join("/GeneGraphDB/data/icity_results/",
-                           os.path.basename(INPUT_FILE).replace(".txt", ".json"))
 
-
-def main():
+def get_all_icicties(baits):
     sql_db = SimpleSqlDb()
-    os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
-
-    # get baits
-    with open(INPUT_FILE, "r") as f:
-        baits = [line.strip() for line in f.readlines()]
-    # jacob said files here accidentally have 20 chars instead of 18
-    baits = [b[:18] for b in baits]
-    ggdb_logging.info(f"Found {len(baits)} baits in file {INPUT_FILE}")
-
     p100_to_p30 = {}  # cache of cluster lookups
     icity_results = {}  # cache of icity results by p30 cluster
 
@@ -70,8 +57,31 @@ def main():
             bait_first_icity["tgt_type"] = "cas1_neighbor"
             icity_results[bait_first_key] = bait_first_icity
 
+    return icity_results
+
+
+def main():
+    INPUT_FILE = "/GeneGraphDB/data/jacob_baits_20220202/cas2.txt"
+    OUTPUT_FILE = os.path.join(
+        "/GeneGraphDB/data/icity_results/", os.path.basename(INPUT_FILE).replace(".txt", ".json")
+    )
+
+    os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
+
+    # get baits
+    with open(INPUT_FILE, "r") as f:
+        baits = [line.strip() for line in f.readlines()]
+    # jacob said files here accidentally have 20 chars instead of 18
+    baits = [b[:18] for b in baits]
+    ggdb_logging.info(f"Found {len(baits)} baits in file {INPUT_FILE}")
+
+    icity_results = get_all_icicties(baits)
+
     # save icity results to a json file for later use
-    with open(OUTPUT_FILE, 'w',) as fp:
+    with open(
+        OUTPUT_FILE,
+        "w",
+    ) as fp:
         json.dump(icity_results, fp, indent=2)
 
     ggdb_logging.info(f"Wrote to file {OUTPUT_FILE}")
