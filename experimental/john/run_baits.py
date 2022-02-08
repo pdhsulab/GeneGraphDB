@@ -6,7 +6,7 @@ from db_inference.simple_sql_db import SimpleSqlDb
 from utils import ggdb_logging
 
 
-def get_all_icicties(baits):
+def get_all_icicties(baits, bait_type):
     sql_db = SimpleSqlDb()
     p100_to_p30 = {}  # cache of cluster lookups
     icity_results = {}  # cache of icity results by p30 cluster
@@ -44,8 +44,8 @@ def get_all_icicties(baits):
             tgt_first_icity["tgt_p100"] = tgt
             tgt_first_icity["bait_hash"] = bait_p30
             tgt_first_icity["bait_p100"] = bait
-            tgt_first_icity["tgt_type"] = "cas1_neighbor"
-            tgt_first_icity["bait_type"] = "cas1"
+            tgt_first_icity["tgt_type"] = f"{bait_type}_neighbor"
+            tgt_first_icity["bait_type"] = bait_type
             icity_results[tgt_first_key] = tgt_first_icity
 
             bait_first_key = f"{bait_p30}|{tgt_p30}"
@@ -53,18 +53,19 @@ def get_all_icicties(baits):
             bait_first_icity["tgt_p100"] = bait
             bait_first_icity["bait_hash"] = tgt_p30
             bait_first_icity["bait_p100"] = tgt
-            bait_first_icity["tgt_type"] = "cas1"
-            bait_first_icity["tgt_type"] = "cas1_neighbor"
+            bait_first_icity["tgt_type"] = bait_type
+            bait_first_icity["bait_type"] = f"{bait_type}_neighbor"
             icity_results[bait_first_key] = bait_first_icity
 
     return icity_results
 
 
 def main():
+    # INPUT_FILE = "/GeneGraphDB/data/jacob_baits_20220202/cas1.txt"
     # INPUT_FILE = "/GeneGraphDB/data/jacob_baits_20220202/cas2.txt"
     INPUT_FILE = "/GeneGraphDB/data/jacob_baits_20220202/tnpBs_in_testdb.p100.1e4.txt"
     OUTPUT_FILE = os.path.join(
-        "/GeneGraphDB/data/icity_results/", os.path.basename(INPUT_FILE).replace(".txt", ".json")
+        "/GeneGraphDB/data/20220208_icity_results/", os.path.basename(INPUT_FILE).replace(".txt", ".json")
     )
 
     os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
