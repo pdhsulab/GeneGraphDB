@@ -2,6 +2,7 @@
 import os.path
 import sqlite3
 from typing import List
+from utils import ggdb_logging
 
 DEFAULT_DATABASE_FILE = "/GeneGraphDB/data/genegraph.db"
 
@@ -40,9 +41,16 @@ class SimpleSqlDb:
         cur = self.conn.cursor()
         cur.execute(f"SELECT * FROM clusters WHERE p100 is '{p100_hash}'")
         all_rows = cur.fetchall()
-        assert len(all_rows) == 1, f"Found {len(all_rows)} clusters for p100 {p100_hash}"
         cur.close()
-        row = all_rows[0]
+        if len(all_rows) > 1:
+            raise NotImplementedError(f"Found multiple ({len(all_rows)}) p30 clusters for p100 {p100_hash}")
+        elif len(all_rows) == 0:
+            # happens somewhat often
+            ggdb_logging.error(f"Found {len(all_rows)} p30 clusters for p100 {p100_hash}")
+            row = None
+        else:
+            # expected case: 1 row for p30 cluster
+            row = all_rows[0]
         return row
 
     def get_p30_cluster_members(self, p30_hash) -> List[sqlite3.Row]:
