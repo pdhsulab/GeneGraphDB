@@ -50,7 +50,7 @@ critical = _logging.critical
 #     try:
 #         1/0:
 #     except ZeroDivisionError:
-#         dcp_logging.exception("ZeroDivisionError")
+#         ggdb_logging.exception("ZeroDivisionError")
 exception = _logging.exception
 
 
@@ -138,15 +138,15 @@ class _GgdbFormatter(_logging.Formatter):
         colorize = os.environ.get(_FORMAT_COLOR, default="0").lower() not in ("0", "false", "no")
         formatters = {
             _FORMAT_FILENAME: _GgdbFormatter(
-                "[%(levelname)-5s|dcp] %(asctime)s %(filename)20s:%(lineno)-4s --- %(message)s", colorized=colorize
+                "[%(levelname)-5s|ggdb] %(asctime)s %(filename)20s:%(lineno)-4s --- %(message)s", colorized=colorize
             ),
             _FORMAT_SHORT_PATH: _GgdbFormatter(
-                "[%(levelname)-5s|dcp] %(asctime)s  %(pathname)40s:%(lineno)-4s --- %(message)s",
+                "[%(levelname)-5s|ggdb] %(asctime)s  %(pathname)40s:%(lineno)-4s --- %(message)s",
                 path_length=40,
                 colorized=colorize,
             ),
             _FORMAT_FULL_PATH: _GgdbFormatter(
-                "[%(levelname)-5s|dcp] %(asctime)s %(pathname)100s:%(lineno)-4s --- %(message)s", colorized=colorize
+                "[%(levelname)-5s|ggdb] %(asctime)s %(pathname)100s:%(lineno)-4s --- %(message)s", colorized=colorize
             ),
         }
         assert (
