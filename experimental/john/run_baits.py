@@ -67,6 +67,7 @@ def main():
     OUTPUT_FILE = os.path.join(
         "/GeneGraphDB/data/20220208_icity_results/", os.path.basename(INPUT_FILE).replace(".txt", ".json")
     )
+    bait_type = os.path.basename(INPUT_FILE)[:4]
 
     os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
 
@@ -78,7 +79,7 @@ def main():
         baits = [b[:18] for b in baits]
     ggdb_logging.info(f"Found {len(baits)} baits in file {INPUT_FILE}")
 
-    icity_results = get_all_icicties(baits)
+    icity_results = get_all_icicties(baits, bait_type)
 
     # save icity results to a json file for later use
     with open(
