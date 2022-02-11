@@ -2,8 +2,10 @@ from db_inference import simple_neo4j
 from utils import ggdb_logging
 from utils import profile_util
 
-CLUSTERS_CSV = "file:///csv_exports/clusters_sample.csv"
-PROT2PROT_WINDOW_CSV = "file:///csv_exports/prot2protwindow_sample.csv"
+# CLUSTERS_CSV = "file:///csv_exports/clusters_sample.csv"
+# PROT2PROT_WINDOW_CSV = "file:///csv_exports/prot2protwindow_sample.csv"
+CLUSTERS_CSV = "file:///csv_exports/clusters.csv"
+PROT2PROT_WINDOW_CSV = "file:///csv_exports/prot2protwindow.csv"
 
 
 def uniqueness_constraints(conn):
