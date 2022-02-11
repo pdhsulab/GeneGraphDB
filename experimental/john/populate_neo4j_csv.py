@@ -15,7 +15,7 @@ def uniqueness_constraints(conn):
 def load_clusters(conn):
     query = (
         """
-            LOAD_CSV WITH HEADERS FROM "%s" as row
+            LOAD CSV WITH HEADERS FROM "%s" AS row
             MERGE (c30:P30 {p30: row.p30})
             MERGE (c90:P90 {p90: row.p90})
             MERGE (c100:P100 {p100: row.p100})
@@ -31,7 +31,7 @@ def load_clusters(conn):
 def load_prot2prot(conn):
     query = (
         """
-            LOAD_CSV WITH HEADERS FROM "%s" as row
+            LOAD CSV WITH HEADERS FROM "%s" AS row
             MERGE (n:P100 {p100: row.p1hash})
             MERGE (m:P100 {p100: row.p2hash})
             MERGE (n)-[:WINDOWED_NEIGHBOR]->(m)
