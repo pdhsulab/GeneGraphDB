@@ -1,3 +1,4 @@
+import sys
 from multiprocessing import Pool
 from os.path import join
 
@@ -17,6 +18,7 @@ def _targets_and_baits(infile, dbpath, outdir, threads):
     with open(infile) as inf:
         for line in inf:
             target_id, bait_ids = line.strip().split("\t")
+            bait_ids = set(bait_ids.split(';'))
             print("Working on", target_id)
             retrieve_target_and_bait(target_id, bait_ids, dbpath, sample2path, outdir, threads)
 
