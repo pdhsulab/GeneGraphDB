@@ -1,0 +1,12 @@
+root@d3648cf33074:/GeneGraphDB/data# sqlite3 genegraph.db
+SQLite version 3.34.1 2021-01-20 14:10:07
+Enter ".help" for usage hints.
+sqlite> .mode csv
+sqlite> .output clusters.csv
+sqlite> select * from clusters;
+
+
+***********
+
+.output prot2protwindow.csv
+select * from prot2protwindow;
