@@ -46,7 +46,8 @@ class SimpleSqlDb:
             raise NotImplementedError(f"Found multiple ({len(all_rows)}) p30 clusters for p100 {p100_hash}")
         elif len(all_rows) == 0:
             # happens somewhat often
-            ggdb_logging.error(f"Found {len(all_rows)} p30 clusters for p100 {p100_hash}")
+            # TODO! add back in
+            # ggdb_logging.error(f"Found {len(all_rows)} p30 clusters for p100 {p100_hash}")
             row = None
         else:
             # expected case: 1 row for p30 cluster
