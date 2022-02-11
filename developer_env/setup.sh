@@ -57,7 +57,8 @@ alias ggdb_docker_jupyter="docker run -it --rm \
 # password ("test"; can be changed)
 alias ggdb_neo4j_run="docker run -d --rm \
     --name testneo4j \
-    -p7474:7474 -p7687:7687 \
+    -p 0.0.0.0:7474:7474 \
+    -p 0.0.0.0:7687:7687 \
     -v $NEO4J_DIR/data:/data \
     -v $NEO4J_DIR/logs:/logs \
     -v $NEO4J_DIR/import:/var/lib/neo4j/import \
