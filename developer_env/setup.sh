@@ -62,7 +62,7 @@ alias ggdb_neo4j_run="docker run -d --rm \
     -v $NEO4J_DIR/logs:/logs \
     -v $NEO4J_DIR/import:/var/lib/neo4j/import \
     -v $NEO4J_DIR/plugins:/plugins \
-    -v $GENEGRAPHDB_REPO_DIR/data/csv_exports:/csv_exports \
+    -v $GENEGRAPHDB_REPO_DIR/data/csv_exports:/var/lib/neo4j/import/csv_exports \
     --env NEO4J_AUTH=neo4j/test \
     --network $NEO4J_NETWORK_NAME \
     neo4j:latest"
