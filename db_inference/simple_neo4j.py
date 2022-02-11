@@ -35,7 +35,8 @@ class Neo4jConnection:
             session = self.__driver.session(database=db) if db is not None else self.__driver.session()
             response = list(session.run(query, parameters))
         except Exception as e:
-            ggdb_logging.warning("Query failed:", e)
+            # TODO: logging
+            print("Query failed:", e)
         finally:
             if session is not None:
                 session.close()
