@@ -4,6 +4,8 @@ NEO4J_DIR="/Users/john/zoo_ventures/arc_institute/GeneGraphDB/data"
 
 # https://neo4j.com/developer/docker-run-neo4j/
 
+docker network create neo4j_network
+
 docker run \
     --name testneo4j \
     -p7474:7474 -p7687:7687 \
