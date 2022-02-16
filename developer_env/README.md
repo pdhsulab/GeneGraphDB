@@ -34,3 +34,17 @@ and consider adding this line to your .bashrc/.zshrc or similar.
 Sourcing setup.sh will also change your local git settings to automatically strip output from ipython notebooks.
 This decreases the size of files committed to github, decreases the risk that sensitive information is committed,
 and decreases the noise of commits (ipython notebook outputs can change without any code changing).
+
+
+## CloudBuild
+
+CloudBuild is a tool offered from GCP for CI/CD ("continuous integration continuous deploy").
+For the typical engineering team, this means building/compiling code, running tests, and deploying the built code to
+e.g. a web server.  For now, we're just using it to build docker images.
+
+### Building a new base image
+
+```
+git tag 'build_base' -f
+git push origin build_base -f
+```
