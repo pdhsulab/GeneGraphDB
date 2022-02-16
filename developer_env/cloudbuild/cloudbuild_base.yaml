@@ -28,7 +28,7 @@ steps:
   args: [
           'build',
           '-t', '${_OUTPUT_IMAGE_NAME}',
-          '-t', '${_OUTPUT_IMAGE_NAME}:${SHORT_SHA}',
+#          '-t', '${_OUTPUT_IMAGE_NAME}:${SHORT_SHA}',
 #          '--cache-from', '${_OUTPUT_IMAGE_NAME}',
           'developer_env'
         ]
@@ -56,6 +56,6 @@ substitutions:
 
 images:
 - '${_OUTPUT_IMAGE_NAME}:latest'
-- '${_OUTPUT_IMAGE_NAME}:${SHORT_SHA}'
+#- '${_OUTPUT_IMAGE_NAME}:${SHORT_SHA}'
 
 timeout: '600s'
