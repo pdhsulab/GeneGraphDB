@@ -1,0 +1,60 @@
+# Build base GGDB image
+steps:
+
+# 1. Move code from /workspace to /GeneGraphDB .
+# NOTE(john) I think this will be useful in future when we add tests to build pipeline
+- name: 'gcr.io/cloud-builders/docker'
+  entrypoint: bash
+  args:
+  - '-c'
+  - |
+    shopt -s extglob dotglob
+    mv * /GeneGraphDB
+  volumes:
+  - name: 'GGDB'
+    path: '/GeneGraphDB'
+  id: 'move_code'
+  waitFor: ['-']
+
+## 2. pull GGDB image
+#- name: 'gcr.io/cloud-builders/docker'
+#  args: ['pull', '${_OUTPUT_IMAGE_NAME}']
+#  id: 'pull_image'
+#  waitFor: ['-']
+
+# 3. build base image
+- name: 'gcr.io/cloud-builders/docker'
+  args: [
+          'build',
+          '-t', '${_OUTPUT_IMAGE_NAME}',
+          '-t', '${_OUTPUT_IMAGE_NAME}:${SHORT_SHA}',
+#          '--cache-from', '${_OUTPUT_IMAGE_NAME}',
+          'developer_env'
+        ]
+  dir: '/GeneGraphDB'
+  volumes:
+  - name: 'GGDB'
+    path: '/GeneGraphDB'
+  id: 'build_base'
+#  waitFor: ['pull_image', 'move_code']
+
+# 4. run tests
+#- name: '${_OUTPUT_IMAGE_NAME}'
+#  args: ['pytest', './test']
+#  dir: '/GeneGraphDB'
+#  volumes:
+#  - name: 'GGDB'
+#    path: '/GeneGraphDB'
+#  id: 'test'
+#  waitFor: ['build_base']
+
+################################################## Build instructions ##################################################
+
+substitutions:
+  _OUTPUT_IMAGE_NAME: 'gcr.io/durrant/genegraphdb_base'
+
+images:
+- '${_OUTPUT_IMAGE_NAME}:latest'
+- '${_OUTPUT_IMAGE_NAME}:${SHORT_SHA}'
+
+timeout: '600s'
