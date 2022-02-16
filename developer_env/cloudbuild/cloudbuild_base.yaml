@@ -21,6 +21,7 @@ steps:
 #  args: ['pull', '${_OUTPUT_IMAGE_NAME}']
 #  id: 'pull_image'
 #  waitFor: ['-']
+# meaningless comment to trigger new build
 
 # 3. build base image
 - name: 'gcr.io/cloud-builders/docker'
