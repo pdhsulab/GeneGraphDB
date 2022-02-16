@@ -16,20 +16,19 @@ steps:
   id: 'move_code'
   waitFor: ['-']
 
-## 2. pull GGDB image
-#- name: 'gcr.io/cloud-builders/docker'
-#  args: ['pull', '${_OUTPUT_IMAGE_NAME}']
-#  id: 'pull_image'
-#  waitFor: ['-']
-# meaningless comment to trigger new build
+# 2. pull GGDB image
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['pull', '${_OUTPUT_IMAGE_NAME}']
+  id: 'pull_image'
+  waitFor: ['-']
 
 # 3. build base image
 - name: 'gcr.io/cloud-builders/docker'
   args: [
           'build',
           '-t', '${_OUTPUT_IMAGE_NAME}',
-#          '-t', '${_OUTPUT_IMAGE_NAME}:${SHORT_SHA}',
-#          '--cache-from', '${_OUTPUT_IMAGE_NAME}',
+          '-t', '${_OUTPUT_IMAGE_NAME}:${SHORT_SHA}',
+          '--cache-from', '${_OUTPUT_IMAGE_NAME}',
           'developer_env'
         ]
   dir: '/GeneGraphDB'
@@ -37,7 +36,7 @@ steps:
   - name: 'GGDB'
     path: '/GeneGraphDB'
   id: 'build_base'
-#  waitFor: ['pull_image', 'move_code']
+  waitFor: ['pull_image', 'move_code']
 
 # 4. run tests
 #- name: '${_OUTPUT_IMAGE_NAME}'
@@ -56,6 +55,6 @@ substitutions:
 
 images:
 - '${_OUTPUT_IMAGE_NAME}:latest'
-#- '${_OUTPUT_IMAGE_NAME}:${SHORT_SHA}'
+- '${_OUTPUT_IMAGE_NAME}:${SHORT_SHA}'
 
 timeout: '600s'
