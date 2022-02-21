@@ -7,6 +7,9 @@ from utils import profile_util
 CLUSTERS_CSV = "file:///csv_exports/clusters.csv"
 PROT2PROT_WINDOW_CSV = "file:///csv_exports/prot2protwindow.csv"
 
+# CLUSTER_LIMIT = 100000
+# NEIGHBOR_LIMIT = 100000
+
 
 def uniqueness_constraints(conn):
     conn.query("CREATE CONSTRAINT ON (p:P30) ASSERT p.p30 IS UNIQUE")
@@ -19,6 +22,7 @@ def load_clusters(conn):
         """
             USING PERIODIC COMMIT 10000
             LOAD CSV WITH HEADERS FROM "%s" AS row
+            WITH row LIMIT 100000
             MERGE (c30:P30 {p30: row.p30})
             MERGE (c90:P90 {p90: row.p90})
             MERGE (c100:P100 {p100: row.p100})
@@ -36,6 +40,7 @@ def load_prot2prot(conn):
         """
             USING PERIODIC COMMIT 10000
             LOAD CSV WITH HEADERS FROM "%s" AS row
+            WITH row LIMIT 100000
             MERGE (n:P100 {p100: row.p1hash})
             MERGE (m:P100 {p100: row.p2hash})
             MERGE (n)-[:WINDOWED_NEIGHBOR]->(m)
