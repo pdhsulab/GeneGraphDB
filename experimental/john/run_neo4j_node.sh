@@ -1,6 +1,8 @@
 #!/bin/bash
 
-NEO4J_DIR="/Users/john/zoo_ventures/arc_institute/GeneGraphDB/data"
+#NEO4J_DIR="/Users/john/zoo_ventures/arc_institute/GeneGraphDB/data"
+
+NEO4J_DIR="/home/john/GeneGraphDB/data/neo4j"
 
 # https://neo4j.com/developer/docker-run-neo4j/
 
