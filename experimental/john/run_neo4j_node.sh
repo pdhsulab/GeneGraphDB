@@ -12,10 +12,10 @@ docker run \
     -p7474:7474 -p7687:7687 \
     -d \
     --rm \
-    -v $NEO4J_DIR/neo4j/data:/data \
-    -v $NEO4J_DIR/neo4j/logs:/logs \
-    -v $NEO4J_DIR/neo4j/import:/var/lib/neo4j/import \
-    -v $NEO4J_DIR/neo4j/plugins:/plugins \
+    -v $NEO4J_DIR/data:/data \
+    -v $NEO4J_DIR/logs:/logs \
+    -v $NEO4J_DIR/import:/var/lib/neo4j/import \
+    -v $NEO4J_DIR/plugins:/plugins \
     --env NEO4J_AUTH=neo4j/test \
     --network "neo4j_network" \
     neo4j:latest
