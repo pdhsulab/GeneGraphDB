@@ -22,7 +22,7 @@ def load_clusters(conn):
         """
             USING PERIODIC COMMIT 10000
             LOAD CSV WITH HEADERS FROM "%s" AS row
-            WITH row LIMIT 100000
+            WITH row LIMIT 1000000
             MERGE (c30:P30 {p30: row.p30})
             MERGE (c90:P90 {p90: row.p90})
             MERGE (c100:P100 {p100: row.p100})
@@ -40,7 +40,7 @@ def load_prot2prot(conn):
         """
             USING PERIODIC COMMIT 10000
             LOAD CSV WITH HEADERS FROM "%s" AS row
-            WITH row LIMIT 100000
+            WITH row LIMIT 1000000
             MERGE (n:P100 {p100: row.p1hash})
             MERGE (m:P100 {p100: row.p2hash})
             MERGE (n)-[:WINDOWED_NEIGHBOR]->(m)
