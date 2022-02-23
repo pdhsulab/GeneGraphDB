@@ -15,6 +15,10 @@ def uniqueness_constraints(conn):
     conn.query("CREATE CONSTRAINT ON (p:P30) ASSERT p.p30 IS UNIQUE")
     conn.query("CREATE CONSTRAINT ON (p:P90) ASSERT p.p90 IS UNIQUE")
     conn.query("CREATE CONSTRAINT ON (p:P100) ASSERT p.p100 IS UNIQUE")
+    # # TODO: is this redundant given above constraint?
+    # conn.query("CREATE INDEX on :P100(p100)")
+    # conn.query("CREATE INDEX on :P90(p90)")
+    # conn.query("CREATE INDEX on :P30(p30)")
 
 
 def load_clusters(conn):
