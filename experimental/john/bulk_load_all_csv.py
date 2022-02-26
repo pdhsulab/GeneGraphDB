@@ -32,6 +32,14 @@ def main():
     ggdb_logging.info(f"CLUSTER_LIMIT is {CLUSTER_LIMIT}")
     ggdb_logging.info(f"NEIGHBOR_LIMIT is {NEIGHBOR_LIMIT}")
 
+    cluster_query = "SELECT * FROM clusters"
+    if CLUSTER_LIMIT is not None:
+        cluster_query += f" LIMIT {CLUSTER_LIMIT}"
+
+    neighbor_query = "SELECT * FROM prot2protwindow"
+    if NEIGHBOR_LIMIT is not None:
+        neighbor_query += f" LIMIT {NEIGHBOR_LIMIT}"
+
     sql_db = simple_sql_db.SimpleSqlDb()
     csv_dir = "/GeneGraphDB/data/neo4j/import"
     p100_fpath = os.path.join(csv_dir, "p100.csv")
@@ -39,7 +47,7 @@ def main():
     p90_fpath = os.path.join(csv_dir, "p90.csv")
     p90_p100_fpath = os.path.join(csv_dir, "p90_cluster_p100.csv")
     p30_fpath = os.path.join(csv_dir, "p30.csv")
-    p30_p90_fpath = os.path.join(csv_dir, "p30_cluster_p100.csv")
+    p30_p90_fpath = os.path.join(csv_dir, "p30_cluster_p90.csv")
 
     unique_p30s = set()
     unique_p90s = set()
@@ -50,7 +58,7 @@ def main():
     num_read_cluster = 0
     cur = sql_db.conn.cursor()
     with profile_util.memory_monitor("clusters_unique_proteins"), profile_util.time_monitor("cluster_unique_proteins"):
-        for row in cur.execute(f"SELECT * FROM clusters LIMIT {CLUSTER_LIMIT}"):
+        for row in cur.execute(cluster_query):
             num_read_cluster += 1
             unique_p30s.add(row["p30"])
             unique_p90s.add(row["p90"])
@@ -65,7 +73,7 @@ def main():
     ggdb_logging.info("Reading prot2protwindow for unique proteins")
     num_prot2protwindow_rows = 0
     with profile_util.memory_monitor("prot2protwindow_unique_proteins"):
-        for row in cur.execute(f"SELECT * FROM prot2protwindow LIMIT {NEIGHBOR_LIMIT}"):
+        for row in cur.execute(neighbor_query):
             num_prot2protwindow_rows += 1
             unique_p100s.add(row["p1hash"])
             unique_p100s.add(row["p2hash"])
@@ -97,7 +105,7 @@ def main():
     # read through clusters file to gather unique p30_p90, p90_p100
     num_read_cluster_rows = 0
     with profile_util.memory_monitor("clusters_unique_edges"), profile_util.time_monitor("cluster_unique_edges"):
-        for row in cur.execute(f"SELECT * FROM clusters LIMIT {CLUSTER_LIMIT}"):
+        for row in cur.execute(cluster_query):
             p30_p90 = "_".join([row["p30"], row["p90"]])
             unique_p30_p90.add(p30_p90)
             p90_p100 = "_".join([row["p90"], row["p100"]])
@@ -121,7 +129,7 @@ def main():
     # read through neighbor file to gather unique p100_p100s
     with open(p100_neighbor_fpath, "w") as csv_fp, profile_util.time_monitor(f"Writing p100_to_p100_neighbor"):
         csv_fp.write(f":START_ID(P100),:END_ID(P100)\n")
-        for row in cur.execute(f"SELECT * FROM prot2protwindow LIMIT {NEIGHBOR_LIMIT}"):
+        for row in cur.execute(neighbor_query):
             p1_id = p100_to_neo4j_idx[row["p1hash"]]
             p2_id = p100_to_neo4j_idx[row["p2hash"]]
             # sorting unnecessary if we assume these are unique?
