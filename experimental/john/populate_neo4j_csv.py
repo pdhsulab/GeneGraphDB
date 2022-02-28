@@ -12,13 +12,12 @@ PROT2PROT_WINDOW_CSV = "file:///csv_exports/prot2protwindow.csv"
 
 
 def uniqueness_constraints(conn):
-    conn.query("CREATE CONSTRAINT ON (p:P30) ASSERT p.p30 IS UNIQUE")
-    conn.query("CREATE CONSTRAINT ON (p:P90) ASSERT p.p90 IS UNIQUE")
-    conn.query("CREATE CONSTRAINT ON (p:P100) ASSERT p.p100 IS UNIQUE")
-    # # TODO: is this redundant given above constraint?
-    # conn.query("CREATE INDEX on :P100(p100)")
-    # conn.query("CREATE INDEX on :P90(p90)")
-    # conn.query("CREATE INDEX on :P30(p30)")
+    with profile_util.time_monitor("P30 index"):
+        conn.query("CREATE CONSTRAINT ON (p:P30) ASSERT p.p30 IS UNIQUE")
+    with profile_util.time_monitor("P90 index"):
+        conn.query("CREATE CONSTRAINT ON (p:P90) ASSERT p.p90 IS UNIQUE")
+    with profile_util.time_monitor("P100 index"):
+        conn.query("CREATE CONSTRAINT ON (p:P100) ASSERT p.p100 IS UNIQUE")
 
 
 def load_clusters(conn):
@@ -60,13 +59,13 @@ def main():
     with profile_util.time_monitor("Uniqueness constraints"):
         uniqueness_constraints(conn)
 
-    with profile_util.time_monitor("Load clusters"):
-        ggdb_logging.info("Loading clusters")
-        load_clusters(conn)
-
-    with profile_util.time_monitor("Load prot2protwindow"):
-        ggdb_logging.info("Loading prot2protwindows")
-        load_prot2prot(conn)
+    # with profile_util.time_monitor("Load clusters"):
+    #     ggdb_logging.info("Loading clusters")
+    #     load_clusters(conn)
+    #
+    # with profile_util.time_monitor("Load prot2protwindow"):
+    #     ggdb_logging.info("Loading prot2protwindows")
+    #     load_prot2prot(conn)
 
     ggdb_logging.info("Finished")
 
