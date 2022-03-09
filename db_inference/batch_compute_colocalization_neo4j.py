@@ -8,16 +8,15 @@ from utils import profile_util
 
 def get_colocalization_scores(baits, bait_type):
     neo4j_db = SimpleNeo4j()
-    p100_to_p30 = {}  # cache of cluster lookups
-    colocalization_results = {}
+    processed_bait_p30s = set()
+    colocalization_scores = {}
 
     # for bait in baits, find neighbors and compute icity for each
     for bait in baits:
         ggdb_logging.info(f"Running bait {bait}")
-        if bait not in p100_to_p30:
-            bait_p30 = neo4j_db.get_p30_for_protein(bait)
-            p100_to_p30[bait] = bait_p30
-        bait_p30 = p100_to_p30[bait]
+        bait_p30 = neo4j_db.get_p30_for_protein(bait)
+        if bait_p30 in processed_bait_p30s:
+            ggdb_logging.info(f"Already computed targets and colocaliztion for bait P30 {bait_p30}")
 
         num_bait_p100s = neo4j_db.get_num_p100s(bait_p30)
         ggdb_logging.info(f"Bait {bait} has {num_bait_p100s} P100s")
@@ -28,14 +27,14 @@ def get_colocalization_scores(baits, bait_type):
         # for each target, compute icity (if not cached)
         for tgt_p30 in tgt_p30s:
             tgt_first_key = f"{tgt_p30}|{bait_p30}"
-            if tgt_first_key in colocalization_results:
+            if tgt_first_key in colocalization_scores:
                 ggdb_logging.debug(f"cache hit for {tgt_first_key}")
                 continue
             ggdb_logging.debug(f"Computing icity for {tgt_first_key}")
 
-            num_tgt_p100s = neo4j_db.get_num_p100s(tgt_p30s)
+            num_tgt_p100s = neo4j_db.get_num_p100s(tgt_p30)
             if num_tgt_p100s == 0:
-                ggdb_logging.debug(f"Skipping nonexistent tgt {tgt_p30s}")
+                ggdb_logging.debug(f"Skipping nonexistent tgt {tgt_p30}")
                 continue
 
             num_colocated_p100s = neo4j_db.get_num_shared(bait_p30, tgt_p30)
@@ -51,9 +50,12 @@ def get_colocalization_scores(baits, bait_type):
                 "bait_type": bait_type,
             }
 
-            colocalization_results[tgt_first_key] = colocalization_result
+            colocalization_scores[tgt_first_key] = colocalization_result
+            ggdb_logging.debug(f"added score for {tgt_first_key}")
 
-    return colocalization_results
+        processed_bait_p30s.add(bait_p30)
+
+    return colocalization_scores
 
 
 def main():
