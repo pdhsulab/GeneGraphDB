@@ -1,3 +1,5 @@
+from typing import List
+
 from neo4j import GraphDatabase
 
 from utils import ggdb_logging
@@ -41,3 +43,40 @@ class Neo4jConnection:
             if session is not None:
                 session.close()
         return response
+
+
+class SimpleNeo4j:
+    def __init__(self):
+        # TODO: validate data is as expected (e.g. that paper reader has loaded database)
+        self.conn = Neo4jConnection()
+
+    def get_p30_for_protein(self, p100_hash):
+        query = f'MATCH (n:P30)-->(o:P90)-->(p:P100) WHERE p.p100 = "{p100_hash}" RETURN n'
+        resp = self.conn.query(query)
+        p30_hash = resp[0][0]['p30']
+        return p30_hash
+
+    def get_num_p100s(self, p30_hash) -> int:
+        query = f'MATCH (n:P30)-->(:P90)-->(p:P100) WHERE n.p30 = "{p30_hash}" RETURN count(p)'
+        resp = self.conn.query(query)
+        num_p100s = resp[0]['count(p)']
+        return num_p100s
+
+    def get_targets_for_bait(self, p30_hash) -> List[str]:
+        query = 'MATCH (bait:P30)-->(bn:P90)-->(bp:P100)--(tp:P100)<--(tn:P90)<--(tgt:P30) ' \
+                f'WHERE bait.p30 = "{p30_hash}" RETURN collect(tgt)'
+        resp = self.conn.query(query)
+        tgt_nodes = resp[0][0]
+        tgts = [tgt["p30"] for tgt in tgt_nodes if tgt["p30"] != p30_hash]
+        return tgts
+
+    def get_num_shared(self, p30_A, p30_B):
+        query = 'MATCH (n:P30)-->(o:P90)-->(p:P100)-[e]-(tp:P100)<--(to:P90)<--(tn:P30) ' \
+                f'WHERE n.p30 = "{p30_A}" AND tn.p30="{p30_B}" RETURN count(e), count(p), count(tp)'
+        resp = self.conn.query(query)
+        count_edges = resp[0]["count(e)"]
+        count_prot_A = resp[0]["count(p)"]
+        count_prot_B = resp[0]["count(tp)"]
+        assert count_edges == count_prot_A == count_prot_B, \
+            f"Nonmatching counts {count_edges, count_prot_A, count_prot_B} for ({p30_A}, {p30_B})"
+        return count_edges
