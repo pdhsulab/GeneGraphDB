@@ -80,8 +80,8 @@ def main():
 
             ggdb_logging.info(f"Found {len(baits)} baits in file {input_file}")
 
-            baits = baits[:2]
-            ggdb_logging.warning("Reducing baits for debugging purposes")
+            # baits = baits[:2]
+            # ggdb_logging.warning("Reducing baits for debugging purposes")
 
             colocalization_results = get_colocalization_scores(baits, bait_type)
 
