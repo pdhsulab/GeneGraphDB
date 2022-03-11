@@ -1,7 +1,7 @@
 #!/bin/bash
 
-NEO4J_DIR="$GENEGRAPHDB_REPO_DIR/data/neo4j"
 #NEO4J_DIR="/home/john/GeneGraphDB/data/neo4j"
+NEO4J_DIR="$GENEGRAPHDB_REPO_DIR/data/neo4j"
 
 # https://neo4j.com/developer/docker-run-neo4j/
 

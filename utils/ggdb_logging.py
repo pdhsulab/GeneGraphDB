@@ -324,6 +324,13 @@ def _limit_fsspec_logging():
     gcsfs_logger.setLevel(max_level)
 
 
+def _limit_neo4j_logging():
+    """Neo4J also has extremely verbose DEBUG logs; set them to INFO"""
+    neo4j_logger = _logging.getLogger("neo4j")
+    max_level = max(_MIN_LOG_LEVEL, _logging.INFO)
+    neo4j_logger.setLevel(max_level)
+
+
 def _configure_root_logging(*handlers: _logging.Handler):
     """Configure the root logger, along with various other loggers we expect to encounter."""
     # Get the root logger
@@ -332,6 +339,7 @@ def _configure_root_logging(*handlers: _logging.Handler):
     # Set root logger to (almost) maximum verbosity; handlers can be more strict
     logger.setLevel(_logging.DEBUG)
     _limit_fsspec_logging()
+    _limit_neo4j_logging()
 
     logger.handlers.extend(handlers)
 
