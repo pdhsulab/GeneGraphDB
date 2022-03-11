@@ -5,6 +5,8 @@ from db_inference.simple_neo4j import SimpleNeo4j
 from utils import ggdb_logging
 from utils import profile_util
 
+BAITS_PER_FILE = 150
+
 
 def get_colocalization_scores(baits, bait_type):
     neo4j_db = SimpleNeo4j()
@@ -80,8 +82,9 @@ def main():
 
             ggdb_logging.info(f"Found {len(baits)} baits in file {input_file}")
 
-            # baits = baits[:2]
-            # ggdb_logging.warning("Reducing baits for debugging purposes")
+            if BAITS_PER_FILE is not None:
+                baits = baits[:BAITS_PER_FILE]
+                ggdb_logging.warning(f"Reducing baits to {BAITS_PER_FILE} for debugging purposes")
 
             colocalization_results = get_colocalization_scores(baits, bait_type)
 
