@@ -1,8 +1,6 @@
-from typing import List
+from typing import Dict, List
 
 from neo4j import GraphDatabase
-
-from utils import ggdb_logging
 
 # NOTE: in developer_env/setup.sh we create a docker network, and both the neo4j container and usual ggdb container are
 # run on this network. The shared network allows the containers to reference each other in URLs by container name.
@@ -61,6 +59,17 @@ class SimpleNeo4j:
         resp = self.conn.query(query)
         num_p100s = resp[0]["count(p)"]
         return num_p100s
+
+    def get_targets_and_num_shared_for_bait(self, p30_hash) -> Dict[str, int]:
+        query = (
+            "MATCH (bait:P30)-->(bn:P90)-->(bp:P100)-[e]-(tp:P100)<--(tn:P90)<--(tgt:P30) "
+            f'WHERE bait.p30 = "{p30_hash}" '
+            "WITH tgt, count(e) AS numShared "
+            "RETURN tgt{.p30, numShared} "
+        )
+        resp = self.conn.query(query)
+        tgts_to_counts = {r[0]["p30"]: r[0]["numShared"] for r in resp}
+        return tgts_to_counts
 
     def get_targets_for_bait(self, p30_hash) -> List[str]:
         query = (

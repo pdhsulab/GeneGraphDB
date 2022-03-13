@@ -11,6 +11,7 @@ BAITS_PER_FILE = 150
 def get_colocalization_scores(baits, bait_type):
     neo4j_db = SimpleNeo4j()
     processed_bait_p30s = set()
+    p30_to_count_p100s = {}
     colocalization_scores = {}
 
     # for bait in baits, find neighbors and compute icity for each
@@ -20,26 +21,31 @@ def get_colocalization_scores(baits, bait_type):
         if bait_p30 in processed_bait_p30s:
             ggdb_logging.info(f"Already computed targets and colocaliztion for bait P30 {bait_p30}")
 
-        num_bait_p100s = neo4j_db.get_num_p100s(bait_p30)
+        if bait_p30 not in p30_to_count_p100s:
+            num_p100s = neo4j_db.get_num_p100s(bait_p30)
+            p30_to_count_p100s[bait_p30] = num_p100s
+        num_bait_p100s = p30_to_count_p100s[bait_p30]
         ggdb_logging.info(f"Bait {bait} has {num_bait_p100s} P100s")
 
-        tgt_p30s = neo4j_db.get_targets_for_bait(bait_p30)
-        ggdb_logging.info(f"Bait {bait} has {len(tgt_p30s)} P30 neighbors")
+        tgt_p30s_to_num_shared = neo4j_db.get_targets_and_num_shared_for_bait(bait_p30)
+        ggdb_logging.info(f"Bait {bait} has {len(tgt_p30s_to_num_shared)} P30 neighbors")
 
         # for each target, compute icity (if not cached)
-        for tgt_p30 in tgt_p30s:
+        for tgt_p30, num_colocated_p100s in tgt_p30s_to_num_shared.items():
             tgt_first_key = f"{tgt_p30}|{bait_p30}"
             if tgt_first_key in colocalization_scores:
                 ggdb_logging.debug(f"cache hit for {tgt_first_key}")
                 continue
             ggdb_logging.debug(f"Computing icity for {tgt_first_key}")
 
-            num_tgt_p100s = neo4j_db.get_num_p100s(tgt_p30)
+            if tgt_p30 not in p30_to_count_p100s:
+                num_p100s = neo4j_db.get_num_p100s(tgt_p30)
+                p30_to_count_p100s[tgt_p30] = num_p100s
+            num_tgt_p100s = p30_to_count_p100s[tgt_p30]
+
             if num_tgt_p100s == 0:
                 ggdb_logging.debug(f"Skipping nonexistent tgt {tgt_p30}")
                 continue
-
-            num_colocated_p100s = neo4j_db.get_num_shared(bait_p30, tgt_p30)
 
             colocalization_result = {
                 "tgt_p30": tgt_p30,
@@ -68,7 +74,8 @@ def main():
     ]:
         with profile_util.time_monitor(f"Processing {input_file}"):
             output_file = os.path.join(
-                "/GeneGraphDB/data/20220308_neo4j_colocalization/", os.path.basename(input_file).replace(".txt", ".json")
+                "/GeneGraphDB/data/20220308_neo4j_colocalization/",
+                os.path.basename(input_file).replace(".txt", ".json"),
             )
 
             os.makedirs(os.path.dirname(output_file), exist_ok=True)
