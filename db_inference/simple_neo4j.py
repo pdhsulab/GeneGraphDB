@@ -60,29 +60,28 @@ class SimpleNeo4j:
         num_p100s = resp[0]["count(p)"]
         return num_p100s
 
-    # def get_targets_and_num_shared_num_prots_for_bait(self, p30_hash) -> Dict[str, int]:
-    #     query = (
-    #         "MATCH (bait:P30)-->(bn:P90)-->(bp:P100)-[e]-(tp:P100)<--(tn:P90)<--(tgt:P30) "
-    #         f'WHERE bait.p30 = "{p30_hash}" '
-    #         "WITH tgt, count(e) AS numShared "
-    #         "MATCH (tgt:P30) --> (tgt_n:P90) --> (tgt_p:P100) "
-    #         "WITH tgt, numShared, count(tgt_p) as numProts "
-    #         "RETURN tgt{.p30, numShared, numProts}"
-    #     )
-    #     resp = self.conn.query(query)
-    #     tgt_to_num_shared_num_prots = {r[0]["p30"]: (r[0]["numShared"], r[0]["numProts"]) for r in resp}
-    #     return tgt_to_num_shared_num_prots
-
-    def get_targets_and_num_shared_for_bait(self, p30_hash) -> Dict[str, int]:
+    def get_targets_and_num_shared_for_bait(self, p30_hash) -> Dict[str, Dict[str, int]]:
         query = (
             "MATCH (bait:P30)-->(bn:P90)-->(bp:P100)-[e]-(tp:P100)<--(tn:P90)<--(tgt:P30) "
             f'WHERE bait.p30 = "{p30_hash}" '
-            "WITH tgt, count(e) AS numSharedPaths, count( "
-            "RETURN tgt{.p30, numShared} "
+            "WITH tgt, "
+            "count(e) AS num_connections, "
+            "count(DISTINCT bp) as num_conn_bait_p100s, "
+            "count(DISTINCT bn) as num_conn_bait_p90s, "
+            "count(DISTINCT tn) as num_conn_tgt_p90s, "
+            "count(DISTINCT tp) as num_conn_tgt_p100s "
+            "RETURN tgt{.p30, num_connections, num_conn_bait_p100s, num_conn_bait_p90s, "
+            "num_conn_tgt_p90s, num_conn_tgt_p100s}"
         )
         resp = self.conn.query(query)
-        tgts_to_counts = {r[0]["p30"]: r[0]["numShared"] for r in resp}
-        return tgts_to_counts
+
+        tgt_to_stats = {}
+        for record in resp:
+            record_dict = record[0]
+            tgt = record_dict['p30']
+            stats = {k:v for k,v in record_dict.items() if k != 'p30'}
+            tgt_to_stats[tgt] = stats
+        return tgt_to_stats
 
     def get_targets_for_bait(self, p30_hash) -> List[str]:
         query = (
