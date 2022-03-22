@@ -60,7 +60,7 @@ class SimpleNeo4j:
         num_p100s = resp[0]["count(p)"]
         return num_p100s
 
-    def get_targets_and_num_shared_for_bait(self, p30_hash) -> Dict[str, Dict[str, int]]:
+    def get_targets_and_num_shared_for_bait(self, p30_hash, min_num_connections=None) -> Dict[str, Dict[str, int]]:
         query = (
             "MATCH (bait:P30)-->(bn:P90)-->(bp:P100)-[e]-(tp:P100)<--(tn:P90)<--(tgt:P30) "
             f'WHERE bait.p30 = "{p30_hash}" '
@@ -70,6 +70,10 @@ class SimpleNeo4j:
             "count(DISTINCT bn) as num_conn_bait_p90s, "
             "count(DISTINCT tn) as num_conn_tgt_p90s, "
             "count(DISTINCT tp) as num_conn_tgt_p100s "
+        )
+        if min_num_connections is not None:
+            query += f" WHERE num_connections >= {min_num_connections} "
+        query += (
             "RETURN tgt{.p30, num_connections, num_conn_bait_p100s, num_conn_bait_p90s, "
             "num_conn_tgt_p90s, num_conn_tgt_p100s}"
         )

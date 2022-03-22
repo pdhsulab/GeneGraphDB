@@ -6,6 +6,7 @@ from utils import ggdb_logging
 from utils import profile_util
 
 BAITS_PER_FILE = 150
+MIN_NUM_CONNECTIONS = 2
 
 
 def get_colocalization_scores(baits, bait_type):
@@ -27,8 +28,9 @@ def get_colocalization_scores(baits, bait_type):
         num_bait_p100s = p30_to_count_p100s[bait_p30]
         ggdb_logging.info(f"Bait {bait} has {num_bait_p100s} P100s")
 
-        tgt_p30s_to_conn_counts = neo4j_db.get_targets_and_num_shared_for_bait(bait_p30)
-        ggdb_logging.info(f"Bait {bait} has {len(tgt_p30s_to_conn_counts)} P30 neighbors")
+        tgt_p30s_to_conn_counts = neo4j_db.get_targets_and_num_shared_for_bait(bait_p30, MIN_NUM_CONNECTIONS)
+        ggdb_logging.info(f"Bait {bait} has {len(tgt_p30s_to_conn_counts)} P30 neighbors with at least  "
+                          f"{MIN_NUM_CONNECTIONS} connections")
 
         # for each target, compute icity (if not cached)
         for tgt_p30, conn_counts in tgt_p30s_to_conn_counts.items():
