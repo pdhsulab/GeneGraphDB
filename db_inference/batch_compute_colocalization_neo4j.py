@@ -29,7 +29,7 @@ def get_colocalization_scores(baits, bait_type):
         ggdb_logging.info(f"Bait {bait} has {num_bait_p100s} P100s")
 
         tgt_p30s_to_conn_counts = neo4j_db.get_targets_and_num_shared_for_bait(bait_p30, MIN_NUM_CONNECTIONS)
-        ggdb_logging.info(f"Bait {bait} has {len(tgt_p30s_to_conn_counts)} P30 neighbors with at least  "
+        ggdb_logging.info(f"Bait {bait} has {len(tgt_p30s_to_conn_counts)} P30 neighbors with at least "
                           f"{MIN_NUM_CONNECTIONS} connections")
 
         # for each target, compute icity (if not cached)
