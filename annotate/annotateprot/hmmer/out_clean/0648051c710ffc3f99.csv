@@ -1,0 +1,2 @@
+query_id,query_accession,query_len,hit_id,hit_score,hit_evalue,target_length,qstart,qend,tstart,tend
+Vac_ImportDeg,PF09783.11,162,0648051c710ffc3f99,13.7,2.3e-06,364,19,110,63,164

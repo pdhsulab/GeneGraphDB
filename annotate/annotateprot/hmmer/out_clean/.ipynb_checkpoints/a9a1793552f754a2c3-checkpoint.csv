@@ -1,0 +1,4 @@
+query_id,query_accession,query_len,hit_id,hit_score,hit_evalue,target_length,qstart,qend,tstart,tend
+AHJR-like,PF18743.3,123,a9a1793552f754a2c3,12.5,4.3e-06,309,86,118,40,71
+AHJR-like,PF18743.3,123,a9a1793552f754a2c3,12.5,4.3e-06,309,33,69,214,252
+HTH_OrfB_IS605,PF12323.10,47,a9a1793552f754a2c3,33.2,1.5e-12,309,2,35,161,194

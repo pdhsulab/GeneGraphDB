@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="570" height="400" viewBox="0 -400 570 400">
+<defs>
+</defs>
+<path d="M210,-20 L210,-320" stroke="grey" stroke-width="1" fill="none" />
+<text x="160" y="-330" font-size="22" fill="grey" dy="0em">1000</text>
+<path d="M410,-20 L410,-320" stroke="grey" stroke-width="1" fill="none" />
+<text x="360" y="-330" font-size="22" fill="grey" dy="0em">2000</text>
+<text x="16.0" y="-260" font-size="38" fill="black" dy="0em">Ambiguous: 0093c124a5b6ee038d|766cf87ff91f4adb1c|ce7111536f1a8fa833|GUT_GENOME212255|GUT_GENOME212255_64:0-9713(REV)@2 (7363-9711)</text>
+<path d="M10.2,-200 L266.2,-200 L296.2,-175.0 L266.2,-150 L10.2,-150 L10.2,-200 Z" fill="#efc050" fill-opacity="0.8" stroke="#efc050" stroke-width="4" />
+<text x="10.2" y="-210" font-size="26" fill="black" dy="0em">Cas9</text>
+<path d="M298.2,-200 L449.8,-200 L479.8,-175.0 L449.8,-150 L298.2,-150 L298.2,-200 Z" fill="#efc050" fill-opacity="0.8" stroke="#efc050" stroke-width="4" />
+<text x="298.2" y="-120" font-size="26" fill="black" dy="0em">Cas9</text>
+</svg>

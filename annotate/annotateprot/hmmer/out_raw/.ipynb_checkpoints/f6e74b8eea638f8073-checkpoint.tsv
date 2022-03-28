@@ -1,0 +1,16 @@
+#                                                                            --- full sequence --- -------------- this domain -------------   hmm coord   ali coord   env coord
+# target name        accession   tlen query name           accession   qlen   E-value  score  bias   #  of  c-Evalue  i-Evalue  score  bias  from    to  from    to  from    to  acc description of target
+#------------------- ---------- ----- -------------------- ---------- ----- --------- ------ ----- --- --- --------- --------- ------ ----- ----- ----- ----- ----- ----- ----- ---- ---------------------
+f6e74b8eea638f8073   -            359 DUP                  PF00674.20   103   4.2e-06   13.2   0.0   1   1   8.7e-06   8.7e-06   12.2   0.0    52    90   269   309   261   318 0.86 -
+f6e74b8eea638f8073   -            359 OrfB_Zn_ribbon       PF07282.13    69   3.9e-09   22.7   0.0   1   2   4.9e-06   4.9e-06   12.7   0.0     2    36   104   138   103   150 0.89 -
+f6e74b8eea638f8073   -            359 OrfB_Zn_ribbon       PF07282.13    69   3.9e-09   22.7   0.0   2   2   0.00025   0.00025    7.3   0.0    56    69   226   239   220   239 0.87 -
+#
+# Program:         hmmsearch
+# Version:         3.3.2 (Nov 2020)
+# Pipeline mode:   SEARCH
+# Query file:      ../../../tnpBs/data/Pfam-A.hmm
+# Target file:     INPUT/faa/f6e74b8eea638f8073.faa
+# Option settings: hmmsearch --domtblout hmmer/out_raw/f6e74b8eea638f8073.tsv -E 1 --cpu 32 ../../../tnpBs/data/Pfam-A.hmm INPUT/faa/f6e74b8eea638f8073.faa 
+# Current dir:     /home/jupyter/GeneGraphDB/annotate/annotateprot
+# Date:            Tue Feb  1 23:45:26 2022
+# [ok]

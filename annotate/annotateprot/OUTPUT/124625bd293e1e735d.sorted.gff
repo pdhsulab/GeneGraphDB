@@ -1,0 +1,6 @@
+124625bd293e1e735d	PRODIGAL	CDS	1	366	0	.	0	parent=993ea08c331aa195bb
+124625bd293e1e735d	CCT	CCT_domain	1	366	1	.	0	ID=Cas12f1_0_CAS-V-F;full_seq_evalue=1.5e-12;full_seq_score=1;qlen=512;tlen=366;qaln_perc=46.875;taln_perc=63.934426229508205
+124625bd293e1e735d	CCT	CCT_domain	1	366	1	.	0	ID=Cas12f1_1_CAS-V-F;full_seq_evalue=3.1e-09;full_seq_score=1;qlen=557;tlen=366;qaln_perc=16.696588868940754;taln_perc=24.316939890710383
+124625bd293e1e735d	CCT	CCT_domain	1	366	1	.	0	ID=Cas12f1_2_CAS-V-F;full_seq_evalue=1.1e-55;full_seq_score=1;qlen=429;tlen=366;qaln_perc=83.44988344988346;taln_perc=96.99453551912568
+124625bd293e1e735d	CCT	CCT_domain	1	366	1	.	0	ID=Cas12f2_1_CAS-V-F;full_seq_evalue=2.1e-08;full_seq_score=1;qlen=422;tlen=366;qaln_perc=26.540284360189574;taln_perc=29.508196721311474
+124625bd293e1e735d	hmmsearch	pfam_domain	242	322	1	.	0	ID=OrfB_IS605;domain_evalue=1.2e-07;domain_score=18.2;qlen=120;tlen=365;qstart=29;qend=113;tstart=242;tend=322

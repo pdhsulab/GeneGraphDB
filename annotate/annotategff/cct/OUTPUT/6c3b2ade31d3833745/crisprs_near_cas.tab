@@ -1,0 +1,2 @@
+Contig	CRISPR	Start	End	Consensus_repeat	N_repeats	Repeat_len	Spacer_len_avg	Repeat_identity	Spacer_identity	Spacer_len_sem	Trusted	Prediction	Subtype	Subtype_probability
+6c3b2ade31d3833745|7f5fe71ad1596c0e1a|7f5fe71ad1596c0e1a|632598|NZ_AQWN01000007.1:155811-181365(FWD)	6c3b2ade31d3833745|7f5fe71ad1596c0e1a|7f5fe71ad1596c0e1a|632598|NZ_AQWN01000007.1:155811-181365(FWD)_1	14362	17315	GTTCGTAGCCTGCCTATAAGGAATGGAAAC	45	30	36.5	100.0	40.7	0.2	True	Unknown	III-D	0.517

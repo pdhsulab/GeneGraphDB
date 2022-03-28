@@ -1,0 +1,2 @@
+0648051c710ffc3f99	PRODIGAL	CDS	1	365	0	.	0	parent=6e87489ba377373838
+0648051c710ffc3f99	hmmsearch	pfam_domain	63	164	1	.	0	ID=Vac_ImportDeg;domain_evalue=2.3e-06;domain_score=13.7;qlen=162;tlen=364;qstart=19;qend=110;tstart=63;tend=164

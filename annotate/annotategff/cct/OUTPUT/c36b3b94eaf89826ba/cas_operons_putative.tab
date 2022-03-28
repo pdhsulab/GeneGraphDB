@@ -1,0 +1,2 @@
+Contig	Operon	Start	End	Prediction	Complete_Interference	Complete_Adaptation	Best_type	Best_score	Genes	Positions	E-values	CoverageSeq	CoverageHMM	Strand_Interference	Strand_Adaptation
+c36b3b94eaf89826ba|9b3fe91190f49843cf|9b3fe91190f49843cf|2316231|RDXH01000001.1:16365-41565(FWD)	c36b3b94eaf89826ba|9b3fe91190f49843cf|9b3fe91190f49843cf|2316231|RDXH01000001.1:16365-41565(FWD)@1	7173	8000	False	0%	NA	IV-B	3.0	['CysH_0_IVB']	[7]	['4.20e-03']	[0.406]	[0.446]	NA	NA

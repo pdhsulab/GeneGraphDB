@@ -1,0 +1,2 @@
+Contig	Operon	Start	End	Prediction	Complete_Interference	Complete_Adaptation	Best_type	Best_score	Genes	Positions	E-values	CoverageSeq	CoverageHMM	Strand_Interference	Strand_Adaptation
+e95a232b429ceb001b|55a51c711b04418305|7af611c123b3d93314|618651|NZ_KQ948780.1:184860-210984(FWD)	e95a232b429ceb001b|55a51c711b04418305|7af611c123b3d93314|618651|NZ_KQ948780.1:184860-210984(FWD)@1	2150	2632	False	17%	NA	III-D	4.0	['Cas11_0_CAS-III-D']	[5]	['2.90e-03']	[0.385]	[0.415]	1	NA

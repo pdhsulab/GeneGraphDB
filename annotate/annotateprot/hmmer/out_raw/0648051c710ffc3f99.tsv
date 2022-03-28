@@ -1,0 +1,14 @@
+#                                                                            --- full sequence --- -------------- this domain -------------   hmm coord   ali coord   env coord
+# target name        accession   tlen query name           accession   qlen   E-value  score  bias   #  of  c-Evalue  i-Evalue  score  bias  from    to  from    to  from    to  acc description of target
+#------------------- ---------- ----- -------------------- ---------- ----- --------- ------ ----- --- --- --------- --------- ------ ----- ----- ----- ----- ----- ----- ----- ---- ---------------------
+0648051c710ffc3f99   -            364 Vac_ImportDeg        PF09783.11   162   2.3e-06   13.7   0.1   1   1   3.8e-06   3.8e-06   13.0   0.1    20   110    64   164    35   193 0.75 -
+#
+# Program:         hmmsearch
+# Version:         3.3.2 (Nov 2020)
+# Pipeline mode:   SEARCH
+# Query file:      ../../../tnpBs/data/Pfam-A.hmm
+# Target file:     INPUT/faa/0648051c710ffc3f99.faa
+# Option settings: hmmsearch --domtblout hmmer/out_raw/0648051c710ffc3f99.tsv -E 1 --cpu 32 ../../../tnpBs/data/Pfam-A.hmm INPUT/faa/0648051c710ffc3f99.faa 
+# Current dir:     /home/jupyter/GeneGraphDB/annotate/annotateprot
+# Date:            Tue Feb  1 23:45:26 2022
+# [ok]

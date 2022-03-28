@@ -1,0 +1,2 @@
+Contig	CRISPR	Start	End	Consensus_repeat	N_repeats	Repeat_len	Spacer_len_avg	Repeat_identity	Spacer_identity	Spacer_len_sem	Trusted	Prediction	Subtype	Subtype_probability
+c15257c28ad9a20cdd|de49ffa11f48b2343f|de49ffa11f48b2343f|6341291|WTFV01000252.1:0-23341(FWD)	c15257c28ad9a20cdd|de49ffa11f48b2343f|de49ffa11f48b2343f|6341291|WTFV01000252.1:0-23341(FWD)_2	21860	22066	GGGAAGATCCGCGTGCGTGCGGAGGGGAC	4	29	30.3	80.2	44.4	1.2	True	I-E	I-E	0.93
