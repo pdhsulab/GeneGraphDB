@@ -52,9 +52,9 @@ alias ggdb_docker_jupyter="docker run -it --rm \
         --no-browser \
         --NotebookApp.custom_display_url=http://localhost:8888"
 
-# note the NEO4J_AUTH command determines
-# user ("neo4j"; cannot be changed)
-# password ("test"; can be changed)
+# note the NEO4J_AUTH command determines:
+#   * user name (default "neo4j"; cannot be changed)
+#   * password ("test"; can be changed)
 alias ggdb_neo4j_run="docker run -d --rm \
     --name testneo4j \
     -p 0.0.0.0:7474:7474 \
