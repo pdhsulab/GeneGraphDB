@@ -5,7 +5,11 @@ from db_inference.simple_neo4j import SimpleNeo4j
 from utils import ggdb_logging
 from utils import profile_util
 
-BAITS_PER_FILE = 150
+# Set to integer value, and at most X baits are read from each file when determining targets and computing
+# colocalization.  If None, entire bait file is used.  Intention of this limit is for shorter run times when optimizing
+# query performance
+BAITS_PER_FILE = None
+# Minimum number of connections (inclusive) required for a bait and target to have their colocalization score computed.
 MIN_NUM_CONNECTIONS = 2
 
 
@@ -71,6 +75,7 @@ def get_colocalization_scores(baits, bait_type):
 
 
 def main():
+    # gsutil cp -r gs://durrant_mcspedon/jacob_baits_20220202 /GeneGraphDB/data/
     for input_file, bait_type in [
         ("/GeneGraphDB/data/jacob_baits_20220202/cas1.txt", "cas1"),
         ("/GeneGraphDB/data/jacob_baits_20220202/cas2.txt", "cas2"),
