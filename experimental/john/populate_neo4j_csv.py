@@ -1,3 +1,4 @@
+"""Failed attempt loading data via cypher.  Worked well with e.g. 100k nodes but took weeks for full 200M"""
 from db_inference import simple_neo4j
 from utils import ggdb_logging
 from utils import profile_util
