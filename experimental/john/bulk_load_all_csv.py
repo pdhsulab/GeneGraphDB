@@ -1,3 +1,5 @@
+"""Script for outputting CSVs for consumption by neo4j's bulk load CSV feature.  This is recommended method for
+importing >10M nodes. """
 import os
 
 from db_inference import simple_sql_db
