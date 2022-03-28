@@ -1,2 +1,0 @@
-Contig	CRISPR	Start	End	Consensus_repeat	N_repeats	Repeat_len	Spacer_len_avg	Repeat_identity	Spacer_identity	Spacer_len_sem	Trusted	Prediction	Subtype	Subtype_probability
-d2246f26c16fb9eec9|28ee291fbd50dba85d|28ee291fbd50dba85d|4419391|NZ_CABKTR010000009.1:61265-86849(REV)	d2246f26c16fb9eec9|28ee291fbd50dba85d|28ee291fbd50dba85d|4419391|NZ_CABKTR010000009.1:61265-86849(REV)_1	25087	25322	CGTTTGTACCACCGTGGTACGAACAC	5	26	26.5	86.5	53.9	0.3	True	Unknown	III-D	0.536

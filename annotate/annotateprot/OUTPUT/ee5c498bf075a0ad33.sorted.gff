@@ -1,4 +1,0 @@
-ee5c498bf075a0ad33	PRODIGAL	CDS	1	387	0	.	0	parent=894a0679fdb57b0802
-ee5c498bf075a0ad33	hmmsearch	pfam_domain	4	328	1	.	0	ID=CitMHS;domain_evalue=5.5e-26;domain_score=77.5;qlen=296;tlen=386;qstart=4;qend=295;tstart=4;tend=328
-ee5c498bf075a0ad33	hmmsearch	pfam_domain	34	370	1	.	0	ID=ArsB;domain_evalue=3.4e-25;domain_score=75.2;qlen=423;tlen=386;qstart=47;qend=407;tstart=34;tend=370
-ee5c498bf075a0ad33	hmmsearch	pfam_domain	322	372	1	.	0	ID=CitMHS;domain_evalue=5.5e-26;domain_score=77.5;qlen=296;tlen=386;qstart=117;qend=159;tstart=322;tend=372

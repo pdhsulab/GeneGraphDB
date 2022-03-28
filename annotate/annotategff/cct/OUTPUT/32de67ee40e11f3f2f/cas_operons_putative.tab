@@ -1,3 +1,0 @@
-Contig	Operon	Start	End	Prediction	Complete_Interference	Complete_Adaptation	Best_type	Best_score	Genes	Positions	E-values	CoverageSeq	CoverageHMM	Strand_Interference	Strand_Adaptation
-32de67ee40e11f3f2f|50bb0d1a9c8ea2e639|50bb0d1a9c8ea2e639|2316231|RDXH01000001.1:13097-39383(FWD)	32de67ee40e11f3f2f|50bb0d1a9c8ea2e639|50bb0d1a9c8ea2e639|2316231|RDXH01000001.1:13097-39383(FWD)@1	10441	11268	False	0%	NA	IV-B	3.0	['CysH_0_IVB']	[12]	['5.30e-03']	[0.406]	[0.446]	NA	NA
-32de67ee40e11f3f2f|47af8db9e0957dde43|47af8db9e0957dde43|6600451|JAAUPI010000139.1:0-14987(FWD)	32de67ee40e11f3f2f|47af8db9e0957dde43|47af8db9e0957dde43|6600451|JAAUPI010000139.1:0-14987(FWD)@1	2366	3040	False	0%	0%	I-A	0.0	['2OG_1_CAS-I-II-III-IV-V-VI']	[3]	['3.00e-18']	[0.4]	[0.968]	NA	NA

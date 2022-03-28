@@ -1,3 +1,0 @@
-Contig	Operon	Start	End	Prediction	Complete_Interference	Complete_Adaptation	Best_type	Best_score	Genes	Positions	E-values	CoverageSeq	CoverageHMM	Strand_Interference	Strand_Adaptation
-a0d79afeb20bd32508|3284f9cd54a3af753b|3284f9cd54a3af753b|1761761|QHCE01000064.1:14407-32916(FWD)	a0d79afeb20bd32508|3284f9cd54a3af753b|3284f9cd54a3af753b|1761761|QHCE01000064.1:14407-32916(FWD)@1	13616	15325	False	0%	NA	III-B	1.0	['TPR_0_CAS-III-B']	[20]	['6.40e-07']	[0.456]	[0.436]	NA	NA
-a0d79afeb20bd32508|a0d79afeb20bd32508|a0d79afeb20bd32508|1564551|NZ_PTIX01000013.1:56848-82618(FWD)	a0d79afeb20bd32508|a0d79afeb20bd32508|a0d79afeb20bd32508|1564551|NZ_PTIX01000013.1:56848-82618(FWD)@1	22334	22864	False	0%	0%	I-A	0.0	['2OG_1_CAS-I-II-III-IV-V-VI']	[18]	['8.80e-09']	[0.463]	[0.915]	NA	NA

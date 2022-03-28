@@ -1,2 +1,0 @@
-Contig	Operon	Start	End	Prediction	Complete_Interference	Complete_Adaptation	Best_type	Best_score	Genes	Positions	E-values	CoverageSeq	CoverageHMM	Strand_Interference	Strand_Adaptation
-7c8d22120719f2db6d|a4feb64ffd566059b5|a4feb64ffd566059b5|2352121|NZ_SNWR01000002.1:175979-201746(FWD)	7c8d22120719f2db6d|a4feb64ffd566059b5|a4feb64ffd566059b5|2352121|NZ_SNWR01000002.1:175979-201746(FWD)@1	18480	18893	False	0%	0%	I-A	0.0	['Csa3_1_CAS-I-II-III-IV-V-VI']	[21]	['4.50e-20']	[0.703]	[0.78]	NA	NA

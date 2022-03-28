@@ -1,3 +1,0 @@
-query_id,query_accession,query_len,hit_id,hit_score,hit_evalue,target_length,qstart,qend,tstart,tend
-FAS_meander,PF17951.3,146,c328360c354617b7a9,13.6,2.5e-06,364,17,75,30,88
-FAS_meander,PF17951.3,146,c328360c354617b7a9,13.6,2.5e-06,364,32,66,124,158

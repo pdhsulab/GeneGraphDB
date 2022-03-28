@@ -1,5 +1,0 @@
-13d95e27e737ac62a9	PRODIGAL	CDS	1	365	0	.	0	parent=199f6fcd868299f952
-13d95e27e737ac62a9	CCT	CCT_domain	1	365	1	.	0	ID=Cas12f1_0_CAS-V-F;full_seq_evalue=7.3e-15;full_seq_score=1;qlen=512;tlen=365;qaln_perc=36.71875;taln_perc=50.68493150684932
-13d95e27e737ac62a9	CCT	CCT_domain	1	365	1	.	0	ID=Cas12f1_1_CAS-V-F;full_seq_evalue=7.2e-09;full_seq_score=1;qlen=557;tlen=365;qaln_perc=29.443447037701976;taln_perc=49.31506849315068
-13d95e27e737ac62a9	CCT	CCT_domain	1	365	1	.	0	ID=Cas12f1_2_CAS-V-F;full_seq_evalue=7.700000000000001e-60;full_seq_score=1;qlen=429;tlen=365;qaln_perc=83.68298368298368;taln_perc=97.26027397260275
-13d95e27e737ac62a9	CCT	CCT_domain	1	365	1	.	0	ID=Cas12f2_1_CAS-V-F;full_seq_evalue=3.6e-07;full_seq_score=1;qlen=422;tlen=365;qaln_perc=40.99526066350711;taln_perc=45.75342465753425

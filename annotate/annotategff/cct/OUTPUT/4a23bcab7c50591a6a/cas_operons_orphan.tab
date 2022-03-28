@@ -1,2 +1,0 @@
-Contig	Operon	Start	End	Prediction	Complete_Interference	Complete_Adaptation	Best_type	Best_score	Genes	Positions	E-values	CoverageSeq	CoverageHMM	Strand_Interference	Strand_Adaptation
-4a23bcab7c50591a6a|ee911e1ba914f20a52|5bfc24a524cfc357e5|469811|NZ_LGTE01000004.1:12995-38393(REV)	4a23bcab7c50591a6a|ee911e1ba914f20a52|5bfc24a524cfc357e5|469811|NZ_LGTE01000004.1:12995-38393(REV)@2	15988	17514	V-F	100%	NA	V-F	4.0	['Cas12f4_0_CAS-V-F']	[16]	['7.30e-174']	[0.984]	[0.903]	1	NA

@@ -1,4 +1,0 @@
-query_id,query_accession,query_len,hit_id,hit_score,hit_evalue,target_length,qstart,qend,tstart,tend
-DUP,PF00674.20,103,f6e74b8eea638f8073,13.2,4.2e-06,359,51,90,268,309
-OrfB_Zn_ribbon,PF07282.13,69,f6e74b8eea638f8073,22.7,3.9e-09,359,1,36,103,138
-OrfB_Zn_ribbon,PF07282.13,69,f6e74b8eea638f8073,22.7,3.9e-09,359,55,69,225,239

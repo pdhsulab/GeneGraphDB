@@ -1,2 +1,0 @@
-Contig	Operon	Start	End	Prediction	Complete_Interference	Complete_Adaptation	Best_type	Best_score	Genes	Positions	E-values	CoverageSeq	CoverageHMM	Strand_Interference	Strand_Adaptation
-c7de21b826534e1702|e5b818333b2c9b67ef|e5b818333b2c9b67ef|8121071|NZ_BMWD01000037.1:993-26652(REV)	c7de21b826534e1702|e5b818333b2c9b67ef|e5b818333b2c9b67ef|8121071|NZ_BMWD01000037.1:993-26652(REV)@1	1615	2385	False	0%	NA	III-A	1.0	['AbiEii_0_CAS-III']	[2]	['9.40e-06']	[0.374]	[0.324]	NA	NA

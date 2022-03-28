@@ -1,2 +1,0 @@
-Contig	Operon	Start	End	Prediction	Complete_Interference	Complete_Adaptation	Best_type	Best_score	Genes	Positions	E-values	CoverageSeq	CoverageHMM	Strand_Interference	Strand_Adaptation
-214319fd8cc31efee9|03d1219e2cf37da4e3|03d1219e2cf37da4e3|9041531|NZ_JADMLH010000013.1:139774-166708(REV)	214319fd8cc31efee9|03d1219e2cf37da4e3|03d1219e2cf37da4e3|9041531|NZ_JADMLH010000013.1:139774-166708(REV)@1	5758	6570	False	0%	0%	I-A	1.0	['Csx18_0_CAS-I-III']	[9]	['9.80e-04']	[0.373]	[0.688]	NA	NA
