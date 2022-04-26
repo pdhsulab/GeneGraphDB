@@ -1,6 +1,7 @@
 biopython==1.79
 click==8.0.1
 dill==0.3.4
+gcsfs==2022.1.0
 google-cloud==0.34.0
 google-cloud-storage==1.44.0  # todo 2.0.0 release
 ipdb==0.13.9
