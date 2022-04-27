@@ -23,7 +23,7 @@ CDS_DOWNLOAD_DESCRIPTION_LABELS = [
 ]
 # When running breadth-first-search, grab this many samples in each study
 BFS_MAX_NUM_SAMPLES = 5
-LOCAL_MAX_NUM_STUDIES = 2
+LOCAL_MAX_NUM_STUDIES = 5
 
 
 @dataclass
@@ -79,7 +79,7 @@ def download_CDS_files(analysis_json, analysis_output_dir):
             cds_url = download["links"]["self"]
             cds_fname = download["attributes"]["alias"]
             tgt_fpath = os.path.join(analysis_output_dir, cds_fname)
-            if file_util.file_exists(tgt_fpath):
+            if file_util.exists(tgt_fpath):
                 ggdb_logging.info(f"Skipping download for {tgt_fpath} because it already exists")
             else:
                 ggdb_logging.info(f"Downloading CDS file {cds_url}")
