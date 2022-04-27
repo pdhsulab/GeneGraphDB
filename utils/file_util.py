@@ -122,7 +122,10 @@ def create_directory(path, exist_ok=True):
       ValueError: if path is a file or os.makedir fails.
     """
     fs = fs_util.get_fs_from_url(path)
-    if fs.exists(path):
+    if is_gcs_uri(path):
+        # no need to create directories in GCS
+        return
+    elif fs.exists(path):
         if exist_ok:
             return
         else:
