@@ -182,7 +182,7 @@ def full_scrape(output_dir):
             time.sleep(10)
 
 
-def main_full(full_run=False):
+def main_bfs(full_run=False):
     if full_run:
         output_dir = constants.GCS_BUCKET_NAME
         max_studies = 100  # TODO: find out how many studies in total
@@ -195,5 +195,12 @@ def main_full(full_run=False):
     breadth_first_scrape(output_dir, max_studies)
 
 
+def main():
+    output_dir = os.path.join(constants.GCS_BUCKET_NAME, "mgnify_scrape_20220426")
+    ggdb_logging.info(f"Running full scrape. Saving results to {output_dir}")
+    full_scrape(output_dir)
+
+
 if __name__ == "__main__":
-    main_full()
+    # main_full()
+    main()
