@@ -8,7 +8,7 @@ from utils import ggdb_logging
 
 V1_ENDPOINT = "https://www.ebi.ac.uk/metagenomics/api/v1/"
 # TODO: revisit
-TARGET_PIPELINE_VERSION = "4.1"
+TARGET_PIPELINE_VERSION = "5.0"
 
 
 # TODO: add test cases and move to common.util

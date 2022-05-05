@@ -182,23 +182,24 @@ def full_scrape(output_dir):
             time.sleep(10)
 
 
-def main_bfs(full_run=False):
-    if full_run:
-        output_dir = constants.GCS_BUCKET_NAME
-        max_studies = 100  # TODO: find out how many studies in total
-    else:
-        output_dir = constants.LOCAL_DATA_DIR
-        max_studies = LOCAL_MAX_NUM_STUDIES
-    output_dir = os.path.join(output_dir, "mgnify_scrape_20220426")
-    ggdb_logging.info(f"using output dir {output_dir}")
-    # full_scrape(output_dir) # TODO: full scrape instead
-    breadth_first_scrape(output_dir, max_studies)
+# def main_bfs(full_run=False):
+#     if full_run:
+#         output_dir = constants.GCS_BUCKET_NAME
+#         max_studies = 100  # TODO: find out how many studies in total
+#     else:
+#         output_dir = constants.LOCAL_DATA_DIR
+#         max_studies = LOCAL_MAX_NUM_STUDIES
+#     output_dir = os.path.join(output_dir, "mgnify_scrape_20220426")
+#     ggdb_logging.info(f"using output dir {output_dir}")
+#     # full_scrape(output_dir) # TODO: full scrape instead
+#     breadth_first_scrape(output_dir, max_studies)
 
 
 def main():
-    output_dir = os.path.join(constants.GCS_BUCKET_NAME, "mgnify_scrape_20220426")
+    output_dir = os.path.join(constants.GCS_BUCKET_NAME, "mgnify_scrape_20220505")
     ggdb_logging.info(f"Running full scrape. Saving results to {output_dir}")
     full_scrape(output_dir)
+    ggdb_logging.info("Finished scraping")
 
 
 if __name__ == "__main__":
