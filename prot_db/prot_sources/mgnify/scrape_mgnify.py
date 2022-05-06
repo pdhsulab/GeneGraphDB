@@ -17,9 +17,10 @@ SAMPLES_DIR = "samples"
 ANALYSES_DIR = "analyses"
 
 # File description in Mgnify of predicted (protein) coding sequences fasta files
-CDS_DOWNLOAD_DESCRIPTION_LABELS = [
-    "Predicted CDS with annotation",
-    "Predicted CDS without annotation",
+# NOTE: these are specific to the MGnify 5.0 software pipeline
+CDS_ANNOTATION_DOWNLOAD_DESCRIPTION_LABELS = [
+    "Predicted CDS (aa)",
+    "Combined (eggNOG, InterPro, antiSMASH) annotation",
 ]
 # When running breadth-first-search, grab this many samples in each study
 BFS_MAX_NUM_SAMPLES = 5
@@ -65,8 +66,8 @@ def save_json_to_dir(output_dir: str, json_dict: dict, label: str):
             json.dump(json_dict, fp)
 
 
-def download_CDS_files(analysis_json, analysis_output_dir):
-    """Given a Mgnify analysis json, download the relevant predicted coding sequence files.
+def download_CDS_annotation_files(analysis_json, analysis_output_dir):
+    """Given a Mgnify analysis json, download the relevant predicted coding sequence (CDS) and annotation files.
 
     Args:
         analysis_json: see mgnify_api or https://www.ebi.ac.uk/metagenomics/api/v1/analyses
@@ -75,17 +76,17 @@ def download_CDS_files(analysis_json, analysis_output_dir):
     downloads_link = analysis_json["relationships"]["downloads"]["links"]["related"]
 
     for download in mgnify_api.iterate_mgnify_url(downloads_link):
-        if download["attributes"]["description"]["label"] in CDS_DOWNLOAD_DESCRIPTION_LABELS:
-            cds_url = download["links"]["self"]
-            cds_fname = download["attributes"]["alias"]
-            tgt_fpath = os.path.join(analysis_output_dir, cds_fname)
+        if download["attributes"]["description"]["label"] in CDS_ANNOTATION_DOWNLOAD_DESCRIPTION_LABELS:
+            download_url = download["links"]["self"]
+            download_fname = os.path.basename(download_url)
+            tgt_fpath = os.path.join(analysis_output_dir, download_fname)
             if file_util.exists(tgt_fpath):
                 ggdb_logging.info(f"Skipping download for {tgt_fpath} because it already exists")
             else:
-                ggdb_logging.info(f"Downloading CDS file {cds_url}")
+                ggdb_logging.info(f"Downloading CDS/annotations file {download_url}")
                 save_json_to_dir(analysis_output_dir, download, "download")
                 with file_util.tmp_copy_on_close(tgt_fpath) as local_path:
-                    urllib.request.urlretrieve(cds_url, local_path)
+                    urllib.request.urlretrieve(download_url, local_path)
 
 
 def get_sample_to_analysis(study_id, max_num_samples=None, sample_id=None) -> Dict:
@@ -139,7 +140,7 @@ def save_analysis(study_dir, sample_id, analysis):
     analyses_dir = os.path.join(study_dir, SAMPLES_DIR, sample_id, ANALYSES_DIR, analysis["id"])
     file_util.create_directory(analyses_dir)
     save_json_to_dir(analyses_dir, analysis, "analysis")
-    download_CDS_files(analysis, analyses_dir)
+    download_CDS_annotation_files(analysis, analyses_dir)
 
 
 def breadth_first_scrape(output_dir, max_num_studies):
@@ -170,7 +171,8 @@ def depth_scrape(output_dir):
 
 
 def full_scrape(output_dir):
-    for study in mgnify_api.get_studies():
+    # TODO: remove remove
+    for study in itertools.islice(mgnify_api.get_studies(), 10):
         try:
             study_dir = save_study(output_dir, study)
             sample_to_analysis = get_sample_to_analysis(study["id"])
@@ -196,7 +198,8 @@ def full_scrape(output_dir):
 
 
 def main():
-    output_dir = os.path.join(constants.GCS_BUCKET_NAME, "mgnify_scrape_20220505")
+    # output_dir = os.path.join(constants.GCS_BUCKET_NAME, "mgnify_scrape_20220505")
+    output_dir = os.path.join("/GeneGraphDB/data/mgnify_scrape_20220505")
     ggdb_logging.info(f"Running full scrape. Saving results to {output_dir}")
     full_scrape(output_dir)
     ggdb_logging.info("Finished scraping")
