@@ -25,6 +25,9 @@ CDS_ANNOTATION_DOWNLOAD_DESCRIPTION_LABELS = [
 # When running breadth-first-search, grab this many samples in each study
 BFS_MAX_NUM_SAMPLES = 5
 LOCAL_MAX_NUM_STUDIES = 5
+# hacky error handling
+NUM_RETRIES_PER_STUDY = 3
+RETRY_SLEEP_SECONDS = 20
 
 
 @dataclass
@@ -128,11 +131,17 @@ def get_sample_to_analysis(study_id, max_num_samples=None, sample_id=None) -> Di
 
 
 def save_study(output_dir: str, study: Dict) -> str:
-    ggdb_logging.info(f"Saving study {study['id']}")
-    study_dir = os.path.join(output_dir, STUDIES_DIR, study["id"])
-    file_util.create_directory(study_dir)
-    save_json_to_dir(study_dir, study, "study")
-    return study_dir
+    for retry in range(NUM_RETRIES_PER_STUDY):
+        try:
+            ggdb_logging.info(f"Saving study {study['id']}")
+            study_dir = os.path.join(output_dir, STUDIES_DIR, study["id"])
+            file_util.create_directory(study_dir)
+            save_json_to_dir(study_dir, study, "study")
+            return study_dir
+        # TODO: different handling of ConnectionResetError vs. other errors?
+        except Exception:
+            ggdb_logging.exception(f"Error for study {study['id']}")
+            time.sleep(RETRY_SLEEP_SECONDS)
 
 
 def save_analysis(study_dir, sample_id, analysis):
@@ -163,27 +172,6 @@ def breadth_first_scrape(output_dir, max_num_studies):
             time.sleep(10)
 
 
-def depth_scrape(output_dir):
-    raise NotImplementedError()
-    # https://www.ebi.ac.uk/metagenomics/studies/MGYS00003194  grab 1000 of 17877
-    # https://www.ebi.ac.uk/metagenomics/studies/MGYS00005294  479 samples (take everything)
-    # https://www.ebi.ac.uk/metagenomics/studies/MGYS00004633 10 samples
-
-
-def full_scrape(output_dir):
-    # TODO: remove remove
-    for study in itertools.islice(mgnify_api.get_studies(), 10):
-        try:
-            study_dir = save_study(output_dir, study)
-            sample_to_analysis = get_sample_to_analysis(study["id"])
-            for sample_id, analysis in sample_to_analysis.items():
-                save_analysis(study_dir, sample_id, analysis)
-        # TODO: only catch networking errors
-        except Exception:
-            ggdb_logging.exception(f"Error for study {study['id']}")
-            time.sleep(10)
-
-
 # def main_bfs(full_run=False):
 #     if full_run:
 #         output_dir = constants.GCS_BUCKET_NAME
@@ -197,9 +185,18 @@ def full_scrape(output_dir):
 #     breadth_first_scrape(output_dir, max_studies)
 
 
+def full_scrape(output_dir):
+    # TODO: remove remove
+    for study in mgnify_api.get_studies():
+        study_dir = save_study(output_dir, study)
+        sample_to_analysis = get_sample_to_analysis(study["id"])
+        for sample_id, analysis in sample_to_analysis.items():
+            save_analysis(study_dir, sample_id, analysis)
+
+
 def main():
-    # output_dir = os.path.join(constants.GCS_BUCKET_NAME, "mgnify_scrape_20220505")
-    output_dir = os.path.join("/GeneGraphDB/data/mgnify_scrape_20220505")
+    output_dir = os.path.join(constants.GCS_BUCKET_NAME, "mgnify_scrape_20220505")
+    # output_dir = os.path.join("/GeneGraphDB/data/mgnify_scrape_20220505")
     ggdb_logging.info(f"Running full scrape. Saving results to {output_dir}")
     full_scrape(output_dir)
     ggdb_logging.info("Finished scraping")
