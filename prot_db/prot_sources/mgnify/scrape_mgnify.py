@@ -131,17 +131,11 @@ def get_sample_to_analysis(study_id, max_num_samples=None, sample_id=None) -> Di
 
 
 def save_study(output_dir: str, study: Dict) -> str:
-    for retry in range(NUM_RETRIES_PER_STUDY):
-        try:
-            ggdb_logging.info(f"Saving study {study['id']}")
-            study_dir = os.path.join(output_dir, STUDIES_DIR, study["id"])
-            file_util.create_directory(study_dir)
-            save_json_to_dir(study_dir, study, "study")
-            return study_dir
-        # TODO: different handling of ConnectionResetError vs. other errors?
-        except Exception:
-            ggdb_logging.exception(f"Error for study {study['id']}")
-            time.sleep(RETRY_SLEEP_SECONDS)
+    ggdb_logging.info(f"Saving study {study['id']}")
+    study_dir = os.path.join(output_dir, STUDIES_DIR, study["id"])
+    file_util.create_directory(study_dir)
+    save_json_to_dir(study_dir, study, "study")
+    return study_dir
 
 
 def save_analysis(study_dir, sample_id, analysis):
@@ -188,11 +182,16 @@ def breadth_first_scrape(output_dir, max_num_studies):
 def full_scrape(output_dir):
     # TODO: remove remove
     for study in mgnify_api.get_studies():
-        study_dir = save_study(output_dir, study)
-        sample_to_analysis = get_sample_to_analysis(study["id"])
-        for sample_id, analysis in sample_to_analysis.items():
-            save_analysis(study_dir, sample_id, analysis)
-
+        for retry in range(NUM_RETRIES_PER_STUDY):
+            try:
+                study_dir = save_study(output_dir, study)
+                sample_to_analysis = get_sample_to_analysis(study["id"])
+                for sample_id, analysis in sample_to_analysis.items():
+                    save_analysis(study_dir, sample_id, analysis)
+            # TODO: different handling of ConnectionResetError vs. other errors?
+            except Exception:
+                ggdb_logging.exception(f"Error for study {study['id']}")
+                time.sleep(RETRY_SLEEP_SECONDS)
 
 def main():
     output_dir = os.path.join(constants.GCS_BUCKET_NAME, "mgnify_scrape_20220505")
