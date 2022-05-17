@@ -4,10 +4,12 @@ dill==0.3.4
 fs==2.4.15
 gcsfs==2022.3.0
 google-cloud==0.34.0
+google-cloud-bigtable==2.9.0
 google-cloud-storage==1.44.0  # todo 2.0.0 release
 ipdb==0.13.9
 jupyterlab==3.2.6
 matplotlib==3.5.1
+mmh3==3.0.0
 more-itertools==8.12.0
 neo4j==4.3.1
 networkx==2.6.3
