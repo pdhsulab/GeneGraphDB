@@ -1,9 +1,7 @@
 import datetime
-import functools
 import itertools
 import json
 import os
-import random
 import re
 import subprocess
 import time
@@ -11,24 +9,21 @@ from typing import Optional
 
 import more_itertools
 
-from common import mparams
-from common.deployment import deploy_to_gce, mparams_deployer
-from common.util import file_util, git_util, mx_logging, slack_util
-from projects.cambrium.proteus import constants, pubsub_util, scrape_mgnify
-from projects.cambrium.proteus.bigtable import bigtable_constants as btc, load_indexing_queue
-from projects.cambrium.proteus.fasta_util import open_fasta
+from prot_db import bigtable_constants as btc, constants, load_indexing_queue
+from prot_db.prot_sources.mgnify import scrape_mgnify
+from utils import file_util, ggdb_logging, git_util
+from utils.fasta_util import open_fasta
 
 LOCAL_MAX_NUM_SEQUENCES_PER_FILE = 3000
 CLOUD_BIGTABLE_WRITE_BATCH_SIZE = 30000
 LOCAL_BIGTABLE_WRITE_BATCH_SIZE = 300
-
-CLOUD_SLACK_MSG_RATE = 1 / 25
 
 SEQKIT_PATTERN = re.compile(r"^\[INFO\][^ ]* (\d+) duplicated records removed$")
 
 # metric keys
 MK_NUM_UNIQ_SEQUENCES = "num_unique_sequences"
 MK_NUM_DUPLICATE_SEQUENCES = "num_duplicate_sequences"
+MK_NUM_PARTIAL_SEQUENCES = "num_partial_sequences"  # TODO: use deez
 MK_ORIG_BYTES_COMPRESSED = "num_bytes_orig_compressed"
 MK_BYTES_UNIQUE_DECOMPRESSED = "bytes_deduplicated_decompressed"
 MK_NUM_WRITES_ATTEMPTED = "num_row_writes_attempted"
@@ -42,29 +37,19 @@ MK_FINISH_UNIX_TIME = "finish_unix_time"
 MK_FAA_FPATH = "faa_filepath"
 
 
-def _get_cloud() -> bool:
-    if deploy_to_gce.PARAMS.execution_mode == "gce":
-        cloud = True
-    elif deploy_to_gce.PARAMS.execution_mode == "local":
-        cloud = False
-    else:
-        raise ValueError(f"Unrecognized exeuction_mode: {deploy_to_gce.PARAMS.execution_mode}")
-    return cloud
-
-
 def get_output_dir(cloud):
     return os.path.join(
-        constants.GCS_DERIVED_BUCKET if cloud else constants.LOCAL_DERIVED_DIR, "mgnify_indexing_200709"
+        constants.GCS_BUCKET_NAME if cloud else constants.LOCAL_DATA_DIR, "mgnify_indexing_20220517"
     )
 
 
 def count_num_entries(fpath):
-    mx_logging.info(f"Starting {fpath}")
+    ggdb_logging.info(f"Starting {fpath}")
     with file_util.tmp_copy_on_open(fpath, os.path.basename(fpath)) as local:
         counter = 0
         for _ in open_fasta(local):
             counter += 1
-    mx_logging.info(f"Found {counter} sequences in {fpath}")
+    ggdb_logging.info(f"Found {counter} sequences in {fpath}")
 
 
 def deduplicate_faa_file(faa_file: str, output_fpath: str) -> int:
@@ -88,29 +73,10 @@ def deduplicate_faa_file(faa_file: str, output_fpath: str) -> int:
     return num_duplicates
 
 
-def main_consumer(cloud):
-    slack_client = slack_util.SimpleSlackClient()
-
-    batch_size = CLOUD_BIGTABLE_WRITE_BATCH_SIZE if cloud else LOCAL_BIGTABLE_WRITE_BATCH_SIZE
-    max_seqs = None if cloud else LOCAL_MAX_NUM_SEQUENCES_PER_FILE
-
-    consumer = pubsub_util.RetryConsumer(
-        "indexer",
-        functools.partial(
-            index_faa_seqs_and_counts, cloud=cloud, batch_size=batch_size, max_seqs=max_seqs, slack_client=slack_client
-        ),
-        load_indexing_queue.get_indexer_subscription(cloud),
-        load_indexing_queue.get_counter_deadletter(cloud),
-        max_num_retries=3,
-        reack_seconds=90,
-    )
-    consumer.start()
-
-
 def index_faa_seqs_and_counts(faa_file, cloud: bool, batch_size: int, max_seqs: Optional[int], slack_client=None):
     fxn_start_time = time.time()
     num_bytes_orig_compressed = file_util.get_size(faa_file)
-    mx_logging.info(f"FAA file {faa_file} ({num_bytes_orig_compressed / 10**6: .2f} mb)")
+    ggdb_logging.info(f"FAA file {faa_file} ({num_bytes_orig_compressed / 10**6: .2f} mb)")
 
     # NOTE: the bigtable client isn't threadsafe. as a quickfix, create one client for each call to this function.
     # An alternative would be to refactor the retryconsumer to have a persisted worker thread with startup(),
@@ -132,7 +98,7 @@ def index_faa_seqs_and_counts(faa_file, cloud: bool, batch_size: int, max_seqs: 
         get_output_dir(cloud),
         f"{fpath_metadata.study_id}_{fpath_metadata.analysis_id}_{os.path.basename(faa_file)}.json",
     )
-    assert not file_util.file_exists(
+    assert not file_util.exists(
         stats_output_fpath
     ), f"Stats file for {faa_file} already exists ({stats_output_fpath}). Assuming already processed"
 
@@ -151,7 +117,7 @@ def index_faa_seqs_and_counts(faa_file, cloud: bool, batch_size: int, max_seqs: 
         # write sequences to bigtable in batches
         seqs = open_fasta(deduped_faa_file)
         if max_seqs is not None:
-            mx_logging.warning(f"Reading only first {max_seqs} sequences for debug development")
+            ggdb_logging.warning(f"Reading only first {max_seqs} sequences for debug development")
             seqs = itertools.islice(seqs, 0, max_seqs)
         # write raw sequence into table
         for seq_batch in more_itertools.chunked(seqs, batch_size):
@@ -162,7 +128,7 @@ def index_faa_seqs_and_counts(faa_file, cloud: bool, batch_size: int, max_seqs: 
                 row = table.direct_row(row_key)
                 # include raw sequence
                 row.set_cell(
-                    btc.CF_ID_SEQUENCES, btc.CID_RAW_AA_SEQ, str(seq.seq), timestamp=datetime.datetime.utcnow()
+                    btc.CF_ID_SEQUENCES, btc.COL_ID_RAW_AA_SEQ, str(seq.seq), timestamp=datetime.datetime.utcnow()
                 )
                 # include study_id:analysis_id column
                 row.set_cell(
@@ -180,59 +146,49 @@ def index_faa_seqs_and_counts(faa_file, cloud: bool, batch_size: int, max_seqs: 
             stats[MK_NUM_WRITES_ATTEMPTED] += len(rows)
             for idx, res in enumerate(results):
                 if res.code != 0:
-                    mx_logging.warning(f"Failed to write row: {res}, {idx}, {seq_batch[idx]}")
+                    ggdb_logging.warning(f"Failed to write row: {res}, {idx}, {seq_batch[idx]}")
                     stats[MK_NUM_WRITES_FAILED] += 1
-            mx_logging.info(f"Wrote {len(results)} proteins to table from {faa_file}")
+            ggdb_logging.info(f"Wrote {len(results)} proteins to table from {faa_file}")
 
         stats[MK_FINISH_UNIX_TIME] = int(time.time())
         stats[MK_TIME_TOTAL] = time.time() - fxn_start_time
-
-        # downsample slack messages for cloud deploy
-        if slack_client is not None and cloud and random.random() < CLOUD_SLACK_MSG_RATE:
-            slack_client.send_message("#i-cambrium-alerts", f"Indexed new file: {json.dumps(stats)}")
 
         stats_file_local = os.path.join(work_dir, "stats.json")
         with open(stats_file_local, "w") as f:
             json.dump(stats, f)
         file_util.copy_file(stats_file_local, stats_output_fpath)
-        mx_logging.info(f"Wrote stats to f{stats_output_fpath}")
-
-
-class IndexerDeployer(mparams_deployer.MparamsDeployer):
-    def __init__(self, cloud: bool):
-        super().__init__(filepath_to_deploy=__file__)
-        self.cloud = cloud
-
-    def execute_code(self):
-        main_consumer(self.cloud)
-
-    def output_dir(self):
-        return get_output_dir(self.cloud)
-
-    def get_gce_instance_config(self):
-        return deploy_to_gce.GCEInstanceConfig(
-            name=f"mgnify-bigtable-indexer-{int(time.time())}",
-            machine_type="n1-highmem-2",
-            service_account_email=constants.TRAINER_SERVICE_ACCOUNT,
-            gpu_type=None,
-            preemptible=True,
-        )
+        ggdb_logging.info(f"Wrote stats to f{stats_output_fpath}")
 
 
 def single_threaded_single_file():
-    """ Test logic locally, without involving pub/sub or deployer"""
+    """Test logic locally, without involving pub/sub or deployer"""
     faa_file = load_indexing_queue.get_fasta_files(cloud=False)[0]
     index_faa_seqs_and_counts(faa_file, cloud=False, batch_size=100, max_seqs=1000)
 
+# def main_consumer(cloud):
+#     batch_size = CLOUD_BIGTABLE_WRITE_BATCH_SIZE if cloud else LOCAL_BIGTABLE_WRITE_BATCH_SIZE
+#     max_seqs = None if cloud else LOCAL_MAX_NUM_SEQUENCES_PER_FILE
+#
+#     consumer = pubsub_util.RetryConsumer(
+#         "indexer",
+#         functools.partial(
+#             index_faa_seqs_and_counts, cloud=cloud, batch_size=batch_size, max_seqs=max_seqs, slack_client=slack_client
+#         ),
+#         load_indexing_queue.get_indexer_subscription(cloud),
+#         load_indexing_queue.get_counter_deadletter(cloud),
+#         max_num_retries=3,
+#         reack_seconds=90,
+#     )
+#     consumer.start()
+
 
 def main():
-    mparams.load_params()
-    cloud = _get_cloud()
-    # main_consumer(cloud)
+    cloud = False
     if cloud is False and file_util.isdir(get_output_dir(cloud=False)):
-        mx_logging.info(f"Deleting local stats at {get_output_dir(cloud=False)}")
+        ggdb_logging.info(f"Deleting local stats at {get_output_dir(cloud=False)}")
         file_util.recursive_delete(get_output_dir(cloud=False))
-    IndexerDeployer(cloud).deploy()
+    # main_consumer(cloud)
+    single_threaded_single_file()
 
 
 if __name__ == "__main__":
