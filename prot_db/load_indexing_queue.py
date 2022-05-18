@@ -1,18 +1,18 @@
 import argparse
 import os
 
-from common.util import file_util, mx_logging
-from projects.cambrium.proteus import constants, pubsub_util, scrape_mgnify
-
+from utils import file_util, ggdb_logging
+from prot_db import constants
+from prot_db.prot_sources.mgnify import scrape_mgnify
 
 
 def get_fasta_files(cloud: bool):
     if cloud:
-        faa_glob = os.path.join(constants.GCS_MGNIFY_DATA_BUCKET, "20200416_BFS", "**/*.faa.gz")
+        faa_glob = os.path.join(constants.GCS_BUCKET_NAME, "mgnify_scrape_20220505", "**/*.faa.gz")
     else:
-        faa_glob = os.path.join("/merantix_core/data/bio/MGnify_BFS/", "**/*.faa.gz")
-    faa_files = list(sorted(file_util.recursive_glob(faa_glob)))
-    mx_logging.info(f"Found {len(faa_files)} files for glob {faa_glob}")
+        faa_glob = os.path.join("/GeneGraphDB/data/mgnify_scrape_20220505/", "**/*.faa.gz")
+    faa_files = list(sorted(file_util.glob(faa_glob)))
+    ggdb_logging.info(f"Found {len(faa_files)} files for glob {faa_glob}")
     assert len(faa_files) > 0
     # check all paths can be parsed into metadata
     for fpath in faa_files:
@@ -25,6 +25,7 @@ def main():
     parser.add_argument("--cloud", action="store_true")
     args = parser.parse_args()
     cloud = args.cloud
+    # needs pubsub support
     enqueue_fasta_files(cloud)
 
 
