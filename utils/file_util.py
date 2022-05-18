@@ -214,6 +214,11 @@ def exists(path):
     return fs.exists(path)
 
 
+def recursive_delete(path):
+    fs = fs_util.get_fs_from_url(path)
+    return fs.delete(path, recursive=True)
+
+
 def copy_file(src, dest):
     """Copy a file from src to dest.
 
@@ -253,7 +258,15 @@ def get_gcs_storage_client():
 
 def glob(path: str) -> list:
     fs = fs_util.get_fs_from_url(path)
-    return fs.glob(fs)
+    return fs.glob(path)
+
+
+def get_size(path: str) -> int:
+    fs = fs_util.get_fs_from_url(path)
+    info_dict = fs.info(path)
+    # TODO: this also available for GCS?
+    size = info_dict["size"]
+    return size
 
 
 def _local_md5(fpath, blocksize=65536, base64_encode=True):
@@ -296,6 +309,7 @@ def get_gcs_blob(gcs_uri) -> Blob:
 def md5_sum(fpath):
     """Compute md5 checksum of fpath (to match GCS format, hash is base64 encoded)."""
     if is_gcs_uri(fpath):
+        # TODO: use fs.info method instead
         blob = get_gcs_blob(fpath)
         return blob.md5_hash
     else:
