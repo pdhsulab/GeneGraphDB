@@ -5,7 +5,7 @@ from typing import List, Tuple, Union
 import mmh3
 import numpy as np
 from Bio import SeqIO
-from google.cloud import bigtable
+from google.cloud.bigtable.client import Client
 from google.cloud.bigtable import column_family
 from google.cloud.environment_vars import BIGTABLE_EMULATOR
 
@@ -114,16 +114,26 @@ def get_mgnify_study_to_analysis(row):
 def get_local_client():
     # TODO: check process is running on 8086
     ggdb_logging.warning("Using local bigtable emulator")
-    # Assumes bigtable container (and this container) is running on a shared docker network.
-    # DNS name defined via --name var in prot_db/bigtable_emulator.sh
-    os.environ[BIGTABLE_EMULATOR] = "local_bigtable:8086"
-    client = bigtable.Client(admin=True, project="sweet-sweet-emulation")
+
+    # NOTE(john): my preferred method of running bigtable emulator fails due to python gRPC error
+    # Attempt 1:
+    # # Assumes bigtable container (and this container) is running on a shared docker network.
+    # # DNS name defined via --name var in prot_db/bigtable_emulator.sh
+    # os.environ[BIGTABLE_EMULATOR] = "local_bigtable:8086"
+    # Attempt 2:
+    # use default DNS name of docker host (on Docker for Mac). run bigtable on host machine via gcloud bigtable emulator
+    # https://docs.docker.com/desktop/mac/networking/
+    # os.environ[BIGTABLE_EMULATOR] = "host.docker.internal:8086"
+    # Attempt 3:
+    # Attach to running container and start emulator within running container
+    os.environ[BIGTABLE_EMULATOR] = "127.0.0.1:8086"
+    client = Client(admin=True, project="sweet-sweet-emulation")
     return client
 
 
 def get_cloud_client():
     ggdb_logging.info("Attempting to connect to cloud bigtable isntance")
-    client = bigtable.Client(admin=True, project=constants.GCP_PROJECT_ID)
+    client = Client(admin=True, project=constants.GCP_PROJECT_ID)
     return client
 
 
