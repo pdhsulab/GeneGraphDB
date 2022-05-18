@@ -30,6 +30,12 @@ RUN apt-get update && apt-get -y install apt-transport-https && \
     apt-get install -y google-cloud-sdk google-cloud-sdk-bigtable-emulator \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+# Install seqkit for optimized handling of FASTA files
+RUN wget -P /tmp/ https://github.com/shenwei356/seqkit/releases/download/v2.2.0/seqkit_linux_amd64.tar.gz && \
+    tar -xzvf /tmp/seqkit_linux_amd64.tar.gz && \
+    cp seqkit /usr/local/bin/ && \
+    rm -f /tmp/seqkit_linux_amd64.tar.gz
+
 COPY ./requirements.txt /requirements.txt
 RUN pip install --upgrade pip && \
     pip install -r /requirements.txt && \
