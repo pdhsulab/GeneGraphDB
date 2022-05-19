@@ -5,7 +5,7 @@ import os
 import re
 import subprocess
 import time
-from typing import Optional
+from typing import Dict, Optional
 
 import more_itertools
 
@@ -48,6 +48,40 @@ def count_num_entries(fpath):
         for _ in open_fasta(local):
             counter += 1
     ggdb_logging.info(f"Found {counter} sequences in {fpath}")
+
+
+def seqkit_stats(faa_file: str) -> Dict:
+    """
+    Returns e.g.
+    {'file': '/GeneGraphDB/data/mgnify_scrape_20220505/studies/MGYS00002012/samples/ERS433542/analyses/MGYA00598832/ERZ1746111_FASTA_predicted_cds.faa.gz',
+     'format': 'FASTA',
+     'type': 'Protein',
+     'num_seqs': '317950',
+     'sum_len': '71078352',
+     'min_len': '20',
+     'avg_len': '223.6',
+     'max_len': '5716'}
+    """
+    cmd = f"seqkit stats -T {faa_file}"
+    output_bytes = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
+    output = output_bytes.decode("utf-8")
+    keys, values, _ = output.split("\n")
+    stats_dict = {k: v for k, v in zip(keys.split("\t"), values.split("\t"))}
+    for key in ["num_seqs", "sum_len", "min_len", "max_len"]:
+        stats_dict[key] = int(stats_dict[key])
+    stats_dict["avg_len"] = float(stats_dict["avg_len"])
+    return stats_dict
+
+
+def remove_partial_seq(faa_file: str, output_path: str) -> int:
+    initial_stats = seqkit_stats(faa_file)
+    num_seqs_initial = initial_stats["num_seqs"]
+    cmd = f'seqkit grep -n -r -p "partial=00" {faa_file} -o {output_path}'
+    _ = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
+    final_stats = seqkit_stats(output_path)
+    num_seqs_final = final_stats["num_seqs"]
+    num_partial = num_seqs_initial - num_seqs_final
+    return num_partial
 
 
 def deduplicate_faa_file(faa_file: str, output_fpath: str) -> int:
@@ -105,11 +139,16 @@ def index_faa_seqs_and_counts(faa_file, cloud: bool, batch_size: int, max_seqs: 
         file_util.copy_file(faa_file, faa_file_local)
 
         # deduplicate redundant sequences using `seqkit` binary
+        no_partial_faa_file = os.path.join(work_dir, "no_partials.faa")
         deduped_faa_file = os.path.join(work_dir, "unique_seqs.faa")
         seqkit_start_time = time.time()
-        num_duplicates = deduplicate_faa_file(faa_file_local, deduped_faa_file)
+        num_partial = remove_partial_seq(faa_file_local, no_partial_faa_file)
+        num_duplicates = deduplicate_faa_file(no_partial_faa_file, deduped_faa_file)
+        deduped_seqkit_stats = seqkit_stats(deduped_faa_file)
         stats[MK_TIME_SEQKIT] = time.time() - seqkit_start_time
+        stats[MK_NUM_PARTIAL_SEQUENCES] = num_partial
         stats[MK_NUM_DUPLICATE_SEQUENCES] = num_duplicates
+        stats[MK_NUM_UNIQ_SEQUENCES] = deduped_seqkit_stats["num_seqs"]
         stats[MK_BYTES_UNIQUE_DECOMPRESSED] = file_util.get_size(deduped_faa_file)
 
         # write sequences to bigtable in batches
@@ -164,29 +203,11 @@ def single_threaded_single_file():
     index_faa_seqs_and_counts(faa_file, cloud=False, batch_size=100, max_seqs=1000)
 
 
-# def main_consumer(cloud):
-#     batch_size = CLOUD_BIGTABLE_WRITE_BATCH_SIZE if cloud else LOCAL_BIGTABLE_WRITE_BATCH_SIZE
-#     max_seqs = None if cloud else LOCAL_MAX_NUM_SEQUENCES_PER_FILE
-#
-#     consumer = pubsub_util.RetryConsumer(
-#         "indexer",
-#         functools.partial(
-#             index_faa_seqs_and_counts, cloud=cloud, batch_size=batch_size, max_seqs=max_seqs, slack_client=slack_client
-#         ),
-#         load_indexing_queue.get_indexer_subscription(cloud),
-#         load_indexing_queue.get_counter_deadletter(cloud),
-#         max_num_retries=3,
-#         reack_seconds=90,
-#     )
-#     consumer.start()
-
-
 def main():
     cloud = False
     if cloud is False and file_util.isdir(get_output_dir(cloud=False)):
         ggdb_logging.info(f"Deleting local stats at {get_output_dir(cloud=False)}")
         file_util.recursive_delete(get_output_dir(cloud=False))
-    # main_consumer(cloud)
     single_threaded_single_file()
 
 
