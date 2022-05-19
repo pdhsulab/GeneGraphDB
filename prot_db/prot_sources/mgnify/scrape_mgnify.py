@@ -193,6 +193,7 @@ def full_scrape(output_dir):
                 ggdb_logging.exception(f"Error for study {study['id']}")
                 time.sleep(RETRY_SLEEP_SECONDS)
 
+
 def main():
     output_dir = os.path.join(constants.GCS_BUCKET_NAME, "mgnify_scrape_20220505")
     # output_dir = os.path.join("/GeneGraphDB/data/mgnify_scrape_20220505")

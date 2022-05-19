@@ -7,7 +7,6 @@ import requests
 from utils import ggdb_logging
 
 V1_ENDPOINT = "https://www.ebi.ac.uk/metagenomics/api/v1/"
-# TODO: revisit
 TARGET_PIPELINE_VERSION = "5.0"
 
 
@@ -111,7 +110,7 @@ def get_analyses(study_id: str = None, sample_id: str = None, analyses_url: str 
     if analyses_url is None:
         analyses_url = requests.compat.urljoin(V1_ENDPOINT, f"studies/{study_id}/analyses")
 
-    # restrict to 4.1 pipeline
+    # restrict to recent pipeline version
     params = {"pipeline_version": TARGET_PIPELINE_VERSION}
 
     if sample_id is not None:

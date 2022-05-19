@@ -38,9 +38,7 @@ MK_FAA_FPATH = "faa_filepath"
 
 
 def get_output_dir(cloud):
-    return os.path.join(
-        constants.GCS_BUCKET_NAME if cloud else constants.LOCAL_DATA_DIR, "mgnify_indexing_20220517"
-    )
+    return os.path.join(constants.GCS_BUCKET_NAME if cloud else constants.LOCAL_DATA_DIR, "mgnify_indexing_20220517")
 
 
 def count_num_entries(fpath):
@@ -164,6 +162,7 @@ def single_threaded_single_file():
     """Test logic locally, without involving pub/sub or deployer"""
     faa_file = load_indexing_queue.get_fasta_files(cloud=False)[0]
     index_faa_seqs_and_counts(faa_file, cloud=False, batch_size=100, max_seqs=1000)
+
 
 # def main_consumer(cloud):
 #     batch_size = CLOUD_BIGTABLE_WRITE_BATCH_SIZE if cloud else LOCAL_BIGTABLE_WRITE_BATCH_SIZE
