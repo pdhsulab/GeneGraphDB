@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 This script will tell git to ignore prompt numbers and cell output during commit, diff, status etc.
