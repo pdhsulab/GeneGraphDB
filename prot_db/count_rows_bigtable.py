@@ -1,39 +1,39 @@
 import argparse
-from collections import defaultdict
 import json
 import os
+from collections import defaultdict
 
 from google.cloud.bigtable import row_filters
 
-from common.util import file_util, mx_logging
-from projects.cambrium.proteus.bigtable import bigtable_constants as btc
+from prot_db import bigtable_constants as btc
+from utils import file_util, ggdb_logging
 
 # LOGGING_FREQ = 25000000  # 25M
 LOGGING_FREQ = 5000000  # 5M
 SUBSAMPLE_BITS = 10
-OUTPUT_DIR = f"/merantix_core/data/bigtable_counts_subsampled_{int(2**SUBSAMPLE_BITS)}/"
+OUTPUT_DIR = f"/GeneGraphDB/data/bigtable_counts_subsampled_{int(2**SUBSAMPLE_BITS)}/"
 
 
 def log_info(num_rows, num_seqs_with_count, num_seqs_per_study_analysis):
-    # mx_logging.info(f"{num_rows} num rows")
-    # mx_logging.info(dict(num_seqs_with_count))
-    # mx_logging.info(dict(num_seqs_per_study_analysis))
+    # ggdb_logging.info(f"{num_rows} num rows")
+    # ggdb_logging.info(dict(num_seqs_with_count))
+    # ggdb_logging.info(dict(num_seqs_per_study_analysis))
     num_seqs_per_study_analysis = {k: dict(v) for k, v in num_seqs_per_study_analysis.items()}
     combined_dict = {
         "num_rows": num_rows,
         "seqs_with_count": dict(num_seqs_with_count),
         "seqs_per_study_analysis": num_seqs_per_study_analysis,
     }
-    # mx_logging.info(combined_dict)
+    # ggdb_logging.info(combined_dict)
     info_fpath = os.path.join(OUTPUT_DIR, f"{num_rows}.json")
     with file_util.tmp_copy_on_close(info_fpath) as local_fpath:
         with open(local_fpath, "w") as f:
             json.dump(combined_dict, f)
-    mx_logging.info(f"Wrote to {info_fpath}")
+    ggdb_logging.info(f"Wrote to {info_fpath}")
 
 
 def scan_table_for_counts(table):
-    mx_logging.info("Scanning for all entries:")
+    ggdb_logging.info("Scanning for all entries:")
     row_filter = row_filters.RowFilterChain(
         filters=[
             row_filters.CellsColumnLimitFilter(1),
@@ -41,7 +41,7 @@ def scan_table_for_counts(table):
             # row_filters.RowSampleFilter(sample=0.001),
         ]
     )
-    mx_logging.warning(f"Scanning only subset of table (1/{int(2**SUBSAMPLE_BITS)})")
+    ggdb_logging.warning(f"Scanning only subset of table (1/{int(2**SUBSAMPLE_BITS)})")
     start_key = btc.get_row_key_boundary(98, SUBSAMPLE_BITS)
     end_key = btc.get_row_key_boundary(99, SUBSAMPLE_BITS)
 
