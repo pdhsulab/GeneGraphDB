@@ -5,8 +5,8 @@ from typing import List, Tuple, Union
 import mmh3
 import numpy as np
 from Bio import SeqIO
-from google.cloud.bigtable.client import Client
 from google.cloud.bigtable import column_family
+from google.cloud.bigtable.client import Client
 from google.cloud.environment_vars import BIGTABLE_EMULATOR
 
 from prot_db import constants
@@ -23,12 +23,16 @@ CF_ID_SEQUENCES = "seq"
 COL_ID_RAW_AA_SEQ = "aa"
 # column relating to MGnify study as a source of data
 CF_ID_MGNIFY_STUDY = "mgn_study"
+# columns related to predicted protein attributes
+CF_ID_ANNOTATIONS = "annos"
+COL_ID_MGNIFY_ANNOS = "mgnify_v5_0"
 # garbage collection schema
 COLUMN_FAMILIES = {
     CF_ID_SEQUENCES: column_family.MaxVersionsGCRule(1),
-    # TODO: does this get rid of mgnify analyses?
     CF_ID_MGNIFY_STUDY: column_family.MaxVersionsGCRule(1),
+    CF_ID_ANNOTATIONS: column_family.MaxVersionsGCRule(1),
 }
+
 
 # define a hash(sequence) -> 64 byte row key
 _HASH_LEN = 4  # 32-bit murmurhash
@@ -99,6 +103,10 @@ def get_boundaries(num_bits):
 
 def get_seq_from_row(row):
     return row.cells[CF_ID_SEQUENCES][COL_ID_RAW_AA_SEQ.encode("utf-8")][0].value.decode()
+
+
+def get_annotations_from_row(row):
+    return row.cells[CF_ID_ANNOTATIONS][COL_ID_MGNIFY_ANNOS.encode("utf-8")][0].value.decode()
 
 
 def get_mgnify_study_to_analysis(row):
