@@ -8,10 +8,12 @@ import time
 from typing import Dict, Optional
 
 import more_itertools
+from Bio import SeqIO
+
 
 from prot_db import bigtable_constants as btc, constants, load_indexing_queue
 from prot_db.prot_sources.mgnify import scrape_mgnify
-from utils import file_util, ggdb_logging, git_util
+from utils import fasta_util, file_util, ggdb_logging, git_util
 from utils.fasta_util import open_fasta
 
 LOCAL_MAX_NUM_SEQUENCES_PER_FILE = 3000
@@ -35,6 +37,7 @@ MK_TIME_TOTAL = "time_total_seconds"
 MK_GIT_SHA = "git_sha"
 MK_FINISH_UNIX_TIME = "finish_unix_time"
 MK_FAA_FPATH = "faa_filepath"
+MK_NUM_SEQS_ANNOTATED = "num_seqs_annotated"
 
 
 def get_output_dir(cloud):
@@ -105,7 +108,25 @@ def deduplicate_faa_file(faa_file: str, output_fpath: str) -> int:
     return num_duplicates
 
 
-def index_faa_seqs_and_counts(faa_file, cloud: bool, batch_size: int, max_seqs: Optional[int], slack_client=None):
+# Use these row keys to match annotations to fasta sequences
+def _row_key_from_seq_record(seq_record: SeqIO.SeqRecord):
+    description = seq_record.description
+    fields = description.split(" # ")
+    seq_id, begin_idx, end_idx = fields[0:3]
+    # e.g. ERZ1746111.1-NODE-1-length-464040-cov-12.638829_3 -> ERZ1746111.1-NODE-1-length-464040-cov-12.638829
+    non_indexed_seq_id = seq_id.split("_", -1)[0]
+    seq_id_start_end = "@".join((non_indexed_seq_id, begin_idx, end_idx))
+    return seq_id_start_end
+
+
+def _row_key_from_gff_row(gff_row):
+    seq_id_start_end = "@".join((gff_row.seqid, gff_row.start, gff_row.end))
+    return seq_id_start_end
+
+
+def index_faa_seqs_and_counts(
+    faa_file, annotation_file, cloud: bool, batch_size: int, max_seqs: Optional[int], slack_client=None
+):
     fxn_start_time = time.time()
     num_bytes_orig_compressed = file_util.get_size(faa_file)
     ggdb_logging.info(f"FAA file {faa_file} ({num_bytes_orig_compressed / 10**6: .2f} mb)")
@@ -122,6 +143,7 @@ def index_faa_seqs_and_counts(faa_file, cloud: bool, batch_size: int, max_seqs: 
         MK_ORIG_BYTES_COMPRESSED: num_bytes_orig_compressed,
         MK_NUM_WRITES_ATTEMPTED: 0,
         MK_NUM_WRITES_FAILED: 0,
+        MK_NUM_SEQS_ANNOTATED: 0,
         MK_TIME_ROW_CONSTRUCTION: 0.0,
         MK_TIME_INDEXING: 0.0,
     }
@@ -133,6 +155,12 @@ def index_faa_seqs_and_counts(faa_file, cloud: bool, batch_size: int, max_seqs: 
     assert not file_util.exists(
         stats_output_fpath
     ), f"Stats file for {faa_file} already exists ({stats_output_fpath}). Assuming already processed"
+
+    if annotation_file:
+        gff_rows = fasta_util.parse_gff_file(annotation_file)
+        seq_attributes = {_row_key_from_gff_row(row): row.attributes for row in gff_rows}
+    else:
+        seq_attributes = {}
 
     with file_util.local_tmp_dir() as work_dir:
         faa_file_local = os.path.join(work_dir, os.path.basename(faa_file))
@@ -174,6 +202,17 @@ def index_faa_seqs_and_counts(faa_file, cloud: bool, batch_size: int, max_seqs: 
                     fpath_metadata.analysis_id,
                     timestamp=datetime.datetime.utcnow(),
                 )
+                # include mgnfiy annotation column
+                attribute_key = _row_key_from_seq_record(seq)
+                if attribute_key in seq_attributes:
+                    attributes = seq_attributes[attribute_key]
+                    row.set_cell(
+                        btc.CF_ID_ANNOTATIONS,
+                        btc.COL_ID_MGNIFY_ANNOS,
+                        attributes,
+                        timestamp=datetime.datetime.utcnow(),
+                    )
+                    stats[MK_NUM_SEQS_ANNOTATED] += 1
                 rows.append(row)
             stats[MK_TIME_ROW_CONSTRUCTION] += time.time() - batch_row_construction_start_time
 
@@ -199,16 +238,22 @@ def index_faa_seqs_and_counts(faa_file, cloud: bool, batch_size: int, max_seqs: 
 
 def single_threaded_single_file():
     """Test logic locally, without involving pub/sub or deployer"""
-    faa_file = load_indexing_queue.get_fasta_files(cloud=False)[0]
-    index_faa_seqs_and_counts(faa_file, cloud=False, batch_size=100, max_seqs=1000)
+    faa_file, anno_file = load_indexing_queue.get_fasta_files(cloud=False)[0]
+    index_faa_seqs_and_counts(faa_file, anno_file, cloud=False, batch_size=100, max_seqs=1000)
 
 
 def main():
-    cloud = False
-    if cloud is False and file_util.isdir(get_output_dir(cloud=False)):
-        ggdb_logging.info(f"Deleting local stats at {get_output_dir(cloud=False)}")
-        file_util.recursive_delete(get_output_dir(cloud=False))
-    single_threaded_single_file()
+    # single threaded consumer with no real retry
+    cloud = True
+    filenames = load_indexing_queue.get_fasta_files(cloud=cloud)
+
+    for faa_file, anno_file in filenames:
+        try:
+            index_faa_seqs_and_counts(
+                faa_file, anno_file, cloud=cloud, batch_size=CLOUD_BIGTABLE_WRITE_BATCH_SIZE, max_seqs=None
+            )
+        except Exception as e:
+            continue
 
 
 if __name__ == "__main__":
