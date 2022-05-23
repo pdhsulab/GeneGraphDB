@@ -260,7 +260,7 @@ def glob(path: str) -> list:
     fs = fs_util.get_fs_from_url(path)
     globbed_paths = fs.glob(path)
     if is_gcs_uri(path):
-        globbed_paths = ["gs://" + path for path in globbed_paths]
+        globbed_paths = [GCS_PREFIX + path for path in globbed_paths]
     return globbed_paths
 
 

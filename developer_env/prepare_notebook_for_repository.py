@@ -30,8 +30,8 @@ So when you change the file format of this, (1) you need update all other notebo
 and (2) notify the other developers, as changing all notebooks could cause issues.
 ********************************************************************************
 """
-import sys
 import json
+import sys
 
 nb = sys.stdin.read()
 
@@ -62,6 +62,8 @@ def strip_output_from_cell(cell):
         cell["outputs"] = []
     if "execution_count" in cell:
         cell["execution_count"] = None
+    if "id" in cell:
+        cell["id"] = None
     if "metadata" not in cell:
         cell["metadata"] = {}
     if "ExecuteTime" in cell["metadata"]:
