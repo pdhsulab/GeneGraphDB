@@ -5,6 +5,7 @@ from typing import List
 from utils import ggdb_logging
 
 DEFAULT_DATABASE_FILE = "/GeneGraphDB/data/genegraph.db"
+DEFAULT_SEQUENCE_DB_FILE = "/GeneGraphDB/data/20220322_80kprotein_stats.db"
 
 
 class SimpleSqlDb:
@@ -60,3 +61,20 @@ class SimpleSqlDb:
         assert len(rows) > 0, f"No clusters found for p30 {p30_hash}"
         cur.close()
         return rows
+
+
+class SequenceSqlDb:
+    def __init__(self, database_file=DEFAULT_SEQUENCE_DB_FILE):
+        if not os.path.exists(database_file):
+            raise FileNotFoundError(f"Can't find database file '{database_file}'")
+        self.conn = sqlite3.connect(database_file)
+        self.conn.row_factory = sqlite3.Row
+
+    def get_sequence(self, protein_id) -> str:
+        cur = self.conn.cursor()
+        cmd = f"SELECT sequence FROM proteins WHERE pid is '{protein_id}'"
+        cur.execute(cmd)
+        row = cur.fetchone()
+        aa_sequence = row["sequence"]
+        cur.close()
+        return aa_sequence
