@@ -75,6 +75,6 @@ class SequenceSqlDb:
         cmd = f"SELECT sequence FROM proteins WHERE pid is '{protein_id}'"
         cur.execute(cmd)
         row = cur.fetchone()
-        aa_sequence = row['sequence']
+        aa_sequence = row["sequence"]
         cur.close()
         return aa_sequence
