@@ -55,14 +55,14 @@ def scan_table_for_counts(table):
         num_rows += 1
         if btc.CF_ID_MGNIFY_STUDY in row.cells:
             cells = row.cells[btc.CF_ID_MGNIFY_STUDY]
-            num_occurences = 0
+            num_occurrences = 0
             for study_id, analysis_cells in cells.items():
                 study_id = study_id.decode()
                 for analysis_cell in analysis_cells:
                     analysis_id = analysis_cell.value
-                    num_occurences += 1
+                    num_occurrences += 1
                     num_seqs_per_study_analysis[study_id][analysis_id.decode()] += 1
-            num_seqs_with_count[num_occurences] += 1
+            num_seqs_with_count[num_occurrences] += 1
 
         if num_rows % LOGGING_FREQ == 0:
             log_info(num_rows, num_seqs_with_count, num_seqs_per_study_analysis)
