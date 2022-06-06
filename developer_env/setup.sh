@@ -19,6 +19,7 @@ DOCKER_BASH_HISTORY="$GENEGRAPHDB_REPO_DIR/data/docker.bash_history"
 touch $DOCKER_BASH_HISTORY
 
 DOCKER_IMAGE="genegraphdb"
+EMBEDDING_DOCKER_IMAGE = "prot_embedding"
 NEO4J_NETWORK_NAME="neo4j_network"
 NEO4J_DIR="$GENEGRAPHDB_REPO_DIR/data/neo4j"
 
@@ -68,4 +69,29 @@ alias ggdb_neo4j_run="docker run -d --rm \
     --network $NEO4J_NETWORK_NAME \
     neo4j:latest"
 
-alias ggdb_build_embedding_docker_image="docker build -t prot_embedding $GENEGRAPHDB_REPO_DIR/developer_env/prot_embedding_image"
+# For protein embeddings
+alias ggdb_build_embedding_docker_image="docker build -t $EMBEDDING_DOCKER_IMAGE $GENEGRAPHDB_REPO_DIR/developer_env/prot_embedding_image"
+
+# different docker image. enable gpus
+alias ggdb_embedding_jupyter="docker run -it --rm \
+    --hostname localhost \
+    -v $GENEGRAPHDB_REPO_DIR:/GeneGraphDB \
+    -v $HOME/.config/gcloud:/root/.config/gcloud \
+    -v $GENEGRAPHDB_REPO_DIR/data/docker.bash_history:/root/.bash_history \
+    -p 0.0.0.0:8888:8888 \
+    --network $NEO4J_NETWORK_NAME \
+    --gpus all \
+    $EMBEDDING_DOCKER_IMAGE \
+    jupyter notebook \
+        --port=8888 \
+        --ip=0.0.0.0 \
+        --allow-root \
+        --no-browser \
+        --NotebookApp.custom_display_url=http://localhost:8888"
+
+alias ggdb_embedding_run="docker run -it --rm \
+    -v $GENEGRAPHDB_REPO_DIR:/GeneGraphDB \
+    -v $HOME/.config/gcloud:/root/.config/gcloud \
+    -v $GENEGRAPHDB_REPO_DIR/data/docker.bash_history:/root/.bash_history \
+    --network $NEO4J_NETWORK_NAME \
+    $EMBEDDING_DOCKER_IMAGE"
