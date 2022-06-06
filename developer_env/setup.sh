@@ -67,3 +67,5 @@ alias ggdb_neo4j_run="docker run -d --rm \
     --env NEO4J_AUTH=neo4j/test \
     --network $NEO4J_NETWORK_NAME \
     neo4j:latest"
+
+alias ggdb_build_embedding_docker_image="docker build -t prot_embedding $DOCKER_IMAGE $GENEGRAPHDB_REPO_DIR/developer_env/prot_embedding_image"
