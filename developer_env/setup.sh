@@ -72,12 +72,13 @@ alias ggdb_neo4j_run="docker run -d --rm \
 # For protein embeddings
 alias ggdb_build_embedding_docker_image="docker build -t $EMBEDDING_DOCKER_IMAGE $GENEGRAPHDB_REPO_DIR/developer_env/prot_embedding_image"
 
-# different docker image. enable gpus
+# different docker image. enable gpus. extra dir to save torch model in
 alias ggdb_embedding_jupyter="docker run -it --rm \
     --hostname localhost \
     -v $GENEGRAPHDB_REPO_DIR:/GeneGraphDB \
     -v $HOME/.config/gcloud:/root/.config/gcloud \
     -v $GENEGRAPHDB_REPO_DIR/data/docker.bash_history:/root/.bash_history \
+    -v $GENEGRAPHDB_REPO_DIR/data/torch_hub:/root/.cache/torch/hub \
     -p 0.0.0.0:8888:8888 \
     --network $NEO4J_NETWORK_NAME \
     --gpus all \
@@ -93,5 +94,6 @@ alias ggdb_embedding_run="docker run -it --rm \
     -v $GENEGRAPHDB_REPO_DIR:/GeneGraphDB \
     -v $HOME/.config/gcloud:/root/.config/gcloud \
     -v $GENEGRAPHDB_REPO_DIR/data/docker.bash_history:/root/.bash_history \
+    -v $GENEGRAPHDB_REPO_DIR/data/torch_hub:/root/.cache/torch/hub \
     --network $NEO4J_NETWORK_NAME \
     $EMBEDDING_DOCKER_IMAGE"
