@@ -19,7 +19,7 @@ DOCKER_BASH_HISTORY="$GENEGRAPHDB_REPO_DIR/data/docker.bash_history"
 touch $DOCKER_BASH_HISTORY
 
 DOCKER_IMAGE="genegraphdb"
-EMBEDDING_DOCKER_IMAGE = "prot_embedding"
+EMBEDDING_DOCKER_IMAGE="prot_embedding"
 NEO4J_NETWORK_NAME="neo4j_network"
 NEO4J_DIR="$GENEGRAPHDB_REPO_DIR/data/neo4j"
 
