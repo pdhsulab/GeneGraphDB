@@ -35,7 +35,14 @@ alias ggdb_docker_run="docker run -it --rm \
     -v $GENEGRAPHDB_REPO_DIR/data/docker.bash_history:/root/.bash_history \
     --network $NEO4J_NETWORK_NAME \
     $DOCKER_IMAGE"
-    # -v /home/jupyter/GeneGraphDB/genegraph.db:/GeneGraphDB/data/genegraph.db \
+
+alias ggdb_docker_streamlit="docker run -it --rm \
+    -v $GENEGRAPHDB_REPO_DIR:/GeneGraphDB \
+    -v $HOME/.config/gcloud:/root/.config/gcloud \
+    -v $GENEGRAPHDB_REPO_DIR/data/docker.bash_history:/root/.bash_history \
+    -p 0.0.0.0:8501:8501 \
+    --network $NEO4J_NETWORK_NAME \
+    $DOCKER_IMAGE"
 
 alias ggdb_docker_jupyter="docker run -it --rm \
     --hostname localhost \
